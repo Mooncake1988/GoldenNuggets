@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import Uppy from "@uppy/core";
 import { DashboardModal } from "@uppy/react";
@@ -52,6 +52,7 @@ export function ObjectUploader({
   const handleOpenModal = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Opening upload modal - button clicked');
     setShowModal(true);
   };
 
@@ -66,14 +67,16 @@ export function ObjectUploader({
         {children}
       </Button>
 
-      <DashboardModal
-        uppy={uppy}
-        open={showModal}
-        onRequestClose={() => setShowModal(false)}
-        proudlyDisplayPoweredByUppy={false}
-        disablePageScrollWhenModalOpen={true}
-        animateOpenClose={false}
-      />
+      {showModal && (
+        <DashboardModal
+          uppy={uppy}
+          open={showModal}
+          onRequestClose={() => setShowModal(false)}
+          proudlyDisplayPoweredByUppy={false}
+          disablePageScrollWhenModalOpen={true}
+          animateOpenClose={false}
+        />
+      )}
     </div>
   );
 }
