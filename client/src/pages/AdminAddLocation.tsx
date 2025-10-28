@@ -9,14 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import { Upload, X } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
-
-const categories = ["Coffee Shop", "Restaurant", "Beach", "Hike", "Market", "Bar"];
+import type { Category } from "@shared/schema";
 
 export default function AdminAddLocation() {
   const { toast } = useToast();
@@ -35,6 +34,11 @@ export default function AdminAddLocation() {
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+    enabled: isAuthenticated,
+  });
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -167,8 +171,8 @@ export default function AdminAddLocation() {
                       data-testid="select-category"
                     >
                       <option value="">Select a category</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
+                      {categories?.map((cat) => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
                       ))}
                     </select>
                   </div>

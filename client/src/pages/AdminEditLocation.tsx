@@ -15,9 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import { Upload, X, Loader2 } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
-import type { Location } from "@shared/schema";
-
-const categories = ["Coffee Shop", "Restaurant", "Beach", "Hike", "Market", "Bar"];
+import type { Location, Category } from "@shared/schema";
 
 export default function AdminEditLocation() {
   const { toast } = useToast();
@@ -41,6 +39,11 @@ export default function AdminEditLocation() {
 
   const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
     queryKey: ["/api/locations"],
+  });
+
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+    enabled: isAuthenticated,
   });
 
   const currentLocation = locations?.find(loc => loc.id === locationId);
@@ -200,8 +203,8 @@ export default function AdminEditLocation() {
                       data-testid="select-category"
                     >
                       <option value="">Select a category</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
+                      {categories?.map((cat) => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
                       ))}
                     </select>
                   </div>
