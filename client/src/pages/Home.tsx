@@ -29,15 +29,15 @@ export default function Home() {
 
   const { data: locations, isLoading, error } = useQuery<Location[]>({
     queryKey: searchQuery ? ["/api/locations/search", searchQuery] : ["/api/locations"],
-    queryFn: searchQuery 
-      ? async () => {
-          const res = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
-          if (!res.ok) {
-            throw new Error(`Search failed: ${res.statusText}`);
-          }
-          return res.json();
+    ...(searchQuery && {
+      queryFn: async () => {
+        const res = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
+        if (!res.ok) {
+          throw new Error(`Search failed: ${res.statusText}`);
         }
-      : undefined,
+        return res.json();
+      }
+    }),
   });
 
   return (
