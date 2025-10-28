@@ -8,7 +8,7 @@ Cape Town Golden Nuggets is a fully functional travel discovery web application 
 - **Admin Dashboard**: Secure admin interface for managing locations with multi-image uploads
 - **Interactive Map**: Leaflet-based map view with location markers and navigation
 - **Location Details**: Full detail pages with image galleries, descriptions, and directions
-- **Authentication**: Replit Auth (OIDC) integration for admin access
+- **Authentication**: Secure username/password authentication for admin-only access
 - **Object Storage**: Google Cloud Storage integration for location images
 
 **Status**: Production-ready with complete CRUD functionality, authentication, and image upload capabilities.
@@ -54,8 +54,9 @@ Preferred communication style: Simple, everyday language.
 **API Design**: RESTful API endpoints with JSON responses
 
 **Authentication**: 
-- Replit Auth integration using OpenID Connect (OIDC)
-- Passport.js strategy for authentication flow
+- Simple username/password authentication for single admin access
+- Passport.js with Local Strategy for authentication flow
+- Admin credentials stored securely in environment variables (ADMIN_USERNAME, ADMIN_PASSWORD)
 - Session-based authentication with secure HTTP-only cookies
 - Session storage in PostgreSQL using connect-pg-simple
 
@@ -81,18 +82,14 @@ Preferred communication style: Simple, everyday language.
 
 **Schema Design**:
 
-1. **Users Table**: Stores user profiles from Replit Auth
-   - ID, email, first name, last name, profile image
-   - Timestamps for creation and updates
-
-2. **Locations Table**: Core content model
+1. **Locations Table**: Core content model
    - Name, category, neighborhood, description, address
    - Latitude/longitude for map positioning
    - Array fields for images and tags
    - Featured flag for highlighting premium content
    - Timestamps for creation and updates
 
-3. **Sessions Table**: Manages user authentication sessions
+2. **Sessions Table**: Manages admin authentication sessions
    - Session ID, session data (JSONB), expiration timestamp
    - Indexed on expiration for efficient cleanup
 
@@ -103,9 +100,9 @@ Preferred communication style: Simple, everyday language.
 
 ### External Dependencies
 
-**Authentication & User Management**:
-- Replit Auth (OpenID Connect provider)
-- Passport.js for authentication strategy implementation
+**Authentication**:
+- Passport.js with Local Strategy for username/password authentication
+- Environment variables for secure credential storage
 
 **Cloud Services**:
 - Google Cloud Storage for image/object storage
@@ -151,8 +148,13 @@ Preferred communication style: Simple, everyday language.
 - `DATABASE_URL`: PostgreSQL connection string
 - `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`: Individual connection params
 
-**Authentication** (managed by Replit Auth integration):
+**Authentication**:
 - `SESSION_SECRET`: Secret for session cookie signing
+- `ADMIN_USERNAME`: Admin username for login (set in Replit Secrets)
+- `ADMIN_PASSWORD`: Admin password for login (set in Replit Secrets)
+  - Can be stored as plain text or bcrypt hash
+  - For better security, use a bcrypt hash (starting with $2a$, $2b$, or $2y$ and 60 chars long)
+  - System auto-detects and handles both formats
 
 ## Key Features Implemented
 

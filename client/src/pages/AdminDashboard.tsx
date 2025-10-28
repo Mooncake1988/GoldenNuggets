@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, MapPin, Edit, Trash2 } from "lucide-react";
+import { Plus, MapPin, Edit, Trash2, LogOut } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -24,11 +24,28 @@ export default function AdminDashboard() {
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        window.location.href = "/admin/login";
       }, 500);
       return;
     }
   }, [isAuthenticated, isLoading, toast]);
+
+  const handleLogout = async () => {
+    try {
+      await apiRequest("/api/auth/logout", "POST", {});
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      });
+      window.location.href = "/";
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to log out",
+        variant: "destructive",
+      });
+    }
+  };
 
   const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
     queryKey: ["/api/locations"],
@@ -54,7 +71,7 @@ export default function AdminDashboard() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/admin/login";
         }, 500);
         return;
       }
@@ -93,6 +110,10 @@ export default function AdminDashboard() {
                   Add Location
                 </Button>
               </Link>
+              <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
 

@@ -1,22 +1,45 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { insertLocationSchema, insertCategorySchema } from "@shared/schema";
+import passport from "passport";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
-  app.get('/api/auth/user', isAuthenticated, async (req: Request, res) => {
-    try {
-      const userId = (req.user as any)?.claims?.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
+  // Login endpoint
+  app.post('/api/auth/login', (req, res, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal server error" });
+      }
+      if (!user) {
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Login failed" });
+        }
+        return res.json({ user });
+      });
+    })(req, res, next);
+  });
+
+  // Logout endpoint
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  // Get current user endpoint
+  app.get('/api/auth/user', isAuthenticated, (req: Request, res) => {
+    res.json({ user: req.user });
   });
 
   app.get("/objects/:objectPath(*)", async (req, res) => {
@@ -43,13 +66,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.body.imageURL) {
       return res.status(400).json({ error: "imageURL is required" });
     }
-    const userId = (req.user as any)?.claims?.sub;
     try {
       const objectStorageService = new ObjectStorageService();
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
         req.body.imageURL,
         {
-          owner: userId,
+          owner: "admin",
           visibility: "public",
         },
       );
