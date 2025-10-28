@@ -32,7 +32,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await apiRequest("/api/auth/logout", "POST", {});
+      await apiRequest("POST", "/api/auth/logout", {});
       toast({
         title: "Success",
         description: "Logged out successfully",

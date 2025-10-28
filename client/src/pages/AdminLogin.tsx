@@ -29,7 +29,7 @@ export default function AdminLogin() {
     setIsSubmitting(true);
 
     try {
-      await apiRequest("/api/auth/login", "POST", {
+      await apiRequest("POST", "/api/auth/login", {
         username,
         password,
       });
