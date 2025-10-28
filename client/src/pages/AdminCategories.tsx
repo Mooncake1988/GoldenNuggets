@@ -80,7 +80,7 @@ export default function AdminCategories() {
       }
       toast({
         title: "Error",
-        description: "Failed to create category",
+        description: error.message || "Failed to create category",
         variant: "destructive",
       });
     },
@@ -115,7 +115,7 @@ export default function AdminCategories() {
       }
       toast({
         title: "Error",
-        description: "Failed to update category",
+        description: error.message || "Failed to update category",
         variant: "destructive",
       });
     },
@@ -146,7 +146,7 @@ export default function AdminCategories() {
       }
       toast({
         title: "Error",
-        description: "Failed to delete category",
+        description: error.message || "Failed to delete category",
         variant: "destructive",
       });
     },

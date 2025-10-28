@@ -101,7 +101,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Category not found" });
       }
       const parsed = insertCategorySchema.partial().parse(req.body);
+      
+      // Check if the new name already exists (if renaming)
+      if (parsed.name && parsed.name !== existing.name) {
+        const allCategories = await storage.getAllCategories();
+        const duplicateName = allCategories.find(
+          cat => cat.id !== req.params.id && cat.name === parsed.name
+        );
+        if (duplicateName) {
+          return res.status(400).json({ error: "A category with this name already exists" });
+        }
+      }
+      
+      // Update the category
       const category = await storage.updateCategory(req.params.id, parsed);
+      
+      // If the category name changed, update all locations with the old category name
+      if (parsed.name && parsed.name !== existing.name) {
+        const allLocations = await storage.getAllLocations();
+        const locationsToUpdate = allLocations.filter(loc => loc.category === existing.name);
+        
+        for (const location of locationsToUpdate) {
+          await storage.updateLocation(location.id, { category: parsed.name });
+        }
+      }
+      
       res.json(category);
     } catch (error) {
       console.error("Error updating category:", error);
