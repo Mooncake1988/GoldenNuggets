@@ -23,6 +23,14 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const categories = pgTable("categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const locations = pgTable("locations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -45,6 +53,12 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
+export const insertCategorySchema = createInsertSchema(categories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertLocationSchema = createInsertSchema(locations).omit({
   id: true,
   createdAt: true,
@@ -53,5 +67,7 @@ export const insertLocationSchema = createInsertSchema(locations).omit({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type InsertCategory = z.infer<typeof insertCategorySchema>;
+export type Category = typeof categories.$inferSelect;
 export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;

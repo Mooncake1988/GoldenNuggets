@@ -1,9 +1,12 @@
 import {
   users,
   locations,
+  categories,
   type User,
   type Location,
   type InsertLocation,
+  type Category,
+  type InsertCategory,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -19,6 +22,11 @@ export interface UpsertUser {
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  getAllCategories(): Promise<Category[]>;
+  getCategory(id: string): Promise<Category | undefined>;
+  createCategory(category: InsertCategory): Promise<Category>;
+  updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category>;
+  deleteCategory(id: string): Promise<void>;
   getAllLocations(): Promise<Location[]>;
   getLocation(id: string): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
@@ -45,6 +53,33 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async getAllCategories(): Promise<Category[]> {
+    return await db.select().from(categories);
+  }
+
+  async getCategory(id: string): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.id, id));
+    return category;
+  }
+
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const [newCategory] = await db.insert(categories).values(category).returning();
+    return newCategory;
+  }
+
+  async updateCategory(id: string, categoryData: Partial<InsertCategory>): Promise<Category> {
+    const [updated] = await db
+      .update(categories)
+      .set({ ...categoryData, updatedAt: new Date() })
+      .where(eq(categories.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    await db.delete(categories).where(eq(categories.id, id));
   }
 
   async getAllLocations(): Promise<Location[]> {

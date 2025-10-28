@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertLocationSchema } from "@shared/schema";
+import { insertLocationSchema, insertCategorySchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
@@ -57,6 +57,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error setting location image:", error);
       res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const categories = await storage.getAllCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+
+  app.get("/api/categories/:id", async (req, res) => {
+    try {
+      const category = await storage.getCategory(req.params.id);
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      res.json(category);
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      res.status(500).json({ error: "Failed to fetch category" });
+    }
+  });
+
+  app.post("/api/categories", isAuthenticated, async (req, res) => {
+    try {
+      const parsed = insertCategorySchema.parse(req.body);
+      const category = await storage.createCategory(parsed);
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(400).json({ error: "Invalid category data" });
+    }
+  });
+
+  app.put("/api/categories/:id", isAuthenticated, async (req, res) => {
+    try {
+      const existing = await storage.getCategory(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      const parsed = insertCategorySchema.partial().parse(req.body);
+      const category = await storage.updateCategory(req.params.id, parsed);
+      res.json(category);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      res.status(400).json({ error: "Invalid category data" });
+    }
+  });
+
+  app.delete("/api/categories/:id", isAuthenticated, async (req, res) => {
+    try {
+      const existing = await storage.getCategory(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      await storage.deleteCategory(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ error: "Failed to delete category" });
     }
   });
 
