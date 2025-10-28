@@ -81,12 +81,19 @@ export default function AdminDashboard() {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
               <p className="text-muted-foreground">Manage your Cape Town Golden Nuggets</p>
             </div>
-            <Link href="/admin/add">
-              <Button data-testid="button-add-location">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Location
-              </Button>
-            </Link>
+            <div className="flex gap-3">
+              <Link href="/admin/categories">
+                <Button variant="outline" data-testid="button-manage-categories">
+                  Manage Categories
+                </Button>
+              </Link>
+              <Link href="/admin/add">
+                <Button data-testid="button-add-location">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Location
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

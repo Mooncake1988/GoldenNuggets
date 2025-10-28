@@ -9,6 +9,7 @@ import MapPage from "@/pages/MapPage";
 import LocationDetail from "@/pages/LocationDetail";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminCategories from "@/pages/AdminCategories";
 import AdminAddLocation from "@/pages/AdminAddLocation";
 import AdminEditLocation from "@/pages/AdminEditLocation";
 import NotFound from "@/pages/not-found";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/location/:id" component={LocationDetail} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/categories" component={AdminCategories} />
       <Route path="/admin/add" component={AdminAddLocation} />
       <Route path="/admin/edit/:id" component={AdminEditLocation} />
       <Route component={NotFound} />
