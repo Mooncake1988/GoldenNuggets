@@ -1,15 +1,120 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { insertLocationSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  await setupAuth(app);
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  app.get('/api/auth/user', isAuthenticated, async (req: Request, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    res.json({ method: "PUT", url: uploadURL });
+  });
+
+  app.post("/api/locations/image", isAuthenticated, async (req: Request, res) => {
+    if (!req.body.imageURL) {
+      return res.status(400).json({ error: "imageURL is required" });
+    }
+    const userId = (req.user as any)?.claims?.sub;
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        req.body.imageURL,
+        {
+          owner: userId,
+          visibility: "public",
+        },
+      );
+      res.status(200).json({ objectPath });
+    } catch (error) {
+      console.error("Error setting location image:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/locations", async (req, res) => {
+    try {
+      const locations = await storage.getAllLocations();
+      res.json(locations);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      res.status(500).json({ error: "Failed to fetch locations" });
+    }
+  });
+
+  app.get("/api/locations/:id", async (req, res) => {
+    try {
+      const location = await storage.getLocation(req.params.id);
+      if (!location) {
+        return res.status(404).json({ error: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      console.error("Error fetching location:", error);
+      res.status(500).json({ error: "Failed to fetch location" });
+    }
+  });
+
+  app.post("/api/locations", isAuthenticated, async (req, res) => {
+    try {
+      const parsed = insertLocationSchema.parse(req.body);
+      const location = await storage.createLocation(parsed);
+      res.status(201).json(location);
+    } catch (error) {
+      console.error("Error creating location:", error);
+      res.status(400).json({ error: "Invalid location data" });
+    }
+  });
+
+  app.put("/api/locations/:id", isAuthenticated, async (req, res) => {
+    try {
+      const parsed = insertLocationSchema.partial().parse(req.body);
+      const location = await storage.updateLocation(req.params.id, parsed);
+      res.json(location);
+    } catch (error) {
+      console.error("Error updating location:", error);
+      res.status(400).json({ error: "Invalid location data" });
+    }
+  });
+
+  app.delete("/api/locations/:id", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteLocation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting location:", error);
+      res.status(500).json({ error: "Failed to delete location" });
+    }
+  });
 
   const httpServer = createServer(app);
-
   return httpServer;
 }

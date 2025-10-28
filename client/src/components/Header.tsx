@@ -39,7 +39,7 @@ export default function Header() {
                 Map View
               </span>
             </Link>
-            <Link href="/admin" data-testid="link-nav-admin">
+            <Link href="/admin/login" data-testid="link-nav-admin">
               <Button variant="outline" size="sm">
                 Admin Login
               </Button>
@@ -74,7 +74,7 @@ export default function Header() {
                 Map View
               </span>
             </Link>
-            <Link href="/admin" data-testid="link-mobile-admin">
+            <Link href="/admin/login" data-testid="link-mobile-admin">
               <Button variant="outline" size="sm" className="mt-2 w-full">
                 Admin Login
               </Button>
