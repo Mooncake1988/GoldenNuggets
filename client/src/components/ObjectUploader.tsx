@@ -37,6 +37,7 @@ export function ObjectUploader({
         allowedFileTypes: ['image/*'],
       },
       autoProceed: false,
+      allowMultipleUploadBatches: false,
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
@@ -48,9 +49,20 @@ export function ObjectUploader({
       })
   );
 
+  const handleOpenModal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowModal(true);
+  };
+
   return (
     <div>
-      <Button onClick={() => setShowModal(true)} className={buttonClassName} type="button">
+      <Button 
+        onClick={handleOpenModal} 
+        className={buttonClassName} 
+        type="button"
+        data-testid="button-upload-images"
+      >
         {children}
       </Button>
 
@@ -59,6 +71,8 @@ export function ObjectUploader({
         open={showModal}
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
+        disablePageScrollWhenModalOpen={true}
+        animateOpenClose={false}
       />
     </div>
   );
