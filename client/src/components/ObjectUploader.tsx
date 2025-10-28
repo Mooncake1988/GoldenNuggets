@@ -36,16 +36,26 @@ export function ObjectUploader({
         maxFileSize,
         allowedFileTypes: ['image/*'],
       },
-      autoProceed: false,
-      allowMultipleUploadBatches: false,
+      autoProceed: true,
+      allowMultipleUploadBatches: true,
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
         getUploadParameters: onGetUploadParameters,
       })
       .on("complete", (result) => {
+        console.log('Upload complete:', result);
         onComplete?.(result);
         setShowModal(false);
+      })
+      .on("upload", () => {
+        console.log('Upload started');
+      })
+      .on("upload-success", (file, response) => {
+        console.log('File uploaded successfully:', file?.name, response);
+      })
+      .on("error", (error) => {
+        console.error('Upload error:', error);
       })
   );
 
