@@ -9,6 +9,7 @@ import LocationDetail from "@/pages/LocationDetail";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminAddLocation from "@/pages/AdminAddLocation";
+import AdminEditLocation from "@/pages/AdminEditLocation";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/add" component={AdminAddLocation} />
+      <Route path="/admin/edit/:id" component={AdminEditLocation} />
       <Route component={NotFound} />
     </Switch>
   );
