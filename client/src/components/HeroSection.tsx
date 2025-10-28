@@ -2,8 +2,32 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import heroImage from "@assets/generated_images/Cape_Town_Table_Mountain_hero_ec65eba7.png";
+import { useState, FormEvent, useEffect, useMemo } from "react";
+import { useLocation } from "wouter";
 
 export default function HeroSection() {
+  const [location, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const currentSearchParam = useMemo(() => {
+    const params = new URLSearchParams(location.split('?')[1]);
+    return params.get('search') || '';
+  }, [location]);
+
+  useEffect(() => {
+    setSearchQuery(currentSearchParam);
+  }, [currentSearchParam]);
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedQuery) {
+      setLocation(`/?search=${encodeURIComponent(trimmedQuery)}`);
+    } else {
+      setLocation('/');
+    }
+  };
+
   return (
     <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center">
       <div
@@ -21,18 +45,22 @@ export default function HeroSection() {
         </p>
         
         <div className="max-w-2xl mx-auto">
-          <div className="flex gap-2 bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/20">
-            <Input
-              type="search"
-              placeholder="Search for coffee shops, restaurants, experiences..."
-              className="bg-white text-foreground border-0 h-12 text-base"
-              data-testid="input-hero-search"
-            />
-            <Button size="lg" className="shrink-0" data-testid="button-hero-search">
-              <Search className="h-5 w-5 md:mr-2" />
-              <span className="hidden md:inline">Search</span>
-            </Button>
-          </div>
+          <form onSubmit={handleSearch}>
+            <div className="flex gap-2 bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/20">
+              <Input
+                type="search"
+                placeholder="Search for coffee shops, restaurants, experiences..."
+                className="bg-white text-foreground border-0 h-12 text-base"
+                data-testid="input-hero-search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Button type="submit" size="lg" className="shrink-0" data-testid="button-hero-search">
+                <Search className="h-5 w-5 md:mr-2" />
+                <span className="hidden md:inline">Search</span>
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </section>
