@@ -1,6 +1,7 @@
-import { MapPin, ExternalLink } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
 
 interface LocationCardProps {
   id: string;
@@ -10,7 +11,6 @@ interface LocationCardProps {
   description: string;
   image: string;
   tags: string[];
-  onClick?: () => void;
 }
 
 export default function LocationCard({
@@ -21,23 +21,25 @@ export default function LocationCard({
   description,
   image,
   tags,
-  onClick,
 }: LocationCardProps) {
   return (
-    <Card
-      className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-300"
-      onClick={() => {
-        onClick?.();
-        console.log(`Location clicked: ${name}`);
-      }}
-      data-testid={`card-location-${id}`}
-    >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
+    <Link href={`/location/${id}`} data-testid={`link-location-${id}`}>
+      <Card
+        className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-300"
+        data-testid={`card-location-${id}`}
+      >
+        <div className="relative aspect-[4/3] overflow-hidden">
+          {image ? (
+            <img
+              src={image}
+              alt={name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <MapPin className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
         <Badge className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground border-0">
           {category}
         </Badge>
@@ -60,5 +62,6 @@ export default function LocationCard({
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 }

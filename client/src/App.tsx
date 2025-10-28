@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import MapPage from "@/pages/MapPage";
+import LocationDetail from "@/pages/LocationDetail";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminAddLocation from "@/pages/AdminAddLocation";
@@ -15,6 +16,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/map" component={MapPage} />
+      <Route path="/location/:id" component={LocationDetail} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/add" component={AdminAddLocation} />
