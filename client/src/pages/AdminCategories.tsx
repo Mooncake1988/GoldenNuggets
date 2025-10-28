@@ -47,7 +47,7 @@ export default function AdminCategories() {
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        window.location.href = "/admin/login";
       }, 500);
       return;
     }
@@ -74,7 +74,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/admin/login";
         }, 500);
         return;
       }
@@ -109,7 +109,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/admin/login";
         }, 500);
         return;
       }
@@ -140,7 +140,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/admin/login";
         }, 500);
         return;
       }

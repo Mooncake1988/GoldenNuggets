@@ -48,7 +48,7 @@ export default function AdminAddLocation() {
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        window.location.href = "/admin/login";
       }, 500);
       return;
     }
@@ -79,7 +79,7 @@ export default function AdminAddLocation() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/admin/login";
         }, 500);
         return;
       }
