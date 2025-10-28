@@ -5,16 +5,27 @@ import LocationCard from "@/components/LocationCard";
 import Footer from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import type { Location } from "@shared/schema";
-import { useLocation } from "wouter";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [location] = useLocation();
-  
-  const searchQuery = useMemo(() => {
-    const params = new URLSearchParams(location.split('?')[1]);
+  const [searchQuery, setSearchQuery] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
     return params.get('search') || '';
-  }, [location]);
+  });
+  
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setSearchQuery(params.get('search') || '');
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('locationchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('locationchange', handleLocationChange);
+    };
+  }, []);
 
   const { data: locations, isLoading, error } = useQuery<Location[]>({
     queryKey: searchQuery ? ["/api/locations/search", searchQuery] : ["/api/locations"],
