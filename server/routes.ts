@@ -179,6 +179,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/locations/search", async (req, res) => {
+    try {
+      const query = req.query.q;
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ error: "Search query parameter 'q' is required" });
+      }
+      const locations = await storage.searchLocations(query);
+      res.json(locations);
+    } catch (error) {
+      console.error("Error searching locations:", error);
+      res.status(500).json({ error: "Failed to search locations" });
+    }
+  });
+
   app.get("/api/locations/:id", async (req, res) => {
     try {
       const location = await storage.getLocation(req.params.id);

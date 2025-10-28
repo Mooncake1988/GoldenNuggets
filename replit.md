@@ -5,13 +5,14 @@
 Cape Town Golden Nuggets is a fully functional travel discovery web application that showcases hidden gems and local favorites in Cape Town, South Africa. The platform features:
 
 - **Curated Location Database**: Coffee shops, restaurants, beaches, hikes, markets, and bars
+- **Full-Text Search**: PostgreSQL-powered search across locations, categories, tags, and descriptions
 - **Admin Dashboard**: Secure admin interface for managing locations with multi-image uploads
 - **Interactive Map**: Leaflet-based map view with location markers and navigation
 - **Location Details**: Full detail pages with image galleries, descriptions, and directions
 - **Authentication**: Secure username/password authentication for admin-only access
 - **Object Storage**: Google Cloud Storage integration for location images
 
-**Status**: Production-ready with complete CRUD functionality, authentication, and image upload capabilities.
+**Status**: Production-ready with complete CRUD functionality, authentication, search, and image upload capabilities.
 
 **Last Updated**: October 28, 2025
 
@@ -68,13 +69,22 @@ Preferred communication style: Simple, everyday language.
 - Pre-signed URL generation for direct client-to-storage uploads
 - Custom ACL (Access Control List) policy system for object permissions
 
+**Search Implementation**:
+- Backend: `GET /api/locations/search?q=query` endpoint using PostgreSQL ILIKE
+- Searches across: name, description, category, neighborhood, address, and tags array
+- Frontend: Custom event-based URL synchronization for search state
+- URL-driven search with query parameters (`/?search=query`)
+- Lazy state initialization from URL on component mount
+- Custom 'locationchange' event dispatched on programmatic navigation
+- Listeners for both 'popstate' (browser nav) and 'locationchange' (app nav)
+
 **Key Architectural Decisions**:
 - Monorepo structure with shared schema definitions between client and server
 - Separate `/api` routes for backend endpoints
 - Middleware for request logging and JSON body parsing
 - Custom error handling for unauthorized access
 - Client-side auth guards redirect to login when sessions expire
-- All locations fetched in bulk, filtered client-side for detail views
+- Search uses server-side PostgreSQL filtering for scalability
 
 ### Database Architecture
 
@@ -159,9 +169,14 @@ Preferred communication style: Simple, everyday language.
 ## Key Features Implemented
 
 ### Public Features
-1. **Home Page** (`/`): Hero section, category filters, featured locations grid
-2. **Map View** (`/map`): Interactive Leaflet map with all location markers
-3. **Location Detail** (`/location/:id`): Full details with image gallery, tags, directions
+1. **Home Page** (`/`): Hero section with functional search box, category filters, featured locations grid
+2. **Search Functionality**: Full-text search with URL-based filtering (`/?search=query`)
+   - PostgreSQL ILIKE search across name, description, category, neighborhood, address, and tags
+   - Real-time URL sync with search state
+   - Clear search by submitting empty query
+   - Proper error handling and empty states
+3. **Map View** (`/map`): Interactive Leaflet map with all location markers
+4. **Location Detail** (`/location/:id`): Full details with image gallery, tags, directions
 
 ### Admin Features (Authentication Required)
 1. **Admin Login** (`/admin/login`): Replit Auth integration
@@ -169,7 +184,9 @@ Preferred communication style: Simple, everyday language.
 3. **Add Location** (`/admin/add`): Multi-image upload with form validation
 
 ### Technical Highlights
+- **Search System**: PostgreSQL full-text search with ILIKE pattern matching and array field support
 - **Image Upload Flow**: Presigned URLs → Direct client upload → ACL policy → DB storage
 - **Auth Guards**: Client-side redirects with session expiration handling
+- **URL State Sync**: Custom event-based synchronization between URL parameters and component state
 - **Error States**: Proper loading, empty, and error state handling throughout
 - **Responsive Design**: Mobile-first with Cape Town-inspired color palette
