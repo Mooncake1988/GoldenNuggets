@@ -6,6 +6,8 @@ Cape Town Golden Nuggets is a fully functional travel discovery web application 
 
 - **Curated Location Database**: Coffee shops, restaurants, beaches, hikes, markets, and bars
 - **Full-Text Search**: PostgreSQL-powered search across locations, categories, tags, and descriptions
+- **Dynamic Tag Filtering**: Real-time tag-based discovery with case-insensitive matching
+- **Combined Search & Filters**: Search and tag filters work together for precise location discovery
 - **Admin Dashboard**: Secure admin interface for managing locations with multi-image uploads
 - **Interactive Map**: Leaflet-based map view with location markers and navigation
 - **Location Details**: Full detail pages with image galleries, descriptions, and directions
@@ -14,7 +16,7 @@ Cape Town Golden Nuggets is a fully functional travel discovery web application 
 
 **Status**: Production-ready with complete CRUD functionality, authentication, search, and image upload capabilities.
 
-**Last Updated**: October 28, 2025
+**Last Updated**: October 29, 2025
 
 ## User Preferences
 
@@ -69,14 +71,20 @@ Preferred communication style: Simple, everyday language.
 - Pre-signed URL generation for direct client-to-storage uploads
 - Custom ACL (Access Control List) policy system for object permissions
 
-**Search Implementation**:
-- Backend: `GET /api/locations/search?q=query` endpoint using PostgreSQL ILIKE
-- Searches across: name, description, category, neighborhood, address, and tags array
-- Frontend: Custom event-based URL synchronization for search state
-- URL-driven search with query parameters (`/?search=query`)
-- Lazy state initialization from URL on component mount
-- Custom 'locationchange' event dispatched on programmatic navigation
-- Listeners for both 'popstate' (browser nav) and 'locationchange' (app nav)
+**Search & Filtering Implementation**:
+- **Search Endpoint**: `GET /api/locations/search?q=query&tag=tagname`
+  - PostgreSQL ILIKE pattern matching across: name, description, category, neighborhood, address, and tags
+  - Supports combined search + tag filtering
+  - Case-insensitive tag matching using SQL LOWER() functions
+- **Tag Endpoints**:
+  - `GET /api/tags` - Returns popular tags with usage counts
+  - `GET /api/locations/by-tag/:tag` - Filters locations by specific tag (case-insensitive)
+- **Frontend State Management**:
+  - URL-driven filtering with query parameters (`/?search=query&tag=tagname`)
+  - Custom 'urlchange' event system for real-time state synchronization
+  - Components listen for both 'popstate' (browser navigation) and 'urlchange' (programmatic navigation)
+  - TagFilter component with dynamic badge rendering from database tags
+  - Search and tag filters preserve each other when updated
 
 **Key Architectural Decisions**:
 - Monorepo structure with shared schema definitions between client and server
@@ -169,14 +177,23 @@ Preferred communication style: Simple, everyday language.
 ## Key Features Implemented
 
 ### Public Features
-1. **Home Page** (`/`): Hero section with functional search box, category filters, featured locations grid
+1. **Home Page** (`/`): Hero section with search box, dynamic tag filters, and featured locations grid
 2. **Search Functionality**: Full-text search with URL-based filtering (`/?search=query`)
    - PostgreSQL ILIKE search across name, description, category, neighborhood, address, and tags
    - Real-time URL sync with search state
    - Clear search by submitting empty query
    - Proper error handling and empty states
-3. **Map View** (`/map`): Interactive Leaflet map with all location markers
-4. **Location Detail** (`/location/:id`): Full details with image gallery, tags, directions
+3. **Tag Filtering**: Dynamic tag badges for location discovery (`/?tag=tagname`)
+   - Tags fetched from actual location data (not hardcoded)
+   - Case-insensitive filtering (e.g., "Fruit Farm" matches "fruit farm")
+   - Click tags to filter locations by specific attributes
+   - Visual indication of selected tag with badge styling
+4. **Combined Filtering**: Search and tag filters work together (`/?search=coffee&tag=brunch`)
+   - Both filters can be active simultaneously
+   - URL parameters are preserved when switching filters
+   - Results show locations matching both search query AND selected tag
+5. **Map View** (`/map`): Interactive Leaflet map with all location markers
+6. **Location Detail** (`/location/:id`): Full details with image gallery, tags, directions
 
 ### Admin Features (Authentication Required)
 1. **Admin Login** (`/admin/login`): Replit Auth integration
@@ -185,8 +202,27 @@ Preferred communication style: Simple, everyday language.
 
 ### Technical Highlights
 - **Search System**: PostgreSQL full-text search with ILIKE pattern matching and array field support
+- **Tag Filtering**: Dynamic tag system with case-insensitive matching using SQL LOWER() functions
+- **Combined Filters**: Search + tag filtering with proper URL parameter preservation
 - **Image Upload Flow**: Presigned URLs → Direct client upload → ACL policy → DB storage
 - **Auth Guards**: Client-side redirects with session expiration handling
-- **URL State Sync**: Custom event-based synchronization between URL parameters and component state
+- **URL State Sync**: Custom 'urlchange' event system for real-time state synchronization across components
 - **Error States**: Proper loading, empty, and error state handling throughout
 - **Responsive Design**: Mobile-first with Cape Town-inspired color palette
+
+### Recent Updates (October 29, 2025)
+
+**Dynamic Tag Filtering System**:
+- Replaced hardcoded category filters with dynamic tag-based filtering
+- Tags are automatically extracted from location data in the database
+- Implemented case-insensitive tag matching to handle variations in tag capitalization
+- Added custom event system ('urlchange') for seamless state synchronization
+- Search and tag filters now work together without losing each other
+- Browser back/forward navigation properly restores filter state
+
+**Key Files Modified**:
+- `server/routes.ts` - Added `/api/tags` and `/api/locations/by-tag/:tag` endpoints
+- `server/storage.ts` - Implemented `getPopularTags()` and case-insensitive `getLocationsByTag()`
+- `client/src/components/TagFilter.tsx` - New component for dynamic tag badge rendering
+- `client/src/components/HeroSection.tsx` - Enhanced to preserve tag filters during search
+- `client/src/pages/Home.tsx` - Updated to handle combined search + tag filtering with custom events

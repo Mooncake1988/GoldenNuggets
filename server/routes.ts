@@ -185,11 +185,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!query || typeof query !== 'string') {
         return res.status(400).json({ error: "Search query parameter 'q' is required" });
       }
-      const locations = await storage.searchLocations(query);
+      const tag = req.query.tag && typeof req.query.tag === 'string' ? req.query.tag : undefined;
+      const locations = await storage.searchLocations(query, tag);
       res.json(locations);
     } catch (error) {
       console.error("Error searching locations:", error);
       res.status(500).json({ error: "Failed to search locations" });
+    }
+  });
+
+  app.get("/api/tags", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+      const tags = await storage.getPopularTags(limit);
+      res.json(tags);
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+      res.status(500).json({ error: "Failed to fetch tags" });
+    }
+  });
+
+  app.get("/api/locations/by-tag/:tag", async (req, res) => {
+    try {
+      const tag = decodeURIComponent(req.params.tag);
+      const locations = await storage.getLocationsByTag(tag);
+      res.json(locations);
+    } catch (error) {
+      console.error("Error fetching locations by tag:", error);
+      res.status(500).json({ error: "Failed to fetch locations" });
     }
   });
 
