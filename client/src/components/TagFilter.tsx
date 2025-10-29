@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface Tag {
   tag: string;
@@ -10,33 +10,61 @@ interface Tag {
 }
 
 export default function TagFilter() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   
-  const { searchQuery, selectedTag } = useMemo(() => {
+  const [urlParams, setUrlParams] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return {
       searchQuery: params.get('search') || '',
       selectedTag: params.get('tag') || '',
     };
-  }, [location]);
+  });
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setUrlParams({
+        searchQuery: params.get('search') || '',
+        selectedTag: params.get('tag') || '',
+      });
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    
+    handleUrlChange();
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, []);
 
   const { data: tags, isLoading } = useQuery<Tag[]>({
     queryKey: ["/api/tags"],
   });
 
   const handleTagClick = (tag: string) => {
+    const params = new URLSearchParams(window.location.search);
+    const currentSearch = params.get('search') || '';
+    const currentTag = params.get('tag') || '';
+    
     const newParams = new URLSearchParams();
     
-    if (searchQuery) {
-      newParams.set('search', searchQuery);
+    if (currentSearch) {
+      newParams.set('search', currentSearch);
     }
     
-    if (tag && selectedTag !== tag) {
+    if (tag && currentTag !== tag) {
       newParams.set('tag', tag);
     }
     
     const newUrl = newParams.toString() ? `/?${newParams.toString()}` : '/';
     setLocation(newUrl);
+    
+    const updatedParams = new URLSearchParams(newUrl.split('?')[1] || '');
+    setUrlParams({
+      searchQuery: updatedParams.get('search') || '',
+      selectedTag: updatedParams.get('tag') || '',
+    });
   };
 
   if (isLoading) {
@@ -56,7 +84,7 @@ export default function TagFilter() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4">
         <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
           <Badge
-            variant={!selectedTag ? "default" : "outline"}
+            variant={!urlParams.selectedTag ? "default" : "outline"}
             className="shrink-0 snap-start cursor-pointer px-4 py-2 text-sm font-medium hover-elevate"
             onClick={() => handleTagClick('')}
             data-testid="badge-tag-all"
@@ -65,7 +93,7 @@ export default function TagFilter() {
           </Badge>
           
           {tags?.map((tagData) => {
-            const isActive = selectedTag === tagData.tag;
+            const isActive = urlParams.selectedTag === tagData.tag;
             
             return (
               <Badge

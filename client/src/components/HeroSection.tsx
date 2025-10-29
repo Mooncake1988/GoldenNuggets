@@ -2,40 +2,43 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import heroImage from "@assets/generated_images/Cape_Town_Table_Mountain_hero_ec65eba7.png";
-import { useState, FormEvent, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
+import type { FormEvent } from "react";
 
 export default function HeroSection() {
-  const [, setLocation] = useLocation();
-  const [searchQuery, setSearchQuery] = useState(() => {
+  const [location, setLocation] = useLocation();
+  
+  const { currentTag, urlSearchQuery } = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('search') || '';
-  });
+    return {
+      currentTag: params.get('tag') || '',
+      urlSearchQuery: params.get('search') || '',
+    };
+  }, [location]);
+  
+  const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
 
   useEffect(() => {
-    const handleLocationChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const currentSearch = params.get('search') || '';
-      setSearchQuery(currentSearch);
-    };
+    setSearchQuery(urlSearchQuery);
+  }, [urlSearchQuery]);
 
-    window.addEventListener('popstate', handleLocationChange);
-    window.addEventListener('locationchange', handleLocationChange);
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-      window.removeEventListener('locationchange', handleLocationChange);
-    };
-  }, []);
-  
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
+    
+    const newParams = new URLSearchParams();
+    
     if (trimmedQuery) {
-      setLocation(`/?search=${encodeURIComponent(trimmedQuery)}`);
-    } else {
-      setLocation('/');
+      newParams.set('search', trimmedQuery);
     }
-    window.dispatchEvent(new Event('locationchange'));
+    
+    if (currentTag) {
+      newParams.set('tag', currentTag);
+    }
+    
+    const newUrl = newParams.toString() ? `/?${newParams.toString()}` : '/';
+    setLocation(newUrl);
   };
 
   return (
