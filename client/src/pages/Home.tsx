@@ -1,69 +1,108 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import CategoryFilter from "@/components/CategoryFilter";
+import TagFilter from "@/components/TagFilter";
 import LocationCard from "@/components/LocationCard";
 import Footer from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import type { Location } from "@shared/schema";
-import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { useMemo } from "react";
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('search') || '';
-  });
+  const [location] = useLocation();
   
-  useEffect(() => {
-    const handleLocationChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      setSearchQuery(params.get('search') || '');
+  const { searchQuery, selectedTag } = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      searchQuery: params.get('search') || '',
+      selectedTag: params.get('tag') || '',
     };
+  }, [location]);
 
-    window.addEventListener('popstate', handleLocationChange);
-    window.addEventListener('locationchange', handleLocationChange);
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-      window.removeEventListener('locationchange', handleLocationChange);
-    };
-  }, []);
+  const queryKey = useMemo(() => {
+    if (searchQuery && selectedTag) {
+      return ["/api/locations/search", searchQuery, selectedTag];
+    } else if (searchQuery) {
+      return ["/api/locations/search", searchQuery];
+    } else if (selectedTag) {
+      return ["/api/locations/by-tag", selectedTag];
+    }
+    return ["/api/locations"];
+  }, [searchQuery, selectedTag]);
 
-  const { data: locations, isLoading, error } = useQuery<Location[]>({
-    queryKey: searchQuery ? ["/api/locations/search", searchQuery] : ["/api/locations"],
-    ...(searchQuery && {
-      queryFn: async () => {
+  const queryFn = useMemo(() => {
+    return async () => {
+      if (searchQuery && selectedTag) {
+        const res = await fetch(
+          `/api/locations/search?q=${encodeURIComponent(searchQuery)}&tag=${encodeURIComponent(selectedTag)}`
+        );
+        if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
+        return res.json();
+      } else if (searchQuery) {
         const res = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
-        if (!res.ok) {
-          throw new Error(`Search failed: ${res.statusText}`);
-        }
+        if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
+        return res.json();
+      } else if (selectedTag) {
+        const res = await fetch(`/api/locations/by-tag/${encodeURIComponent(selectedTag)}`);
+        if (!res.ok) throw new Error(`Failed to fetch locations by tag: ${res.statusText}`);
+        return res.json();
+      } else {
+        const res = await fetch('/api/locations');
+        if (!res.ok) throw new Error(`Failed to fetch locations: ${res.statusText}`);
         return res.json();
       }
-    }),
+    };
+  }, [searchQuery, selectedTag]);
+
+  const { data: locations, isLoading, error } = useQuery<Location[]>({
+    queryKey,
+    queryFn,
   });
+
+  const getTitle = () => {
+    if (searchQuery && selectedTag) {
+      return `"${searchQuery}" in ${selectedTag}`;
+    } else if (searchQuery) {
+      return `Search Results for "${searchQuery}"`;
+    } else if (selectedTag) {
+      return selectedTag;
+    }
+    return "Featured Locations";
+  };
+
+  const getSubtitle = () => {
+    if (searchQuery || selectedTag) {
+      return isLoading ? 'Loading...' : `${locations?.length || 0} location${locations?.length !== 1 ? 's' : ''}`;
+    }
+    return "Discover the best hidden gems Cape Town has to offer";
+  };
+
+  const getNoResultsMessage = () => {
+    if (searchQuery && selectedTag) {
+      return `No locations found for "${searchQuery}" with tag "${selectedTag}".`;
+    } else if (searchQuery) {
+      return `No locations found for "${searchQuery}". Try a different search term.`;
+    } else if (selectedTag) {
+      return `No locations found with the tag "${selectedTag}".`;
+    }
+    return 'No locations available yet. Check back soon!';
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <HeroSection />
-      <CategoryFilter />
+      <TagFilter />
       
       <main className="flex-1">
         <section className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
           <div className="mb-8">
-            {searchQuery ? (
-              <>
-                <h2 className="text-3xl md:text-4xl font-bold mb-2" data-testid="text-search-title">
-                  Search Results for "{searchQuery}"
-                </h2>
-                <p className="text-muted-foreground">
-                  {isLoading ? 'Searching...' : `Found ${locations?.length || 0} location${locations?.length !== 1 ? 's' : ''}`}
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 className="text-3xl md:text-4xl font-bold mb-2">Featured Locations</h2>
-                <p className="text-muted-foreground">Discover the best hidden gems Cape Town has to offer</p>
-              </>
-            )}
+            <h2 className="text-3xl md:text-4xl font-bold mb-2" data-testid="text-section-title">
+              {getTitle()}
+            </h2>
+            <p className="text-muted-foreground" data-testid="text-section-subtitle">
+              {getSubtitle()}
+            </p>
           </div>
           
           {error ? (
@@ -75,7 +114,7 @@ export default function Home() {
           ) : isLoading ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground" data-testid="text-loading">
-                {searchQuery ? 'Searching locations...' : 'Loading locations...'}
+                Loading locations...
               </p>
             </div>
           ) : locations && locations.length > 0 ? (
@@ -96,9 +135,7 @@ export default function Home() {
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground" data-testid="text-no-results">
-                {searchQuery 
-                  ? `No locations found for "${searchQuery}". Try a different search term.`
-                  : 'No locations available yet. Check back soon!'}
+                {getNoResultsMessage()}
               </p>
             </div>
           )}
