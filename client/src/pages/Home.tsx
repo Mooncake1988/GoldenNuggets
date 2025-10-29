@@ -5,21 +5,40 @@ import LocationCard from "@/components/LocationCard";
 import Footer from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import type { Location } from "@shared/schema";
-import { useLocation } from "wouter";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [location] = useLocation();
-  
-  const { searchQuery, selectedTag } = useMemo(() => {
+  const [urlParams, setUrlParams] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return {
       searchQuery: params.get('search') || '',
       selectedTag: params.get('tag') || '',
     };
-  }, [location]);
+  });
 
-  const queryKey = useMemo(() => {
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setUrlParams({
+        searchQuery: params.get('search') || '',
+        selectedTag: params.get('tag') || '',
+      });
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('urlchange', handleUrlChange);
+    
+    handleUrlChange();
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('urlchange', handleUrlChange);
+    };
+  }, []);
+
+  const { searchQuery, selectedTag } = urlParams;
+
+  const getQueryKey = () => {
     if (searchQuery && selectedTag) {
       return ["/api/locations/search", searchQuery, selectedTag];
     } else if (searchQuery) {
@@ -28,35 +47,33 @@ export default function Home() {
       return ["/api/locations/by-tag", selectedTag];
     }
     return ["/api/locations"];
-  }, [searchQuery, selectedTag]);
+  };
 
-  const queryFn = useMemo(() => {
-    return async () => {
-      if (searchQuery && selectedTag) {
-        const res = await fetch(
-          `/api/locations/search?q=${encodeURIComponent(searchQuery)}&tag=${encodeURIComponent(selectedTag)}`
-        );
-        if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
-        return res.json();
-      } else if (searchQuery) {
-        const res = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
-        if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
-        return res.json();
-      } else if (selectedTag) {
-        const res = await fetch(`/api/locations/by-tag/${encodeURIComponent(selectedTag)}`);
-        if (!res.ok) throw new Error(`Failed to fetch locations by tag: ${res.statusText}`);
-        return res.json();
-      } else {
-        const res = await fetch('/api/locations');
-        if (!res.ok) throw new Error(`Failed to fetch locations: ${res.statusText}`);
-        return res.json();
-      }
-    };
-  }, [searchQuery, selectedTag]);
+  const getQueryFn = async () => {
+    if (searchQuery && selectedTag) {
+      const res = await fetch(
+        `/api/locations/search?q=${encodeURIComponent(searchQuery)}&tag=${encodeURIComponent(selectedTag)}`
+      );
+      if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
+      return res.json();
+    } else if (searchQuery) {
+      const res = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
+      if (!res.ok) throw new Error(`Search failed: ${res.statusText}`);
+      return res.json();
+    } else if (selectedTag) {
+      const res = await fetch(`/api/locations/by-tag/${encodeURIComponent(selectedTag)}`);
+      if (!res.ok) throw new Error(`Failed to fetch locations by tag: ${res.statusText}`);
+      return res.json();
+    } else {
+      const res = await fetch('/api/locations');
+      if (!res.ok) throw new Error(`Failed to fetch locations: ${res.statusText}`);
+      return res.json();
+    }
+  };
 
   const { data: locations, isLoading, error } = useQuery<Location[]>({
-    queryKey,
-    queryFn,
+    queryKey: getQueryKey(),
+    queryFn: getQueryFn,
   });
 
   const getTitle = () => {

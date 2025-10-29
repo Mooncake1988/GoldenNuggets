@@ -39,6 +39,8 @@ export default function HeroSection() {
     
     const newUrl = newParams.toString() ? `/?${newParams.toString()}` : '/';
     setLocation(newUrl);
+    
+    window.dispatchEvent(new CustomEvent('urlchange'));
   };
 
   return (

@@ -65,6 +65,8 @@ export default function TagFilter() {
       searchQuery: updatedParams.get('search') || '',
       selectedTag: updatedParams.get('tag') || '',
     });
+    
+    window.dispatchEvent(new CustomEvent('urlchange'));
   };
 
   if (isLoading) {
