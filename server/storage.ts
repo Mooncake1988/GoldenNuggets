@@ -110,7 +110,10 @@ export class DatabaseStorage implements IStorage {
     );
 
     if (tag) {
-      const tagClause = sql`${tag} = ANY(${locations.tags})`;
+      const tagClause = sql`EXISTS (
+        SELECT 1 FROM unnest(${locations.tags}) AS t
+        WHERE LOWER(t) = LOWER(${tag})
+      )`;
       whereClause = sql`(${whereClause}) AND (${tagClause})`;
     }
     
@@ -142,7 +145,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(locations)
       .where(
-        sql`${tag} = ANY(${locations.tags})`
+        sql`EXISTS (
+          SELECT 1 FROM unnest(${locations.tags}) AS t
+          WHERE LOWER(t) = LOWER(${tag})
+        )`
       );
   }
 
