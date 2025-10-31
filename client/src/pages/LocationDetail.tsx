@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ShareButton from "@/components/ShareButton";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
@@ -114,10 +115,16 @@ export default function LocationDetail() {
 
             <div className="space-y-6">
               <div>
-                <div className="flex items-start justify-between gap-4 mb-2">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                   <h1 className="text-3xl md:text-4xl font-bold" data-testid="text-location-name">
                     {location.name}
                   </h1>
+                  <ShareButton
+                    title={location.name}
+                    text={`Check out ${location.name} in Cape Town - ${location.description}`}
+                    url={typeof window !== 'undefined' ? window.location.href : ''}
+                    variant="outline"
+                  />
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
