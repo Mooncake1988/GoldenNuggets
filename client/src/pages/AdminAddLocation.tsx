@@ -158,7 +158,7 @@ export default function AdminAddLocation() {
           <Card>
             <CardHeader>
               <CardTitle>Add New Location</CardTitle>
-              <CardDescription>Share a new hidden gem with visitors to Cape Town</CardDescription>
+              <CardDescription>Share a new lekker spot with visitors to the Western Cape</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">

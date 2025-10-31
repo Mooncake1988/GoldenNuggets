@@ -91,7 +91,7 @@ export default function Home() {
     if (searchQuery || selectedTag) {
       return isLoading ? 'Loading...' : `${locations?.length || 0} location${locations?.length !== 1 ? 's' : ''}`;
     }
-    return "Discover the best hidden gems Cape Town has to offer";
+    return "Discover the best lekker spots in the Western Cape";
   };
 
   const getNoResultsMessage = () => {

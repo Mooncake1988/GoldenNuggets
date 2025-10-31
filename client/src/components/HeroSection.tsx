@@ -53,10 +53,10 @@ export default function HeroSection() {
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
-          Discover Cape Town's Hidden Gems
+          Discover the Western Cape's Lekker Spots
         </h1>
         <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
-          Curated local favorites - amazing coffee shops, restaurants, and unique experiences not found in typical tourist guides
+          Curated local favorites - amazing coffee shops, restaurants, beaches, and unique experiences off the beaten path
         </p>
         
         <div className="max-w-2xl mx-auto">
@@ -70,7 +70,7 @@ export default function HeroSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button type="submit" size="lg" className="shrink-0" data-testid="button-hero-search">
+              <Button type="submit" variant="accent" size="lg" className="shrink-0" data-testid="button-hero-search">
                 <Search className="h-5 w-5 md:mr-2" />
                 <span className="hidden md:inline">Search</span>
               </Button>

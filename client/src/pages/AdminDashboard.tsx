@@ -96,7 +96,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
-              <p className="text-muted-foreground">Manage your Cape Town Golden Nuggets</p>
+              <p className="text-muted-foreground">Manage your LekkerSpots locations</p>
             </div>
             <div className="flex gap-3">
               <Link href="/admin/categories">

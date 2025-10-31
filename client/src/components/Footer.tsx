@@ -53,14 +53,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="h-6 w-6 text-primary" />
+              <MapPin className="h-6 w-6 text-accent" />
               <div className="flex flex-col">
-                <span className="font-bold text-lg leading-tight">Cape Town</span>
-                <span className="text-xs text-muted-foreground leading-tight">Golden Nuggets</span>
+                <span className="font-bold text-lg leading-tight">LekkerSpots</span>
+                <span className="text-xs text-muted-foreground leading-tight">Western Cape</span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Discover the hidden gems of Cape Town, curated by locals who know the city best.
+              Discover the lekker spots of the Western Cape, curated by locals who know the region best.
             </p>
           </div>
 
@@ -85,13 +85,13 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Follow Us</h3>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground" data-testid="link-instagram">
+              <a href="#" className="text-muted-foreground hover:text-accent transition-colors" data-testid="link-instagram">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground" data-testid="link-facebook">
+              <a href="#" className="text-muted-foreground hover:text-accent transition-colors" data-testid="link-facebook">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground" data-testid="link-email">
+              <a href="#" className="text-muted-foreground hover:text-accent transition-colors" data-testid="link-email">
                 <Mail className="h-5 w-5" />
               </a>
             </div>
@@ -142,6 +142,7 @@ export default function Footer() {
                 />
                 <Button 
                   type="submit" 
+                  variant="accent"
                   size="sm" 
                   disabled={subscribeMutation.isPending}
                   data-testid="button-subscribe"
@@ -154,7 +155,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Cape Town Golden Nuggets. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} LekkerSpots. All rights reserved.</p>
         </div>
       </div>
     </footer>

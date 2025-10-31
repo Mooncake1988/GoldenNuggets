@@ -7,12 +7,12 @@ import { MapPin, Loader2 } from "lucide-react";
 import type { Location } from "@shared/schema";
 
 const categoryDescriptions: Record<string, string> = {
-  "Coffee Shop": "Discover Cape Town's finest artisan coffee spots and cozy cafes",
+  "Coffee Shop": "Discover the Western Cape's finest artisan coffee spots and cozy cafes",
   "Restaurant": "Experience the best dining experiences from local favorites to fine dining",
   "Beach": "Explore pristine beaches and hidden coastal gems",
   "Hike": "Find breathtaking trails and scenic hiking routes",
   "Market": "Browse vibrant local markets and artisan vendors",
-  "Bar": "Enjoy craft cocktails and local brews at the city's best bars",
+  "Bar": "Enjoy craft cocktails and local brews at the region's best bars",
 };
 
 export default function Categories() {
@@ -49,7 +49,7 @@ export default function Categories() {
               Explore by Category
             </h1>
             <p className="text-lg text-muted-foreground">
-              Browse our curated collection of Cape Town's hidden gems organized by type
+              Browse our curated collection of the Western Cape's hidden gems organized by type
             </p>
           </div>
 
@@ -109,7 +109,11 @@ export default function Categories() {
                                   {location.tags.slice(0, 3).map((tag, index) => (
                                     <span
                                       key={index}
-                                      className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md"
+                                      className={`px-2 py-1 text-xs rounded-md ${
+                                        index % 2 === 0 
+                                          ? 'bg-accent text-accent-foreground' 
+                                          : 'bg-muted text-muted-foreground'
+                                      }`}
                                       data-testid={`tag-${tag}-${location.id}`}
                                     >
                                       {tag}

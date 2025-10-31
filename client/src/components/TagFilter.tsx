@@ -86,7 +86,7 @@ export default function TagFilter() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4">
         <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
           <Badge
-            variant={!urlParams.selectedTag ? "default" : "outline"}
+            variant={!urlParams.selectedTag ? "accent" : "outline"}
             className="shrink-0 snap-start cursor-pointer px-4 py-2 text-sm font-medium hover-elevate"
             onClick={() => handleTagClick('')}
             data-testid="badge-tag-all"
@@ -100,7 +100,7 @@ export default function TagFilter() {
             return (
               <Badge
                 key={tagData.tag}
-                variant={isActive ? "default" : "outline"}
+                variant={isActive ? "accent" : "outline"}
                 className="shrink-0 snap-start cursor-pointer px-4 py-2 text-sm font-medium hover-elevate"
                 onClick={() => handleTagClick(tagData.tag)}
                 data-testid={`badge-tag-${tagData.tag.toLowerCase().replace(/\s+/g, '-')}`}

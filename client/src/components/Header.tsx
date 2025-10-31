@@ -15,27 +15,27 @@ export default function Header() {
         <div className="flex h-16 md:h-20 items-center justify-between">
           <Link href="/" data-testid="link-home">
             <div className="flex items-center gap-2 hover-elevate active-elevate-2 cursor-pointer px-2 py-1 rounded-md">
-              <MapPin className="h-6 w-6 text-primary" />
+              <MapPin className="h-6 w-6 text-accent" />
               <div className="flex flex-col">
-                <span className="font-bold text-lg leading-tight">Cape Town</span>
-                <span className="text-xs text-muted-foreground leading-tight">Golden Nuggets</span>
+                <span className="font-bold text-lg leading-tight">LekkerSpots</span>
+                <span className="text-xs text-muted-foreground leading-tight">Western Cape</span>
               </div>
             </div>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/" data-testid="link-nav-home">
-              <span className={`text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer ${isActive("/") ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer ${isActive("/") ? "text-accent" : "text-muted-foreground"}`}>
                 Home
               </span>
             </Link>
             <Link href="/categories" data-testid="link-nav-categories">
-              <span className={`text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer ${isActive("/categories") ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer ${isActive("/categories") ? "text-accent" : "text-muted-foreground"}`}>
                 Categories
               </span>
             </Link>
             <Link href="/map" data-testid="link-nav-map">
-              <span className={`text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer ${isActive("/map") ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer ${isActive("/map") ? "text-accent" : "text-muted-foreground"}`}>
                 Map View
               </span>
             </Link>
@@ -60,17 +60,17 @@ export default function Header() {
         <div className="md:hidden border-t bg-background">
           <nav className="flex flex-col gap-1 px-4 py-4">
             <Link href="/" data-testid="link-mobile-home">
-              <span className={`block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer ${isActive("/") ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer ${isActive("/") ? "text-accent" : "text-muted-foreground"}`}>
                 Home
               </span>
             </Link>
             <Link href="/categories" data-testid="link-mobile-categories">
-              <span className={`block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer ${isActive("/categories") ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer ${isActive("/categories") ? "text-accent" : "text-muted-foreground"}`}>
                 Categories
               </span>
             </Link>
             <Link href="/map" data-testid="link-mobile-map">
-              <span className={`block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer ${isActive("/map") ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer ${isActive("/map") ? "text-accent" : "text-muted-foreground"}`}>
                 Map View
               </span>
             </Link>
