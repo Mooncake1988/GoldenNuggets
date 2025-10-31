@@ -18,6 +18,11 @@ interface ShareButtonProps {
   variant?: "default" | "outline" | "ghost" | "secondary";
 }
 
+const isMobileDevice = () => {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 export default function ShareButton({ 
   title, 
   text, 
@@ -27,12 +32,12 @@ export default function ShareButton({
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
   const [hasNativeShare, setHasNativeShare] = useState(() => 
-    typeof navigator !== 'undefined' && !!navigator.share
+    typeof navigator !== 'undefined' && !!navigator.share && isMobileDevice()
   );
   const { toast } = useToast();
 
   useEffect(() => {
-    setHasNativeShare(typeof navigator !== 'undefined' && !!navigator.share);
+    setHasNativeShare(typeof navigator !== 'undefined' && !!navigator.share && isMobileDevice());
   }, []);
 
   const handleNativeShare = async () => {
