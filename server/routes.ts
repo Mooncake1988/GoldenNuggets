@@ -316,6 +316,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const nameCustomFieldId = process.env.BEEHIIV_NAME_FIELD_ID;
+      console.log("🔍 Debug - Name from form:", parsed.name);
+      console.log("🔍 Debug - Custom field ID from env:", nameCustomFieldId);
+      
       if (nameCustomFieldId && parsed.name) {
         beehiivPayload.custom_fields = [
           {
@@ -323,7 +326,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             value: parsed.name,
           },
         ];
+        console.log("✅ Added custom_fields to payload:", beehiivPayload.custom_fields);
+      } else {
+        console.log("⚠️  Skipping custom_fields - nameCustomFieldId:", nameCustomFieldId, "parsed.name:", parsed.name);
       }
+      
+      console.log("📤 Sending to Beehiiv:", JSON.stringify(beehiivPayload, null, 2));
 
       const response = await fetch(
         `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/subscriptions`,
