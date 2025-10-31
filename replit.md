@@ -1,18 +1,25 @@
-# Cape Town Golden Nuggets Travel Guide
+# LekkerSpots - Western Cape Travel Guide
 
 ## Overview
 
-Cape Town Golden Nuggets is a travel discovery web application showcasing hidden gems and local favorites in Cape Town, South Africa. It features a curated database of locations (coffee shops, restaurants, beaches, hikes, markets, bars), full-text search, dynamic tag filtering, and an interactive map. The platform includes an admin dashboard for content management with multi-image uploads, secure authentication, and integration with Google Cloud Storage for media. It is production-ready with full CRUD functionality, search, and image handling.
+LekkerSpots is a travel discovery web application showcasing hidden gems and local favorites across the Western Cape, South Africa. It features a curated database of locations (coffee shops, restaurants, beaches, hikes, markets, bars), full-text search, dynamic tag filtering, and an interactive map. The platform includes an admin dashboard for content management with multi-image uploads, secure authentication, and integration with Google Cloud Storage for media. It is production-ready with full CRUD functionality, search, and image handling.
+
+The application features a vibrant **Miami Vice 80s-inspired aesthetic** with sunset colors:
+- **Primary Color**: Sunset pink/magenta (HSL: 340 92% 64%)
+- **Accent Color**: Electric cyan (HSL: 185 88% 58%) used prominently for logos, active navigation, search buttons, tags, and interactive elements
+- **Background**: Warm peachy-pink pastels for inviting atmosphere
+- **Visual Style**: Photography-first layouts, alternating cyan/pink tag colors for visual variety
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design preferences: Miami Vice 80s aesthetic with sunset colors (pink to magenta), electric cyan accents, warm pastel backgrounds, avoiding dark themes.
 
 ## System Architecture
 
 ### Frontend
 
-The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first layouts, map-centric navigation with Leaflet, and a reusable component architecture.
+The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system (sunset pink primary, electric cyan accent) and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first layouts, Miami Vice 80s aesthetic with vibrant colors, map-centric navigation with Leaflet, and a reusable component architecture with accent variants for Badge and Button components.
 
 ### Backend
 
