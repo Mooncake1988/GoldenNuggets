@@ -116,7 +116,7 @@ export default function LocationDetail() {
             <div className="space-y-6">
               <div>
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
-                  <h1 className="text-3xl md:text-4xl font-bold" data-testid="text-location-name">
+                  <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight" data-testid="text-location-name">
                     {location.name}
                   </h1>
                   <ShareButton

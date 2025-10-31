@@ -45,7 +45,7 @@ export default function Categories() {
       <main className="flex-1 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
           <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4" data-testid="heading-categories">
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4" data-testid="heading-categories">
               Explore by Category
             </h1>
             <p className="text-lg text-muted-foreground">
@@ -66,7 +66,7 @@ export default function Categories() {
                 return (
                   <div key={category} className="space-y-6" data-testid={`category-${category}`}>
                     <div className="border-b pb-4">
-                      <h2 className="text-2xl md:text-3xl font-bold mb-2" data-testid={`heading-${category}`}>
+                      <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight mb-2" data-testid={`heading-${category}`}>
                         {category}
                       </h2>
                       {categoryDescriptions[category] && (
