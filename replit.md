@@ -177,9 +177,7 @@ Preferred communication style: Simple, everyday language.
 **Newsletter Integration** (Beehiiv):
 - `BEEHIIV_API_KEY`: Beehiiv API key for authentication (set in Replit Secrets)
 - `BEEHIIV_PUBLICATION_ID`: Beehiiv publication ID (set in Replit Secrets)
-- `BEEHIIV_NAME_FIELD_ID`: (Optional) Custom field ID in Beehiiv for storing subscriber names
-  - If not set, only email is sent to Beehiiv
-  - If set, name will be included in the custom_fields array
+- Names are automatically sent to the "Name" custom field in Beehiiv (must be created in Beehiiv dashboard first)
 
 ## Key Features Implemented
 
@@ -206,7 +204,7 @@ Preferred communication style: Simple, everyday language.
    - Form validation with React Hook Form and Zod
    - Direct integration with Beehiiv API for subscriber management
    - Success/error toast notifications
-   - Optional custom field support for storing subscriber names
+   - Names automatically stored in Beehiiv "Name" custom field
 
 ### Admin Features (Authentication Required)
 1. **Admin Login** (`/admin/login`): Replit Auth integration

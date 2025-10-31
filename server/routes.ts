@@ -261,39 +261,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/newsletter/custom-fields", isAuthenticated, async (req, res) => {
-    try {
-      const beehiivApiKey = process.env.BEEHIIV_API_KEY;
-      const beehiivPublicationId = process.env.BEEHIIV_PUBLICATION_ID;
-
-      if (!beehiivApiKey || !beehiivPublicationId) {
-        return res.status(500).json({ error: "Newsletter service is not configured" });
-      }
-
-      const response = await fetch(
-        `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/custom_fields`,
-        {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${beehiivApiKey}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("Beehiiv API error:", response.status, errorData);
-        return res.status(500).json({ error: "Failed to fetch custom fields" });
-      }
-
-      const data = await response.json();
-      res.status(200).json(data);
-    } catch (error) {
-      console.error("Error fetching custom fields:", error);
-      res.status(500).json({ error: "Failed to fetch custom fields" });
-    }
-  });
-
   app.post("/api/newsletter/subscribe", async (req, res) => {
     try {
       const parsed = newsletterSubscriptionSchema.parse(req.body);
