@@ -33,6 +33,7 @@ export const categories = pgTable("categories", {
 
 export const locations = pgTable("locations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
   category: text("category").notNull(),
   neighborhood: text("neighborhood").notNull(),

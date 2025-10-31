@@ -140,6 +140,7 @@ export default function Home() {
                 <LocationCard 
                   key={location.id}
                   id={location.id}
+                  slug={location.slug}
                   name={location.name}
                   category={location.category}
                   neighborhood={location.neighborhood}

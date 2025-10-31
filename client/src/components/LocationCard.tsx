@@ -5,6 +5,7 @@ import { Link } from "wouter";
 
 interface LocationCardProps {
   id: string;
+  slug: string;
   name: string;
   category: string;
   neighborhood: string;
@@ -15,6 +16,7 @@ interface LocationCardProps {
 
 export default function LocationCard({
   id,
+  slug,
   name,
   category,
   neighborhood,
@@ -23,7 +25,7 @@ export default function LocationCard({
   tags,
 }: LocationCardProps) {
   return (
-    <Link href={`/location/${id}`} data-testid={`link-location-${id}`}>
+    <Link href={`/location/${slug}`} data-testid={`link-location-${id}`}>
       <Card
         className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-300"
         data-testid={`card-location-${id}`}

@@ -24,6 +24,7 @@ export default function AdminAddLocation() {
   
   const [formData, setFormData] = useState({
     name: "",
+    slug: "",
     category: "",
     neighborhood: "",
     description: "",
@@ -53,6 +54,19 @@ export default function AdminAddLocation() {
       return;
     }
   }, [isAuthenticated, isLoading, toast]);
+
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    const slug = generateSlug(name);
+    setFormData({ ...formData, name, slug });
+  };
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -153,10 +167,25 @@ export default function AdminAddLocation() {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={handleNameChange}
                     required
                     data-testid="input-name"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="slug">URL Slug *</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    required
+                    data-testid="input-slug"
+                    placeholder="url-friendly-name"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This will be used in the URL: /location/{formData.slug || 'your-slug-here'}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

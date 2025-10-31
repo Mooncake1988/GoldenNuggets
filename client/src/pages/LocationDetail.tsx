@@ -10,15 +10,14 @@ import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 export default function LocationDetail() {
-  const [, params] = useRoute("/location/:id");
+  const [, params] = useRoute("/location/:slug");
   const [, setLocation] = useWouterLocation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   
-  const { data: locations, isLoading } = useQuery<Location[]>({
-    queryKey: ["/api/locations"],
+  const { data: location, isLoading } = useQuery<Location>({
+    queryKey: [`/api/locations/by-slug/${params?.slug}`],
+    enabled: !!params?.slug,
   });
-  
-  const location = locations?.find(loc => loc.id === params?.id);
 
   if (isLoading) {
     return (

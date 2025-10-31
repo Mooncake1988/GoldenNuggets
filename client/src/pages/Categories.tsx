@@ -81,7 +81,7 @@ export default function Categories() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {categoryLocations.map((location) => (
-                        <Link key={location.id} href={`/location/${location.id}`}>
+                        <Link key={location.id} href={`/location/${location.slug}`}>
                           <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer h-full" data-testid={`card-location-${location.id}`}>
                             {location.images && location.images.length > 0 && (
                               <div className="aspect-video w-full overflow-hidden">

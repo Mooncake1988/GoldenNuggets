@@ -216,6 +216,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/locations/by-slug/:slug", async (req, res) => {
+    try {
+      const slug = decodeURIComponent(req.params.slug);
+      const location = await storage.getLocationBySlug(slug);
+      if (!location) {
+        return res.status(404).json({ error: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      console.error("Error fetching location by slug:", error);
+      res.status(500).json({ error: "Failed to fetch location" });
+    }
+  });
+
   app.get("/api/locations/:id", async (req, res) => {
     try {
       const location = await storage.getLocation(req.params.id);

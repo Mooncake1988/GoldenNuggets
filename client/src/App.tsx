@@ -20,7 +20,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/categories" component={Categories} />
       <Route path="/map" component={MapPage} />
-      <Route path="/location/:id" component={LocationDetail} />
+      <Route path="/location/:slug" component={LocationDetail} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/categories" component={AdminCategories} />
