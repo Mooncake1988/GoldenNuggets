@@ -109,11 +109,7 @@ export default function Categories() {
                                   {location.tags.slice(0, 3).map((tag, index) => (
                                     <span
                                       key={index}
-                                      className={`px-2 py-1 text-xs rounded-md ${
-                                        index % 2 === 0 
-                                          ? 'bg-accent text-accent-foreground' 
-                                          : 'bg-muted text-muted-foreground'
-                                      }`}
+                                      className="px-2 py-1 text-xs rounded-md bg-secondary text-secondary-foreground"
                                       data-testid={`tag-${tag}-${location.id}`}
                                     >
                                       {tag}

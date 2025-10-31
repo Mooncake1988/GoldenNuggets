@@ -5,10 +5,11 @@
 LekkerSpots is a travel discovery web application showcasing hidden gems and local favorites across the Western Cape, South Africa. It features a curated database of locations (coffee shops, restaurants, beaches, hikes, markets, bars), full-text search, dynamic tag filtering, and an interactive map. The platform includes an admin dashboard for content management with multi-image uploads, secure authentication, and integration with Google Cloud Storage for media. It is production-ready with full CRUD functionality, search, and image handling.
 
 The application features a vibrant **Miami Vice 80s-inspired aesthetic** with sunset colors:
-- **Primary Color**: Sunset pink/magenta (HSL: 340 92% 64%)
-- **Accent Color**: Electric cyan (HSL: 185 88% 58%) used prominently for logos, active navigation, search buttons, tags, and interactive elements
+- **Primary Color**: Sunset pink/magenta (HSL: 340 92% 64%) - main button color, CTAs
+- **Accent Color**: Electric cyan (HSL: 185 88% 58%) - used selectively for active/selected states (active nav links, selected tags, logo icons)
+- **Secondary Color**: Soft peachy pink (HSL: 340 30% 88%) - tags, subtle backgrounds
 - **Background**: Warm peachy-pink pastels for inviting atmosphere
-- **Visual Style**: Photography-first layouts, alternating cyan/pink tag colors for visual variety
+- **Visual Style**: Photography-first layouts with consistent tag styling, cyan highlights for active states
 
 ## User Preferences
 
@@ -19,7 +20,7 @@ Design preferences: Miami Vice 80s aesthetic with sunset colors (pink to magenta
 
 ### Frontend
 
-The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system (sunset pink primary, electric cyan accent) and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first layouts, Miami Vice 80s aesthetic with vibrant colors, map-centric navigation with Leaflet, and a reusable component architecture with accent variants for Badge and Button components.
+The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system (sunset pink primary for CTAs, electric cyan accent for active states, soft peachy pink for tags) and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first layouts, Miami Vice 80s aesthetic with pink as the dominant color and cyan for highlights, map-centric navigation with Leaflet, and a reusable component architecture with accent variants used sparingly for active/selected states.
 
 ### Backend
 

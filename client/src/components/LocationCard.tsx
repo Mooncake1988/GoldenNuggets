@@ -56,8 +56,8 @@ export default function LocationCard({
           {description}
         </p>
         <div className="flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
-            <Badge key={tag} variant={index % 2 === 0 ? "accent" : "secondary"} className="text-xs">
+          {tags.map((tag) => (
+            <Badge key={tag} variant="secondary" className="text-xs" data-testid={`tag-${tag}-${id}`}>
               {tag}
             </Badge>
           ))}

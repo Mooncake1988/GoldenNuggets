@@ -70,7 +70,7 @@ export default function HeroSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button type="submit" variant="accent" size="lg" className="shrink-0" data-testid="button-hero-search">
+              <Button type="submit" size="lg" className="shrink-0" data-testid="button-hero-search">
                 <Search className="h-5 w-5 md:mr-2" />
                 <span className="hidden md:inline">Search</span>
               </Button>

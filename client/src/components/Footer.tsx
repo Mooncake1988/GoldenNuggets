@@ -142,7 +142,6 @@ export default function Footer() {
                 />
                 <Button 
                   type="submit" 
-                  variant="accent"
                   size="sm" 
                   disabled={subscribeMutation.isPending}
                   data-testid="button-subscribe"
