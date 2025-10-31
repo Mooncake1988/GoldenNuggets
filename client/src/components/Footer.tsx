@@ -2,8 +2,51 @@ import { MapPin, Instagram, Facebook, Mail } from "lucide-react";
 import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { newsletterSubscriptionSchema, type NewsletterSubscription } from "@shared/schema";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Footer() {
+  const { toast } = useToast();
+  
+  const form = useForm<NewsletterSubscription>({
+    resolver: zodResolver(newsletterSubscriptionSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
+
+  const subscribeMutation = useMutation({
+    mutationFn: async (data: NewsletterSubscription) => {
+      const res = await apiRequest("POST", "/api/newsletter/subscribe", data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "You've been subscribed to our newsletter. Check your email for confirmation.",
+      });
+      form.reset();
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.message || "Failed to subscribe. Please try again later.";
+      toast({
+        title: "Subscription Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: NewsletterSubscription) => {
+    subscribeMutation.mutate(data);
+  };
+
   return (
     <footer className="border-t bg-card">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
@@ -59,15 +102,54 @@ export default function Footer() {
             <p className="text-sm text-muted-foreground mb-3">
               Get updates on new locations
             </p>
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Your email"
-                className="text-sm"
-                data-testid="input-newsletter"
-              />
-              <Button size="sm" data-testid="button-subscribe">Subscribe</Button>
-            </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="text"
+                          placeholder="Your name"
+                          className="text-sm"
+                          data-testid="input-newsletter-name"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="Your email"
+                          className="text-sm"
+                          data-testid="input-newsletter-email"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="submit" 
+                  size="sm" 
+                  disabled={subscribeMutation.isPending}
+                  data-testid="button-subscribe"
+                >
+                  {subscribeMutation.isPending ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
 

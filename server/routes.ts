@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertLocationSchema, insertCategorySchema } from "@shared/schema";
+import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema } from "@shared/schema";
 import passport from "passport";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -258,6 +258,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting location:", error);
       res.status(500).json({ error: "Failed to delete location" });
+    }
+  });
+
+  app.post("/api/newsletter/subscribe", async (req, res) => {
+    try {
+      const parsed = newsletterSubscriptionSchema.parse(req.body);
+      
+      const beehiivApiKey = process.env.BEEHIIV_API_KEY;
+      const beehiivPublicationId = process.env.BEEHIIV_PUBLICATION_ID;
+
+      if (!beehiivApiKey || !beehiivPublicationId) {
+        console.error("Missing Beehiiv credentials");
+        return res.status(500).json({ error: "Newsletter service is not configured" });
+      }
+
+      const beehiivPayload: any = {
+        email: parsed.email,
+        reactivate_existing: false,
+        send_welcome_email: true,
+        utm_source: "website",
+        utm_medium: "organic",
+        referring_site: "website",
+      };
+
+      if (parsed.name) {
+        beehiivPayload.custom_fields = [
+          {
+            name: "Name",
+            value: parsed.name,
+          },
+        ];
+      }
+
+      const response = await fetch(
+        `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/subscriptions`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${beehiivApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(beehiivPayload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Beehiiv API error:", response.status, errorData);
+        
+        if (response.status === 400 && errorData.message?.includes("already exists")) {
+          return res.status(400).json({ error: "This email is already subscribed to our newsletter" });
+        }
+        
+        return res.status(500).json({ error: "Failed to subscribe. Please try again later." });
+      }
+
+      const data = await response.json();
+      res.status(200).json({ message: "Successfully subscribed to newsletter!", data });
+    } catch (error) {
+      if (error instanceof Error && error.name === "ZodError") {
+        return res.status(400).json({ error: "Invalid subscription data" });
+      }
+      console.error("Error subscribing to newsletter:", error);
+      res.status(500).json({ error: "Failed to subscribe. Please try again later." });
     }
   });
 

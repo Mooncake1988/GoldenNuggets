@@ -174,6 +174,11 @@ Preferred communication style: Simple, everyday language.
   - For better security, use a bcrypt hash (starting with $2a$, $2b$, or $2y$ and 60 chars long)
   - System auto-detects and handles both formats
 
+**Newsletter Integration** (Beehiiv):
+- `BEEHIIV_API_KEY`: Beehiiv API key for authentication (set in Replit Secrets)
+- `BEEHIIV_PUBLICATION_ID`: Beehiiv publication ID (set in Replit Secrets)
+- Names are automatically sent to the "Name" custom field in Beehiiv (must be created in Beehiiv dashboard first)
+
 ## Key Features Implemented
 
 ### Public Features
@@ -194,6 +199,12 @@ Preferred communication style: Simple, everyday language.
    - Results show locations matching both search query AND selected tag
 5. **Map View** (`/map`): Interactive Leaflet map with all location markers
 6. **Location Detail** (`/location/:id`): Full details with image gallery, tags, directions
+7. **Newsletter Subscription** (Footer): Beehiiv-integrated newsletter signup
+   - Collects name and email from visitors
+   - Form validation with React Hook Form and Zod
+   - Direct integration with Beehiiv API for subscriber management
+   - Success/error toast notifications
+   - Names automatically stored in Beehiiv "Name" custom field
 
 ### Admin Features (Authentication Required)
 1. **Admin Login** (`/admin/login`): Replit Auth integration
@@ -210,9 +221,24 @@ Preferred communication style: Simple, everyday language.
 - **Error States**: Proper loading, empty, and error state handling throughout
 - **Responsive Design**: Mobile-first with Cape Town-inspired color palette
 
-### Recent Updates (October 29, 2025)
+### Recent Updates
 
-**Dynamic Tag Filtering System**:
+**Newsletter Integration with Beehiiv (October 31, 2025)**:
+- Integrated Beehiiv API for newsletter subscription management
+- Added newsletter signup form in footer with name and email fields
+- Implemented form validation using React Hook Form and Zod
+- Added POST /api/newsletter/subscribe endpoint with Beehiiv API integration
+- Success/error toast notifications for user feedback
+- Form automatically resets after successful subscription
+- Optional custom field support for storing subscriber names in Beehiiv (via BEEHIIV_NAME_FIELD_ID env var)
+- Secure credential management using Replit Secrets for API keys
+
+**Key Files Modified**:
+- `shared/schema.ts` - Added newsletterSubscriptionSchema with name and email validation
+- `server/routes.ts` - Added POST /api/newsletter/subscribe endpoint
+- `client/src/components/Footer.tsx` - Converted static form to fully functional newsletter subscription with validation
+
+**Dynamic Tag Filtering System (October 29, 2025)**:
 - Replaced hardcoded category filters with dynamic tag-based filtering
 - Tags are automatically extracted from location data in the database
 - Implemented case-insensitive tag matching to handle variations in tag capitalization
