@@ -56,10 +56,10 @@ export default function HeroSection() {
       </div>
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center">
-        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-primary mb-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
+        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-primary mb-4">
           Discover Cape Town's Hidden Gems
         </h1>
-        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-medium drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
+        <p className="text-xl md:text-2xl text-primary mb-8 max-w-2xl mx-auto font-medium">
           Curated local favorites - amazing coffee shops, restaurants, and unique experiences not found in typical tourist guides
         </p>
         
