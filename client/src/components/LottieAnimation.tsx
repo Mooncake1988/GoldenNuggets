@@ -7,7 +7,6 @@ interface LottieAnimationProps {
   loop?: boolean;
   autoplay?: boolean;
   className?: string;
-  speed?: number;
   onComplete?: () => void;
 }
 
@@ -16,7 +15,6 @@ export default function LottieAnimation({
   loop = true,
   autoplay = true,
   className,
-  speed = 1,
   onComplete,
 }: LottieAnimationProps) {
   const [shouldAnimate, setShouldAnimate] = useState(true);
@@ -41,7 +39,6 @@ export default function LottieAnimation({
     animationData,
     loop,
     autoplay,
-    speed,
     className: cn(className),
     onComplete,
   };

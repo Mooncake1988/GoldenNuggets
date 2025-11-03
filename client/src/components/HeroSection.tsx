@@ -2,6 +2,8 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import heroImage from "@assets/generated_images/Cape_Town_Table_Mountain_hero_ec65eba7.png";
+import LottieAnimation from "@/components/LottieAnimation";
+import heroAnimation from "@assets/animations/hero-subtle.json";
 import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import type { FormEvent } from "react";
@@ -44,11 +46,19 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center">
+    <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${heroImage})` }}
       />
+      <div className="absolute inset-0 opacity-30">
+        <LottieAnimation
+          animationData={heroAnimation}
+          loop={true}
+          autoplay={true}
+          className="w-full h-full"
+        />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center">
