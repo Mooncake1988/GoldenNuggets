@@ -3,6 +3,8 @@ import HeroSection from "@/components/HeroSection";
 import TagFilter from "@/components/TagFilter";
 import LocationCard from "@/components/LocationCard";
 import Footer from "@/components/Footer";
+import LottieAnimation from "@/components/LottieAnimation";
+import emptyStateAnimation from "@assets/animations/empty-state.json";
 import { useQuery } from "@tanstack/react-query";
 import type { Location } from "@shared/schema";
 import { useState, useEffect } from "react";
@@ -151,8 +153,14 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground" data-testid="text-no-results">
+            <div className="flex flex-col items-center justify-center py-12">
+              <LottieAnimation
+                animationData={emptyStateAnimation}
+                loop={true}
+                autoplay={true}
+                className="w-64 h-64 mb-4"
+              />
+              <p className="text-muted-foreground text-lg" data-testid="text-no-results">
                 {getNoResultsMessage()}
               </p>
             </div>
