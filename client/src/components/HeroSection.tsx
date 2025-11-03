@@ -46,7 +46,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden bg-background">
-      <div className="absolute inset-0 opacity-45 flex items-center justify-center">
+      <div className="absolute inset-0 opacity-65 flex items-center justify-center">
         <LottieAnimation
           animationData={areaMapAnimation}
           loop={true}
@@ -54,7 +54,7 @@ export default function HeroSection() {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/35 via-slate-800/25 to-slate-900/40" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center">
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-4">
