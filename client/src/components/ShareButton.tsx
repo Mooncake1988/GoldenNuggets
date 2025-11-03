@@ -117,11 +117,18 @@ export default function ShareButton({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onClick={handleCopyLink} data-testid="menu-item-copy-link">
-          {copied ? (
-            <Check className="h-4 w-4 mr-2" />
-          ) : (
-            <Copy className="h-4 w-4 mr-2" />
-          )}
+          <div className="h-4 w-4 mr-2 relative">
+            <Copy 
+              className={`h-4 w-4 absolute transition-all duration-300 ${
+                copied ? 'opacity-0 scale-0 rotate-90' : 'opacity-100 scale-100 rotate-0'
+              }`}
+            />
+            <Check 
+              className={`h-4 w-4 absolute text-green-600 dark:text-green-400 transition-all duration-300 ${
+                copied ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-0 -rotate-90'
+              }`}
+            />
+          </div>
           {copied ? 'Copied!' : 'Copy Link'}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleFacebookShare} data-testid="menu-item-facebook">
