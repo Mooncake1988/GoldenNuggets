@@ -12,7 +12,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend
 
-The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first layouts, map-centric navigation with Leaflet, and a reusable component architecture.
+The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first layouts, map-centric navigation with Leaflet, a reusable component architecture, and subtle Lottie animations (hero area map, newsletter confetti, empty states) that respect accessibility preferences (prefers-reduced-motion).
 
 ### Backend
 
@@ -32,4 +32,5 @@ The database is PostgreSQL (Neon serverless) with a schema including a `Location
 **Development Tools**: Vite, Replit-specific plugins, TypeScript
 **Form Management**: React Hook Form, Zod, @hookform/resolvers
 **Utility Libraries**: `class-variance-authority`, `clsx`, `tailwind-merge`, `nanoid`
+**Animations**: Lottie React (custom animations for hero, confetti, empty states)
 **Newsletter Integration**: Beehiiv API

@@ -57,14 +57,19 @@ export default function Footer() {
   return (
     <footer className="relative border-t bg-card">
       {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-          <LottieAnimation
-            animationData={confettiAnimation}
-            loop={false}
-            autoplay={true}
-            className="w-full h-full max-w-2xl"
-            onComplete={() => setShowConfetti(false)}
-          />
+        <div 
+          className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center bg-transparent"
+          data-testid="confetti-overlay"
+        >
+          <div className="w-full h-full max-w-screen-xl">
+            <LottieAnimation
+              animationData={confettiAnimation}
+              loop={false}
+              autoplay={true}
+              className="w-full h-full"
+              onComplete={() => setShowConfetti(false)}
+            />
+          </div>
         </div>
       )}
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
