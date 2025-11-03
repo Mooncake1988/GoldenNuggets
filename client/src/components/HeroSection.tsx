@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import LottieAnimation from "@/components/LottieAnimation";
 import areaMapAnimation from "@assets/animations/area-map.json";
+import heroImage from "@assets/stock_images/cape_town_table_moun_ebb08106.jpg";
 import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import type { FormEvent } from "react";
@@ -45,21 +46,29 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden bg-background">
-      <div className="absolute inset-0 flex items-center justify-center" style={{ opacity: 0.65 }}>
-        <LottieAnimation
-          animationData={areaMapAnimation}
-          loop={true}
-          autoplay={true}
-          className="w-full h-full object-cover"
-        />
-      </div>
+    <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden">
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center">
-        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-black mb-4">
+        <div className="flex justify-center mb-6">
+          <div className="w-32 h-32 md:w-40 md:h-40">
+            <LottieAnimation
+              animationData={areaMapAnimation}
+              loop={true}
+              autoplay={true}
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+        
+        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-4">
           Discover Cape Town's Hidden Gems
         </h1>
-        <p className="text-xl md:text-2xl text-black mb-8 max-w-2xl mx-auto font-medium">
+        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-medium">
           Curated local favorites - amazing coffee shops, restaurants, and unique experiences not found in typical tourist guides
         </p>
         
