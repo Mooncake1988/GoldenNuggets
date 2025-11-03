@@ -46,7 +46,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden bg-background">
-      <div className="absolute inset-0 opacity-65 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center" style={{ opacity: 0.65 }}>
         <LottieAnimation
           animationData={areaMapAnimation}
           loop={true}
@@ -54,13 +54,12 @@ export default function HeroSection() {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/35 via-slate-800/25 to-slate-900/40" />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 text-center">
-        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-4">
+        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-primary mb-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]">
           Discover Cape Town's Hidden Gems
         </h1>
-        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-medium">
+        <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-medium drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
           Curated local favorites - amazing coffee shops, restaurants, and unique experiences not found in typical tourist guides
         </p>
         
