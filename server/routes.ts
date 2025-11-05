@@ -46,9 +46,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/sitemap.xml", async (req, res) => {
     try {
       const locations = await storage.getAllLocations();
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : 'https://lekker-spots.replit.app';
+      const baseUrl = process.env.REPLIT_DOMAINS
+        ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+        : process.env.REPLIT_DEV_DOMAIN 
+          ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+          : 'https://lekker-spots.replit.app';
 
       const now = new Date().toISOString();
 
@@ -94,9 +96,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SEO: Robots.txt endpoint
   app.get("/robots.txt", (req, res) => {
-    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-      : 'https://lekker-spots.replit.app';
+    const baseUrl = process.env.REPLIT_DOMAINS
+      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+      : process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : 'https://lekker-spots.replit.app';
 
     const robotsTxt = `# LekkerSpots - Cape Town Hidden Gems
 User-agent: *
