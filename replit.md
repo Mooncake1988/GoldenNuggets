@@ -6,7 +6,13 @@ Cape Town Golden Nuggets is a travel discovery web application showcasing hidden
 
 ## Recent Updates (November 2025)
 
-**SEO Optimization - Dynamic Sitemap (Latest)**
+**Sitemap Domain Fix (Latest)**
+- Fixed sitemap URL generation to use custom domain (lekkerspots.co.za) in production
+- Sitemap and robots.txt now dynamically use request host header for proper domain detection
+- Ensures all sitemap URLs use the correct production domain for optimal SEO
+- Works seamlessly across development and production environments
+
+**SEO Optimization - Dynamic Sitemap**
 - Implemented `/sitemap.xml` endpoint that generates SEO-optimized XML sitemap dynamically from database
 - Automatic synchronization: every location create/update/delete is instantly reflected in the sitemap
 - Proper SEO metadata: lastmod timestamps from database, priority levels, and changefreq values
