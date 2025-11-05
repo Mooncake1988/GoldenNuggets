@@ -10,6 +10,19 @@ import ShareButton from "@/components/ShareButton";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
+const getCategoryColor = (category: string) => {
+  const categoryColors: Record<string, string> = {
+    "Coffee Shop": "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0",
+    "Restaurant": "bg-gradient-to-r from-rose-500 to-pink-500 text-white border-0",
+    "Beach": "bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0",
+    "Hike": "bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0",
+    "Market": "bg-gradient-to-r from-violet-500 to-purple-500 text-white border-0",
+    "Bar": "bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0",
+  };
+  
+  return categoryColors[category] || "bg-primary text-primary-foreground border-0";
+};
+
 export default function LocationDetail() {
   const [, params] = useRoute("/location/:slug");
   const [, setLocation] = useWouterLocation();
@@ -128,7 +141,7 @@ export default function LocationDetail() {
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="secondary" data-testid="badge-category">
+                  <Badge className={`font-semibold ${getCategoryColor(location.category)}`} data-testid="badge-category">
                     {location.category}
                   </Badge>
                   <Badge variant="outline" data-testid="badge-neighborhood">
@@ -194,11 +207,22 @@ export default function LocationDetail() {
                 <div>
                   <p className="font-medium mb-3">Tags</p>
                   <div className="flex flex-wrap gap-2">
-                    {location.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" data-testid={`badge-tag-${index}`}>
-                        {tag}
-                      </Badge>
-                    ))}
+                    {location.tags.map((tag, index) => {
+                      const tagColors = [
+                        "bg-primary/10 text-primary dark:text-primary border-primary/20",
+                        "bg-accent/10 text-accent dark:text-accent border-accent/20",
+                        "bg-secondary/10 text-secondary-foreground dark:text-secondary border-secondary/20",
+                        "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
+                        "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20",
+                      ];
+                      const colorClass = tagColors[index % tagColors.length];
+                      
+                      return (
+                        <Badge key={index} className={colorClass} data-testid={`badge-tag-${index}`}>
+                          {tag}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               )}

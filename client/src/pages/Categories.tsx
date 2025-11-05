@@ -106,15 +106,24 @@ export default function Categories() {
                               </p>
                               {location.tags && location.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-3">
-                                  {location.tags.slice(0, 3).map((tag, index) => (
-                                    <span
-                                      key={index}
-                                      className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md"
-                                      data-testid={`tag-${tag}-${location.id}`}
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
+                                  {location.tags.slice(0, 3).map((tag, index) => {
+                                    const tagColors = [
+                                      "bg-primary/10 text-primary dark:text-primary border border-primary/20",
+                                      "bg-accent/10 text-accent dark:text-accent border border-accent/20",
+                                      "bg-secondary/10 text-secondary-foreground dark:text-secondary border border-secondary/20",
+                                    ];
+                                    const colorClass = tagColors[index % tagColors.length];
+                                    
+                                    return (
+                                      <span
+                                        key={index}
+                                        className={`px-2 py-1 text-xs rounded-md ${colorClass}`}
+                                        data-testid={`tag-${tag}-${location.id}`}
+                                      >
+                                        {tag}
+                                      </span>
+                                    );
+                                  })}
                                 </div>
                               )}
                             </CardContent>
