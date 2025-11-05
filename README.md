@@ -151,6 +151,12 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 
 ## 🎨 Recent Updates (November 2025)
 
+### SEO & Domain Optimization
+- Fixed sitemap to use production domain (lekkerspots.co.za) for optimal SEO
+- Dynamic sitemap generation with automatic updates from database
+- Proper robots.txt configuration for search engine crawling
+- All sitemap URLs now correctly reflect the production domain
+
 ### Color Scheme Refresh
 - Vibrant sunset gradient palette (turquoise, hot pink, coral, yellow)
 - Gradient category badges for visual distinction
