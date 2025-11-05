@@ -6,6 +6,13 @@ Cape Town Golden Nuggets is a travel discovery web application showcasing hidden
 
 ## Recent Updates (November 2025)
 
+**Color Scheme Refresh (Latest)**
+- Vibrant sunset gradient palette using LekkerSpots logo colors (turquoise, hot pink, coral, yellow)
+- Gradient category badges: orange for coffee shops, pink for restaurants, teal for beaches, green for hikes, purple for markets, fuchsia for bars
+- Colorful tag system using theme colors (primary, accent, secondary, pink, teal) with proper dark mode support
+- Gradient logo text in header using primary → accent → secondary gradient
+- All colors maintain WCAG-compliant contrast ratios in both light and dark modes
+
 **Hero Section Redesign**
 - Replaced Lottie background with professional Cape Town stock photo
 - Repositioned area-map animation as elegant accent icon above headline

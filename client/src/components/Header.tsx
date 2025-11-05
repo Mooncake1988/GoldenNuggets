@@ -15,10 +15,12 @@ export default function Header() {
         <div className="flex h-16 md:h-20 items-center justify-between">
           <Link href="/" data-testid="link-home">
             <div className="flex items-center gap-2 hover-elevate active-elevate-2 cursor-pointer px-2 py-1 rounded-md">
-              <MapPin className="h-6 w-6 text-primary" />
+              <div className="relative">
+                <MapPin className="h-6 w-6 text-primary" />
+              </div>
               <div className="flex flex-col">
-                <span className="font-bold text-lg leading-tight">Cape Town</span>
-                <span className="text-xs text-muted-foreground leading-tight">Golden Nuggets</span>
+                <span className="font-bold text-lg leading-tight bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">LekkerSpots</span>
+                <span className="text-xs text-muted-foreground leading-tight">Cape Town Hidden Gems</span>
               </div>
             </div>
           </Link>
