@@ -6,7 +6,15 @@ Cape Town Golden Nuggets is a travel discovery web application showcasing hidden
 
 ## Recent Updates (November 2025)
 
-**Color Scheme Refresh (Latest)**
+**SEO Optimization - Dynamic Sitemap (Latest)**
+- Implemented `/sitemap.xml` endpoint that generates SEO-optimized XML sitemap dynamically from database
+- Automatic synchronization: every location create/update/delete is instantly reflected in the sitemap
+- Proper SEO metadata: lastmod timestamps from database, priority levels, and changefreq values
+- Includes all static pages (home, categories, map) and dynamic location detail pages
+- Added `/robots.txt` endpoint with proper crawling rules (allows all, blocks /admin and /api)
+- Zero maintenance required - sitemap stays current automatically
+
+**Color Scheme Refresh**
 - Vibrant sunset gradient palette using LekkerSpots logo colors (turquoise, hot pink, coral, yellow)
 - Gradient category badges: orange for coffee shops, pink for restaurants, teal for beaches, green for hikes, purple for markets, fuchsia for bars
 - Colorful tag system using theme colors (primary, accent, secondary, pink, teal) with proper dark mode support
