@@ -6,7 +6,13 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
-**Social Media & SEO Optimization (Latest)**
+**Production Deployment Fix (Latest)**
+- **Database Connection Stability**: Fixed production server crashes by adding `poolQueryViaFetch` configuration for Neon database in production environments
+- **WebSocket Handling**: Production deployments now use HTTP fetch instead of WebSockets for database queries, ensuring better reliability in serverless environments
+- **TypeScript Compilation**: Fixed all TypeScript errors preventing production builds (LocationCard slug prop, htmlMetaRewriter function signatures)
+- **Production Build**: Verified successful compilation and proper environment variable handling in deployed environments
+
+**Social Media & SEO Optimization**
 - **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
 - **Two-Tier Middleware System**:
   - `locationMetaMiddleware`: Intercepts `/location/:slug` requests, fetches location data from database, populates `res.locals.locationMeta`
