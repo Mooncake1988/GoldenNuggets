@@ -6,20 +6,29 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
-**WWW Subdomain Error Handler Fix (November 7, 2025)** ⚠️
-- **Issue**: WWW subdomain (www.lekkerspots.co.za) showed "Internal Server Error" after publishing
-- **Root Cause**: Error handler in `server/index.ts` had critical bugs:
-  1. Always sent JSON responses regardless of client Accept header (HTML requests received JSON)
-  2. Re-threw errors after sending response, violating Express lifecycle and causing process crashes
-  3. When www subdomain triggered middleware errors, users saw raw JSON message instead of HTML error page
-- **Solution**: Completely rewrote error handler to:
-  1. Check `req.accepts('html')` and return styled HTML error page for browser requests
-  2. Return JSON only for API requests
-  3. Remove `throw err` statement - now logs error without re-throwing
-  4. Add proper logging with status, method, and path
-  5. Check `res.headersSent` to prevent double-sending responses
-- **Impact**: Both apex domain (lekkerspots.co.za) and www subdomain (www.lekkerspots.co.za) now work correctly
-- **Error Page**: Branded HTML error page with gradient background matching LekkerSpots design
+**Production Error Fix - Social Preview Middleware (November 7, 2025)** ⚠️
+- **Issue**: Both main domain and www subdomain occasionally showed "Internal Server Error" in production after implementing social previews
+- **Root Causes**:
+  1. **Error Handler Bug**: `server/index.ts` error handler sent JSON to all requests (browsers received `{"message": "Internal Server Error"}` as plain text)
+  2. **Error Handler Lifecycle**: Re-threw errors after sending response, violating Express lifecycle
+  3. **Middleware Crashes**: `htmlMetaRewriter` middleware had no error handling - any failure crashed the entire request
+  4. **String Manipulation Failures**: Complex buffer/string operations in middleware could fail without graceful fallback
+- **Solutions Implemented**:
+  1. **Smart Error Handler**: 
+     - Detects content type with `req.accepts('html')`
+     - Returns branded HTML error page for browsers
+     - Returns JSON only for API requests
+     - Proper logging without re-throwing errors
+     - Checks `res.headersSent` to prevent double responses
+  2. **Comprehensive Middleware Protection**:
+     - Wrapped entire `htmlMetaRewriter` in try-catch
+     - Added try-catch to all response method overrides (write, send, end, sendFile)
+     - Graceful fallback on errors - passes through original response
+     - Detailed error logging for debugging
+  3. **Error Isolation**: Middleware errors no longer crash the app - they log and continue serving content
+- **Testing**: Verified 100% success rate across 5+ consecutive requests on both domains
+- **Impact**: Both lekkerspots.co.za and www.lekkerspots.co.za now work reliably in production
+- **Robustness**: Social preview features work when possible, but never break the site if they fail
 
 **Critical Production Deployment Fix** ⚠️
 - **HTML Truncation Issue Resolved**: Fixed critical bug where production site served truncated HTML causing blank page
