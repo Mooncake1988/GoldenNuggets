@@ -8,13 +8,16 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 **Social Media & SEO Optimization (Latest)**
 - Comprehensive Open Graph tags for Facebook, Twitter, and LinkedIn social sharing
-- Generated custom OG image (1200×630px) featuring Western Cape landscapes
-- Dynamic meta tags on location pages using react-helmet-async
+- Custom OG image (1200×630px, 193KB) featuring Western Cape beach with LekkerSpots logo
+- Dynamic base URL system: __BASE_URL__ placeholder replaced at runtime with current domain
+- Stream-aware htmlMetaRewriter middleware intercepts HTML responses (buffers text/html only)
+- Works seamlessly across dev (Replit domain) and production (lekkerspots.co.za)
+- Strict host header validation with regex to prevent spoofing attacks
+- Dynamic meta tags on location pages using react-helmet-async + window.location.origin
 - Each location page has unique og:title, og:description, og:image from location data
 - JSON-LD structured data (LocalBusiness schema) for rich search results
 - Complete SEO meta tags: keywords, canonical URLs, theme-color, author
-- Full Western Cape rebranding across entire application (replacing Cape Town references)
-- OG image hosted on root domain (best practice for attribution and control)
+- Full Western Cape rebranding across entire application
 
 **Sitemap Domain Fix**
 - Fixed sitemap URL generation to use custom domain (lekkerspots.co.za) in production
