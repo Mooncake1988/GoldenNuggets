@@ -25,8 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(createLocationMetaMiddleware(storage));
 
 // Then apply HTML meta rewriter middleware to inject dynamic base URLs and location meta tags
-// TEMPORARILY DISABLED TO DEBUG WWW SUBDOMAIN ISSUE
-// app.use(htmlMetaRewriter);
+app.use(htmlMetaRewriter);
 
 app.use((req, res, next) => {
   const start = Date.now();
