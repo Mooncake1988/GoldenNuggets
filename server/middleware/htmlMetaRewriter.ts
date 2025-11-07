@@ -285,33 +285,37 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       // Read the file and process it
       fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
         if (err) {
-          if (callback) {
-            callback(err);
-          } else {
-            res.status(500).send('Error reading file');
+          console.error('Error reading HTML file in sendFile override:', err);
+          // Fall back to original sendFile
+          return (originalSendFile as any).call(res, filePath, options, callback);
+        }
+
+        try {
+          // Process the HTML content
+          htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
+          
+          // Inject location-specific meta tags if available
+          if (res.locals.locationMeta) {
+            htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
           }
-          return;
-        }
 
-        // Process the HTML content
-        htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
-        
-        // Inject location-specific meta tags if available
-        if (res.locals.locationMeta) {
-          htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
-        }
-
-        // Set proper headers
-        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-        res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
-        
-        // Send the processed HTML
-        res.send(htmlContent);
-        
-        if (callback) {
-          callback();
+          // Set proper headers
+          res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+          res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
+          
+          // Send the processed HTML
+          originalSend.call(res, htmlContent);
+          
+          if (callback) {
+            callback();
+          }
+        } catch (processError) {
+          console.error('Error processing HTML in sendFile callback:', processError);
+          // Fall back to original sendFile
+          (originalSendFile as any).call(res, filePath, options, callback);
         }
       });
+      return;
     } else {
       // For non-HTML files, use original sendFile
       return (originalSendFile as any).call(res, filePath, options, callback);

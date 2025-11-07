@@ -7,12 +7,13 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 ## Recent Updates (November 2025)
 
 **Production Error Fix - Social Preview Middleware (November 7, 2025)** ⚠️
-- **Issue**: Both main domain and www subdomain occasionally showed "Internal Server Error" in production after implementing social previews
+- **Issue**: Both main domain and www subdomain showed "Service Unavailable" / "Internal Server Error" in production after implementing social previews
 - **Root Causes**:
   1. **Error Handler Bug**: `server/index.ts` error handler sent JSON to all requests (browsers received `{"message": "Internal Server Error"}` as plain text)
   2. **Error Handler Lifecycle**: Re-threw errors after sending response, violating Express lifecycle
   3. **Middleware Crashes**: `htmlMetaRewriter` middleware had no error handling - any failure crashed the entire request
-  4. **String Manipulation Failures**: Complex buffer/string operations in middleware could fail without graceful fallback
+  4. **Async Callback Failures**: The `sendFile` override used asynchronous fs.readFile without try-catch, causing unhandled errors in production
+  5. **Recursive Calls**: sendFile override called `res.send` which was itself overridden, potentially causing infinite loops
 - **Solutions Implemented**:
   1. **Smart Error Handler**: 
      - Detects content type with `req.accepts('html')`
@@ -23,11 +24,14 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
   2. **Comprehensive Middleware Protection**:
      - Wrapped entire `htmlMetaRewriter` in try-catch
      - Added try-catch to all response method overrides (write, send, end, sendFile)
-     - Graceful fallback on errors - passes through original response
+     - **Critical**: Added try-catch inside sendFile's async fs.readFile callback
+     - Uses `originalSend` instead of `res.send` to prevent recursion
+     - Explicit return statements to prevent fall-through
+     - Graceful fallback on errors - calls original methods
      - Detailed error logging for debugging
-  3. **Error Isolation**: Middleware errors no longer crash the app - they log and continue serving content
-- **Testing**: Verified 100% success rate across 5+ consecutive requests on both domains
-- **Impact**: Both lekkerspots.co.za and www.lekkerspots.co.za now work reliably in production
+  3. **Error Isolation**: Middleware errors no longer crash the app - they log and fall back to serving original content
+- **Testing**: Build succeeds, development server stable
+- **Impact**: Both lekkerspots.co.za and www.lekkerspots.co.za will work reliably after republishing
 - **Robustness**: Social preview features work when possible, but never break the site if they fail
 
 **Critical Production Deployment Fix** ⚠️
