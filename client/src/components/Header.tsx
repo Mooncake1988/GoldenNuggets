@@ -20,7 +20,7 @@ export default function Header() {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-lg leading-tight bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">LekkerSpots</span>
-                <span className="text-xs text-muted-foreground leading-tight">Cape Town Hidden Gems</span>
+                <span className="text-xs text-muted-foreground leading-tight">Western Cape Hidden Gems</span>
               </div>
             </div>
           </Link>

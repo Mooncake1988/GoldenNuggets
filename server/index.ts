@@ -1,6 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { htmlMetaRewriter } from "./middleware/htmlMetaRewriter";
+import { createLocationMetaMiddleware } from "./middleware/locationMetaMiddleware";
+import { storage } from "./storage";
 
 const app = express();
 
@@ -15,6 +18,12 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false }));
+
+// Apply location meta middleware FIRST to populate res.locals.locationMeta
+app.use(createLocationMetaMiddleware(storage));
+
+// Then apply HTML meta rewriter middleware to inject dynamic base URLs and location meta tags
+app.use(htmlMetaRewriter);
 
 app.use((req, res, next) => {
   const start = Date.now();

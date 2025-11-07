@@ -1,6 +1,6 @@
-# LekkerSpots - Cape Town Hidden Gems
+# LekkerSpots - Western Cape Hidden Gems
 
-A vibrant travel discovery web application showcasing hidden gems and local favorites in Cape Town, South Africa. Discover the best coffee shops, restaurants, beaches, hikes, markets, and bars with an interactive map and beautiful visual design.
+A vibrant travel discovery web application showcasing hidden gems and local favorites in the Western Cape, South Africa. Discover the best coffee shops, restaurants, beaches, hikes, markets, and bars with an interactive map and beautiful visual design.
 
 ![LekkerSpots](./attached_assets/LekkerSpots%20logo_1762342226104.png)
 
@@ -19,12 +19,12 @@ A vibrant travel discovery web application showcasing hidden gems and local favo
 
 ## 🎨 Design Philosophy
 
-LekkerSpots features a vibrant sunset color palette inspired by Cape Town's natural beauty:
+LekkerSpots features a vibrant sunset color palette inspired by the Western Cape's natural beauty:
 - **Turquoise Primary**: Reflects the Atlantic Ocean and Table Bay
-- **Hot Pink Accent**: Captures the energy of the city's sunsets
+- **Hot Pink Accent**: Captures the energy of stunning sunsets
 - **Coral/Orange Secondary**: Echoes golden hour along the beaches
 - **Gradient Category Badges**: Each category has its own colorful gradient (orange for coffee shops, pink for restaurants, teal for beaches, etc.)
-- **Photography-First**: Hero section features professional Cape Town imagery with elegant Lottie animations
+- **Photography-First**: Hero section features professional Western Cape imagery with elegant Lottie animations
 
 ## 🚀 Tech Stack
 
@@ -151,6 +151,18 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 
 ## 🎨 Recent Updates (November 2025)
 
+### Social Media & SEO Optimization
+- **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
+- **Dynamic Meta Tags**: Each location page serves unique title, Open Graph tags, Twitter Card tags, and JSON-LD structured data
+- **Social Media Preview**: Tested and working on Facebook, Twitter, LinkedIn, and WhatsApp
+- **Custom OG Image**: Professional 1200×630px image featuring Western Cape beach with LekkerSpots logo
+- **Favicon System**: Complete multi-size favicon implementation
+  - Browser icons: 16x16, 32x32, favicon.ico
+  - iOS: 180x180 apple-touch-icon
+  - Android: 192x192 and 512x512 icons with web manifest
+- **Security**: HTML escaping for user-generated content prevents XSS attacks in meta tags
+- **Dynamic Base URL**: Works seamlessly across development and production environments
+
 ### SEO & Domain Optimization
 - Fixed sitemap to use production domain (lekkerspots.co.za) for optimal SEO
 - Dynamic sitemap generation with automatic updates from database
@@ -165,7 +177,7 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Gradient logo text in header
 
 ### Hero Section Redesign
-- Professional Cape Town stock photo background
+- Professional Western Cape stock photo background
 - Area-map Lottie animation as accent icon
 - Gradient overlay for optimal text readability
 - Clean visual hierarchy
@@ -190,8 +202,8 @@ This project is licensed under the MIT License.
 - Lottie animations for smooth UI interactions
 - Shadcn/ui for beautiful, accessible components
 - OpenStreetMap for map tiles
-- The Cape Town community for inspiration
+- The Western Cape community for inspiration
 
 ---
 
-Built with ❤️ for Cape Town explorers
+Built with ❤️ for Western Cape explorers

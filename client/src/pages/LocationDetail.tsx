@@ -1,5 +1,6 @@
 import { useRoute, useLocation as useWouterLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import type { Location } from "@shared/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -66,9 +67,69 @@ export default function LocationDetail() {
 
   const hasImages = location.images && location.images.length > 0;
   const currentImage = hasImages ? location.images[selectedImageIndex] : "";
+  
+  const pageTitle = `${location.name} - ${location.category} in ${location.neighborhood} | LekkerSpots`;
+  const pageDescription = location.description.length > 160 
+    ? `${location.description.slice(0, 157)}...` 
+    : location.description;
+  
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lekkerspots.co.za';
+  const ogImage = hasImages ? location.images[0] : `${baseUrl}/og-image.jpg`;
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : `${baseUrl}/location/${location.slug}`;
+  
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": location.name,
+    "description": location.description,
+    "image": hasImages ? location.images : [`${baseUrl}/og-image.jpg`],
+    "address": location.address ? {
+      "@type": "PostalAddress",
+      "streetAddress": location.address,
+      "addressLocality": location.neighborhood,
+      "addressRegion": "Western Cape",
+      "addressCountry": "ZA"
+    } : undefined,
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": location.latitude,
+      "longitude": location.longitude
+    },
+    "url": pageUrl,
+    ...(location.category && { "servesCuisine": location.category === "Restaurant" || location.category === "Coffee Shop" ? location.category : undefined })
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        
+        <meta property="og:type" content="place" />
+        <meta property="og:site_name" content="LekkerSpots" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:secure_url" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="800" />
+        <meta property="og:image:alt" content={`${location.name} - ${location.category} in Western Cape`} />
+        <meta property="og:locale" content="en_ZA" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:alt" content={`${location.name} - ${location.category} in Western Cape`} />
+        
+        <link rel="canonical" href={pageUrl} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+      
       <Header />
       
       <main className="flex-1 bg-muted/30">
@@ -134,7 +195,7 @@ export default function LocationDetail() {
                   </h1>
                   <ShareButton
                     title={location.name}
-                    text={`Check out ${location.name} in Cape Town - ${location.description}`}
+                    text={`Check out ${location.name} in the Western Cape - ${location.description}`}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
                     variant="outline"
                   />

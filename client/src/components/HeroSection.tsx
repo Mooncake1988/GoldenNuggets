@@ -66,7 +66,7 @@ export default function HeroSection() {
         </div>
         
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-4">
-          Discover Cape Town's Hidden Gems
+          Discover Western Cape's Hidden Gems
         </h1>
         <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-medium">
           Curated local favorites - amazing coffee shops, restaurants, and unique experiences not found in typical tourist guides
