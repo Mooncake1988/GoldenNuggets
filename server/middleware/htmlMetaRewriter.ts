@@ -217,6 +217,14 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       
       const processedBuffer = Buffer.from(htmlContent, 'utf-8');
 
+      // CRITICAL: Remove stale Content-Length header set by express.static
+      // The original header is based on unmodified file size, but we've modified the HTML
+      // If we don't remove it, clients will stop reading at the old length, truncating the response
+      res.removeHeader('Content-Length');
+      
+      // Optionally set correct Content-Length for the processed content
+      res.setHeader('Content-Length', processedBuffer.length);
+
       // Send the complete processed buffer directly via end()
       return (originalEnd as any).call(this, processedBuffer, encoding, callback);
     }
@@ -238,6 +246,10 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
         
         // Convert back to Buffer if original was Buffer, preserving encoding
         chunk = Buffer.isBuffer(chunk) ? Buffer.from(htmlContent, 'utf-8') : htmlContent;
+        
+        // CRITICAL: Recalculate Content-Length after modifying HTML
+        res.removeHeader('Content-Length');
+        res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
       }
     }
     
