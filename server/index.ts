@@ -60,12 +60,76 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    console.error(`[Error Handler] ${status} ${req.method} ${req.path}:`, err);
+
+    if (res.headersSent) {
+      return;
+    }
+
+    if (req.accepts('html')) {
+      res.status(status).send(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Error - LekkerSpots</title>
+            <style>
+              body {
+                font-family: system-ui, -apple-system, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+              }
+              .container {
+                text-align: center;
+                padding: 2rem;
+              }
+              h1 {
+                font-size: 3rem;
+                margin: 0 0 1rem 0;
+              }
+              p {
+                font-size: 1.25rem;
+                margin: 0 0 2rem 0;
+                opacity: 0.9;
+              }
+              a {
+                display: inline-block;
+                padding: 0.75rem 2rem;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                text-decoration: none;
+                border-radius: 0.5rem;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                transition: all 0.2s;
+              }
+              a:hover {
+                background: rgba(255, 255, 255, 0.3);
+                border-color: rgba(255, 255, 255, 0.5);
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>${status}</h1>
+              <p>${status === 404 ? 'Page not found' : 'Something went wrong'}</p>
+              <a href="/">Go to Homepage</a>
+            </div>
+          </body>
+        </html>
+      `);
+    } else {
+      res.status(status).json({ message });
+    }
   });
 
   // importantly only setup vite in development and after
