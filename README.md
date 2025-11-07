@@ -1,6 +1,6 @@
-# LekkerSpots - Cape Town Hidden Gems
+# LekkerSpots - Western Cape Hidden Gems
 
-A vibrant travel discovery web application showcasing hidden gems and local favorites in Cape Town, South Africa. Discover the best coffee shops, restaurants, beaches, hikes, markets, and bars with an interactive map and beautiful visual design.
+A vibrant travel discovery web application showcasing hidden gems and local favorites in the Western Cape, South Africa. Discover the best coffee shops, restaurants, beaches, hikes, markets, and bars with an interactive map and beautiful visual design.
 
 ![LekkerSpots](./attached_assets/LekkerSpots%20logo_1762342226104.png)
 
@@ -19,12 +19,12 @@ A vibrant travel discovery web application showcasing hidden gems and local favo
 
 ## 🎨 Design Philosophy
 
-LekkerSpots features a vibrant sunset color palette inspired by Cape Town's natural beauty:
+LekkerSpots features a vibrant sunset color palette inspired by the Western Cape's natural beauty:
 - **Turquoise Primary**: Reflects the Atlantic Ocean and Table Bay
-- **Hot Pink Accent**: Captures the energy of the city's sunsets
+- **Hot Pink Accent**: Captures the energy of stunning sunsets
 - **Coral/Orange Secondary**: Echoes golden hour along the beaches
 - **Gradient Category Badges**: Each category has its own colorful gradient (orange for coffee shops, pink for restaurants, teal for beaches, etc.)
-- **Photography-First**: Hero section features professional Cape Town imagery with elegant Lottie animations
+- **Photography-First**: Hero section features professional Western Cape imagery with elegant Lottie animations
 
 ## 🚀 Tech Stack
 

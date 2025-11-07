@@ -134,7 +134,7 @@ export default function LocationDetail() {
                   </h1>
                   <ShareButton
                     title={location.name}
-                    text={`Check out ${location.name} in Cape Town - ${location.description}`}
+                    text={`Check out ${location.name} in the Western Cape - ${location.description}`}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
                     variant="outline"
                   />
