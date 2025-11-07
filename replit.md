@@ -13,6 +13,11 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
   - `htmlMetaRewriter`: Replaces `__BASE_URL__` placeholders AND injects location-specific meta tags from `res.locals`
 - **Dynamic Meta Tags**: Each location page serves unique `<title>`, OG tags (title, description, image, url, type=place), Twitter Card tags, and JSON-LD structured data
 - **Works for All Crawlers**: Social media bots (Facebook, Twitter, LinkedIn) receive proper meta tags even without JavaScript execution
+- **Favicon System**: Multi-size favicon implementation for all platforms
+  - Browser icons: 16x16, 32x32, favicon.ico
+  - iOS: 180x180 apple-touch-icon
+  - Android: 192x192 and 512x512 icons with web manifest
+  - All sizes feature larger LekkerSpots logo with sunset gradient for better visibility
 - Custom OG image (1200×630px, 193KB) featuring Western Cape beach with LekkerSpots logo
 - Dynamic base URL system works seamlessly across dev (Replit domain) and production (lekkerspots.co.za)
 - Strict host header validation with regex to prevent spoofing attacks

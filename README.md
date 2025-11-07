@@ -151,6 +151,18 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 
 ## 🎨 Recent Updates (November 2025)
 
+### Social Media & SEO Optimization
+- **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
+- **Dynamic Meta Tags**: Each location page serves unique title, Open Graph tags, Twitter Card tags, and JSON-LD structured data
+- **Social Media Preview**: Tested and working on Facebook, Twitter, LinkedIn, and WhatsApp
+- **Custom OG Image**: Professional 1200×630px image featuring Western Cape beach with LekkerSpots logo
+- **Favicon System**: Complete multi-size favicon implementation
+  - Browser icons: 16x16, 32x32, favicon.ico
+  - iOS: 180x180 apple-touch-icon
+  - Android: 192x192 and 512x512 icons with web manifest
+- **Security**: HTML escaping for user-generated content prevents XSS attacks in meta tags
+- **Dynamic Base URL**: Works seamlessly across development and production environments
+
 ### SEO & Domain Optimization
 - Fixed sitemap to use production domain (lekkerspots.co.za) for optimal SEO
 - Dynamic sitemap generation with automatic updates from database
