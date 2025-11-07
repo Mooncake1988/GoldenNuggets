@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { htmlMetaRewriter } from "./middleware/htmlMetaRewriter";
 
 const app = express();
 
@@ -15,6 +16,9 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false }));
+
+// Apply HTML meta rewriter middleware to inject dynamic base URLs for OG tags
+app.use(htmlMetaRewriter);
 
 app.use((req, res, next) => {
   const start = Date.now();

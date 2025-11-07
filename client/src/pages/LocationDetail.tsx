@@ -72,15 +72,17 @@ export default function LocationDetail() {
   const pageDescription = location.description.length > 160 
     ? `${location.description.slice(0, 157)}...` 
     : location.description;
-  const ogImage = hasImages ? location.images[0] : 'https://lekkerspots.co.za/og-image.jpg';
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : `https://lekkerspots.co.za/location/${location.slug}`;
+  
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lekkerspots.co.za';
+  const ogImage = hasImages ? location.images[0] : `${baseUrl}/og-image.jpg`;
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : `${baseUrl}/location/${location.slug}`;
   
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": location.name,
     "description": location.description,
-    "image": hasImages ? location.images : ["https://lekkerspots.co.za/og-image.jpg"],
+    "image": hasImages ? location.images : [`${baseUrl}/og-image.jpg`],
     "address": location.address ? {
       "@type": "PostalAddress",
       "streetAddress": location.address,
