@@ -92,9 +92,6 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
  */
 export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction) {
   try {
-    console.log(`[htmlMetaRewriter] Processing request: ${req.method} ${req.url}`);
-    console.log(`[htmlMetaRewriter] Headers - host: ${req.headers.host}, x-forwarded-host: ${req.headers['x-forwarded-host']}, x-forwarded-proto: ${req.headers['x-forwarded-proto']}`);
-    
     const originalSend = res.send;
     const originalWrite = res.write;
     const originalEnd = res.end;
@@ -144,7 +141,6 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
     }
 
     const baseUrl = `${protocol}://${host}`;
-    console.log(`[htmlMetaRewriter] Computed baseUrl: ${baseUrl}`);
 
   // Override res.write to buffer HTML chunks
   res.write = function (chunk: any, encoding?: any, callback?: any): boolean {
@@ -279,8 +275,6 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
   // Override res.sendFile to process HTML files in production
   res.sendFile = function (filePath: string, options?: any, callback?: any) {
     try {
-      console.log(`[htmlMetaRewriter] sendFile called for: ${filePath}, host: ${host}, baseUrl: ${baseUrl}`);
-      
       // Handle callback in different parameter positions
       if (typeof options === 'function') {
         callback = options;
@@ -289,19 +283,15 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
 
       // Check if this is an HTML file
       if (filePath.endsWith('.html') || filePath.endsWith('index.html')) {
-        console.log(`[htmlMetaRewriter] Processing HTML file...`);
-        
         // Read the file and process it
         fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
           if (err) {
-            console.error('[htmlMetaRewriter] ERROR reading HTML file:', err);
+            console.error('Error reading HTML file in sendFile override:', err);
             // Fall back to original sendFile
             return (originalSendFile as any).call(res, filePath, options, callback);
           }
 
           try {
-            console.log(`[htmlMetaRewriter] Successfully read HTML, length: ${htmlContent.length}`);
-            
             // Process the HTML content
             htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
             
@@ -310,22 +300,18 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
               htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
             }
 
-            const contentLength = Buffer.byteLength(htmlContent, 'utf-8');
-            console.log(`[htmlMetaRewriter] Processed HTML, new length: ${contentLength}`);
-
             // Set proper headers
             res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-            res.setHeader('Content-Length', contentLength);
+            res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
             
             // Send the processed HTML
             originalSend.call(res, htmlContent);
-            console.log('[htmlMetaRewriter] HTML sent successfully');
             
             if (callback) {
               callback();
             }
           } catch (processError) {
-            console.error('[htmlMetaRewriter] ERROR processing HTML in callback:', processError);
+            console.error('Error processing HTML in sendFile callback:', processError);
             // Fall back to original sendFile
             (originalSendFile as any).call(res, filePath, options, callback);
           }
@@ -336,7 +322,7 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
         return (originalSendFile as any).call(res, filePath, options, callback);
       }
     } catch (err) {
-      console.error('[htmlMetaRewriter] ERROR in sendFile override:', err);
+      console.error('Error in sendFile override:', err);
       return (originalSendFile as any).call(res, filePath, options, callback);
     }
   } as any;
