@@ -215,14 +215,8 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       
       const processedBuffer = Buffer.from(htmlContent, 'utf-8');
 
-      // Write the processed content using original methods
-      (originalWrite as any).call(this, processedBuffer);
-      // Call originalEnd with just the callback (no chunk since we already wrote it)
-      if (callback) {
-        return (originalEnd as any).call(this, callback);
-      } else {
-        return (originalEnd as any).call(this);
-      }
+      // Send the complete processed buffer directly via end()
+      return (originalEnd as any).call(this, processedBuffer, encoding, callback);
     }
 
     // For non-buffered HTML responses (e.g., from Vite), process inline
