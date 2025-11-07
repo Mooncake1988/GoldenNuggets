@@ -1,9 +1,91 @@
 import { Request, Response, NextFunction } from 'express';
+import { escapeHtml } from './locationMetaMiddleware';
+
+interface LocationMeta {
+  title: string;
+  description: string;
+  url: string;
+  ogImage: string;
+  locationName: string;
+  category: string;
+  structuredData: string;
+}
 
 /**
- * Middleware that intercepts HTML responses and replaces the __BASE_URL__ placeholder
- * with the actual request base URL. This ensures OG tags and canonical URLs use the
- * correct domain in both development and production environments.
+ * Injects location-specific meta tags into the HTML
+ */
+function injectLocationMeta(html: string, meta: LocationMeta): string {
+  // Replace title tag
+  html = html.replace(
+    /<title>.*?<\/title>/,
+    `<title>${meta.title}</title>`
+  );
+  
+  // Replace description meta tag
+  html = html.replace(
+    /<meta name="description" content="[^"]*" \/>/,
+    `<meta name="description" content="${meta.description}" />`
+  );
+  
+  // Replace Open Graph tags
+  html = html.replace(
+    /<meta property="og:title" content="[^"]*" \/>/,
+    `<meta property="og:title" content="${meta.title}" />`
+  );
+  html = html.replace(
+    /<meta property="og:description" content="[^"]*" \/>/,
+    `<meta property="og:description" content="${meta.description}" />`
+  );
+  html = html.replace(
+    /<meta property="og:url" content="[^"]*" \/>/,
+    `<meta property="og:url" content="${meta.url}" />`
+  );
+  html = html.replace(
+    /<meta property="og:image" content="[^"]*" \/>/,
+    `<meta property="og:image" content="${meta.ogImage}" />`
+  );
+  html = html.replace(
+    /<meta property="og:image:secure_url" content="[^"]*" \/>/,
+    `<meta property="og:image:secure_url" content="${meta.ogImage}" />`
+  );
+  html = html.replace(
+    /<meta property="og:image:alt" content="[^"]*" \/>/,
+    `<meta property="og:image:alt" content="${meta.locationName} - ${meta.category} in Western Cape" />`
+  );
+  html = html.replace(
+    /<meta property="og:type" content="website" \/>/,
+    `<meta property="og:type" content="place" />`
+  );
+  
+  // Replace Twitter Card tags
+  html = html.replace(
+    /<meta name="twitter:title" content="[^"]*" \/>/,
+    `<meta name="twitter:title" content="${meta.title}" />`
+  );
+  html = html.replace(
+    /<meta name="twitter:description" content="[^"]*" \/>/,
+    `<meta name="twitter:description" content="${meta.description}" />`
+  );
+  html = html.replace(
+    /<meta name="twitter:image" content="[^"]*" \/>/,
+    `<meta name="twitter:image" content="${meta.ogImage}" />`
+  );
+  html = html.replace(
+    /<meta name="twitter:image:alt" content="[^"]*" \/>/,
+    `<meta name="twitter:image:alt" content="${meta.locationName} - ${meta.category} in Western Cape" />`
+  );
+  
+  // Inject structured data before closing </head> tag
+  const structuredDataScript = `<script type="application/ld+json">\n${meta.structuredData}\n</script>\n</head>`;
+  html = html.replace(/<\/head>/, structuredDataScript);
+  
+  return html;
+}
+
+/**
+ * Middleware that intercepts HTML responses and:
+ * 1. Replaces __BASE_URL__ placeholder with actual request domain
+ * 2. Injects location-specific meta tags when res.locals.locationMeta is present
  * 
  * Handles streaming HTML from express.static by buffering chunks for text/html responses.
  */
@@ -122,9 +204,15 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       // Combine all chunks into one buffer
       const combinedBuffer = Buffer.concat(htmlChunks);
       
-      // Convert to string, replace placeholder, convert back to buffer
+      // Convert to string, replace placeholder
       let htmlContent = combinedBuffer.toString('utf-8');
       htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
+      
+      // Inject location-specific meta tags if available
+      if (res.locals.locationMeta) {
+        htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
+      }
+      
       const processedBuffer = Buffer.from(htmlContent, 'utf-8');
 
       // Write the processed content using original methods
@@ -146,6 +234,12 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       
       if (typeof htmlContent === 'string') {
         htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
+        
+        // Inject location-specific meta tags if available
+        if (res.locals.locationMeta) {
+          htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
+        }
+        
         // Convert back to Buffer if original was Buffer, preserving encoding
         chunk = Buffer.isBuffer(chunk) ? Buffer.from(htmlContent, 'utf-8') : htmlContent;
       }
