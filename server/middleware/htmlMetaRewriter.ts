@@ -145,18 +145,24 @@ function processHtml(html: string, baseUrl: string, locationMeta?: LocationMeta)
  * This avoids complex response overriding and only processes what's necessary
  */
 export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction) {
+  console.log('[htmlMetaRewriter] Middleware hit for path:', req.path);
+  
   // Skip processing for non-HTML requests
   if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot)$/)) {
+    console.log('[htmlMetaRewriter] Skipping non-HTML request');
     return next();
   }
 
   // Skip processing for API requests
   if (req.path.startsWith('/api/') || req.path.startsWith('/objects/')) {
+    console.log('[htmlMetaRewriter] Skipping API request');
     return next();
   }
 
   const baseUrl = getBaseUrl(req);
   const locationMeta = res.locals.locationMeta;
+  
+  console.log('[htmlMetaRewriter] Setting up sendFile override for path:', req.path, 'baseUrl:', baseUrl);
 
   // Intercept sendFile to process HTML files
   const originalSendFile = res.sendFile.bind(res);
