@@ -6,6 +6,7 @@ export default function LocationCardExample() {
     <div className="max-w-sm">
       <LocationCard
         id="1"
+        slug="truth-coffee"
         name="Truth Coffee"
         category="Coffee Shop"
         neighborhood="CBD"
