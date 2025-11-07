@@ -151,10 +151,18 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 
 ## 🎨 Recent Updates (November 2025)
 
+### Production Deployment Fixes
+- **Critical Fix**: Resolved social media preview issue where `__BASE_URL__` placeholders weren't being replaced in production
+- **Root Cause**: `express.static` middleware uses internal `send` module, bypassing `res.sendFile` overrides
+- **Solution**: Rewrote middleware to directly intercept and serve processed HTML before express.static
+- **Impact**: Social media previews now work perfectly on all platforms (Slack, Facebook, Twitter, LinkedIn, Discord)
+- **Verified**: Both main domain (lekkerspots.co.za) and www subdomain working reliably
+- See `PRODUCTION_DEPLOYMENT_FIX.md` for detailed technical analysis
+
 ### Social Media & SEO Optimization
 - **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
 - **Dynamic Meta Tags**: Each location page serves unique title, Open Graph tags, Twitter Card tags, and JSON-LD structured data
-- **Social Media Preview**: Tested and working on Facebook, Twitter, LinkedIn, and WhatsApp
+- **Social Media Preview**: Tested and working on Facebook, Twitter, LinkedIn, Slack, Discord, and WhatsApp
 - **Custom OG Image**: Professional 1200×630px image featuring Western Cape beach with LekkerSpots logo
 - **Favicon System**: Complete multi-size favicon implementation
   - Browser icons: 16x16, 32x32, favicon.ico

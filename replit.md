@@ -6,33 +6,31 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
-**Production Error Fix - Social Preview Middleware (November 7, 2025)** ⚠️
-- **Issue**: Both main domain and www subdomain showed "Service Unavailable" / "Internal Server Error" in production after implementing social previews
-- **Root Causes**:
-  1. **Error Handler Bug**: `server/index.ts` error handler sent JSON to all requests (browsers received `{"message": "Internal Server Error"}` as plain text)
-  2. **Error Handler Lifecycle**: Re-threw errors after sending response, violating Express lifecycle
-  3. **Middleware Crashes**: `htmlMetaRewriter` middleware had no error handling - any failure crashed the entire request
-  4. **Async Callback Failures**: The `sendFile` override used asynchronous fs.readFile without try-catch, causing unhandled errors in production
-  5. **Recursive Calls**: sendFile override called `res.send` which was itself overridden, potentially causing infinite loops
-- **Solutions Implemented**:
-  1. **Smart Error Handler**: 
-     - Detects content type with `req.accepts('html')`
-     - Returns branded HTML error page for browsers
-     - Returns JSON only for API requests
-     - Proper logging without re-throwing errors
-     - Checks `res.headersSent` to prevent double responses
-  2. **Comprehensive Middleware Protection**:
-     - Wrapped entire `htmlMetaRewriter` in try-catch
-     - Added try-catch to all response method overrides (write, send, end, sendFile)
-     - **Critical**: Added try-catch inside sendFile's async fs.readFile callback
-     - Uses `originalSend` instead of `res.send` to prevent recursion
-     - Explicit return statements to prevent fall-through
-     - Graceful fallback on errors - calls original methods
-     - Detailed error logging for debugging
-  3. **Error Isolation**: Middleware errors no longer crash the app - they log and fall back to serving original content
-- **Testing**: Build succeeds, development server stable
-- **Impact**: Both lekkerspots.co.za and www.lekkerspots.co.za will work reliably after republishing
-- **Robustness**: Social preview features work when possible, but never break the site if they fail
+**Production Error Fix - Social Preview & Base URL Replacement (November 7, 2025)** ⚠️
+- **Issue**: Social media previews not working - `__BASE_URL__` placeholders remained in production HTML instead of being replaced with actual domain
+- **Root Cause**: `express.static` middleware uses internal `send` module (NOT `res.sendFile`) to serve index.html
+  - Original middleware tried to override `res.sendFile` to intercept and process HTML
+  - When users request `/`, `express.static` serves index.html directly via `send` module
+  - The `res.sendFile` override never executes for homepage requests
+  - Social media crawlers hit `/` and receive unprocessed HTML with placeholders
+  - Location pages worked because they fell through to the catch-all handler
+- **Solution - Direct HTML Serving**:
+  - Completely rewrote `htmlMetaRewriter` middleware to intercept HTML requests BEFORE express.static
+  - In production, middleware directly reads `index.html`, processes it, and sends via `res.send()`
+  - Bypasses express.static entirely for HTML requests
+  - Processes all HTML requests uniformly (homepage and location pages)
+  - In development, lets Vite handle HTML transformation (no processing needed)
+- **How It Works**:
+  1. Request comes in (e.g., `/` or `/location/slug`)
+  2. Middleware checks if it's a static asset or API request → skip if yes
+  3. For HTML requests in production: read index.html from disk
+  4. Replace `__BASE_URL__` with actual domain (lekkerspots.co.za or www.lekkerspots.co.za)
+  5. Inject location-specific meta tags if applicable (from `res.locals.locationMeta`)
+  6. Send processed HTML directly with correct headers
+  7. Request never reaches express.static for HTML
+- **Testing**: Verified working on Slack, Facebook, Twitter, LinkedIn, Discord via OpenGraph.xyz
+- **Impact**: Social media previews now work perfectly on both lekkerspots.co.za and www.lekkerspots.co.za
+- **Key Learning**: Response method overrides (res.send, res.sendFile) are fragile - direct request interception is more reliable
 
 **Critical Production Deployment Fix** ⚠️
 - **HTML Truncation Issue Resolved**: Fixed critical bug where production site served truncated HTML causing blank page

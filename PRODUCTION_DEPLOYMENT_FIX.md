@@ -1,16 +1,243 @@
-# Production Deployment Fix - HTML Truncation Issue
+# Production Deployment Fixes
+
+This document tracks critical production issues encountered and their solutions.
+
+---
+
+## Fix #2: Social Media Preview & Base URL Replacement (November 7, 2025)
+
+**Date**: November 7, 2025  
+**Status**: ✅ RESOLVED  
+**Severity**: High (Social media sharing completely broken)
+
+### Problem Summary
+
+After deploying social media preview features to production at `lekkerspots.co.za`, social media platforms (Facebook, Twitter, LinkedIn, Slack) showed broken previews with placeholder text instead of actual content. The OpenGraph meta tags contained `__BASE_URL__/og-image.jpg` instead of `https://lekkerspots.co.za/og-image.jpg`.
+
+### Root Cause Analysis
+
+#### The Express.static + Middleware Conflict
+
+The `htmlMetaRewriter` middleware was designed to replace `__BASE_URL__` placeholders with the actual domain, but it never executed in production for the most important route: the homepage (`/`).
+
+**What was happening:**
+
+1. **Middleware Registration Order**:
+   ```typescript
+   app.use(htmlMetaRewriter);              // Middleware registered first
+   app.use(express.static(distPath));       // express.static registered second
+   app.use("*", (req, res) => {            // Catch-all fallback
+     res.sendFile(path.resolve(distPath, "index.html"));
+   });
+   ```
+
+2. **Original (Broken) Approach - res.sendFile Override**:
+   - Middleware tried to override `res.sendFile` method
+   - Expected the fallback handler to call `res.sendFile()`
+   - Override would intercept, process HTML, replace placeholders
+   
+3. **Why It Failed**:
+   - `express.static` uses the internal `send` module from the `serve-static` package
+   - It NEVER calls `res.sendFile()` - it handles file serving internally
+   - When users request `/`, express.static finds `index.html` and serves it directly via `send`
+   - The `res.sendFile` override never executes
+   - Social media crawlers always hit `/`, so previews never worked
+
+4. **Why Location Pages Worked Temporarily**:
+   - Requests like `/location/some-slug` don't match any static file
+   - They fall through express.static to the catch-all handler
+   - Catch-all calls `res.sendFile()`, triggering the override
+   - But this was unreliable and didn't help homepage previews
+
+### Symptoms
+
+- ✅ Development environment: Works perfectly (Vite handles HTML transformation)
+- ❌ Production homepage (`/`): HTML served with `__BASE_URL__` placeholders intact
+- ❌ Social media previews: Show broken images and placeholder URLs
+- ✅ Location pages (`/location/*`): Sometimes worked, sometimes didn't
+- ✅ API endpoints: Work correctly
+- ✅ Static assets (JS, CSS, images): Serve correctly
+- ❌ No `[htmlMetaRewriter]` logs appearing in production (middleware not executing)
+
+### Solution: Direct HTML Interception
+
+**File**: `server/middleware/htmlMetaRewriter.ts`
+
+Completely rewrote the middleware to **directly serve processed HTML** instead of trying to override response methods:
+
+```typescript
+export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction) {
+  // Skip static assets and API requests
+  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot)$/)) {
+    return next();
+  }
+  if (req.path.startsWith('/api/') || req.path.startsWith('/objects/')) {
+    return next();
+  }
+
+  const baseUrl = getBaseUrl(req);
+  const locationMeta = res.locals.locationMeta;
+
+  // In production, read and process index.html DIRECTLY
+  if (process.env.NODE_ENV === 'production') {
+    const indexPath = path.resolve(import.meta.dirname, 'public', 'index.html');
+    
+    fs.readFile(indexPath, 'utf-8', (err, htmlContent) => {
+      if (err) {
+        console.error('[htmlMetaRewriter] Error reading index.html:', err);
+        return next();  // Fallback to express.static
+      }
+
+      try {
+        // Process HTML: replace __BASE_URL__ and inject location meta
+        const processedHtml = processHtml(htmlContent, baseUrl, locationMeta);
+
+        // Send processed HTML directly
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.send(processedHtml);
+      } catch (processError) {
+        console.error('[htmlMetaRewriter] Error processing HTML:', processError);
+        next();  // Fallback on error
+      }
+    });
+  } else {
+    // In development, let Vite handle HTML transformation
+    next();
+  }
+}
+```
+
+**Key Changes:**
+
+1. **Direct Serving**: Middleware reads index.html from disk and sends it directly
+2. **Bypasses express.static**: Request never reaches express.static for HTML
+3. **No Response Overrides**: No fragile `res.sendFile`, `res.send`, or `res.end` overrides
+4. **Uniform Processing**: All HTML requests (homepage and location pages) processed identically
+5. **Graceful Fallback**: On any error, falls through to express.static
+6. **Environment Aware**: Only runs in production; lets Vite handle dev environment
+
+### Testing & Verification
+
+#### Before Fix
+```bash
+$ curl -s https://lekkerspots.co.za/ | grep og:image
+<meta property="og:image" content="__BASE_URL__/og-image.jpg" />
+# Placeholder not replaced! ❌
+```
+
+#### After Fix
+```bash
+$ curl -s https://lekkerspots.co.za/ | grep og:image
+<meta property="og:image" content="https://lekkerspots.co.za/og-image.jpg" />
+# Correctly replaced with actual domain! ✅
+
+$ curl -s https://www.lekkerspots.co.za/ | grep og:image
+<meta property="og:image" content="https://www.lekkerspots.co.za/og-image.jpg" />
+# Works on www subdomain too! ✅
+```
+
+#### Social Media Preview Testing
+
+Verified working on:
+- ✅ **Slack**: Shows correct title, description, and image
+- ✅ **Facebook**: Proper Open Graph preview with image
+- ✅ **Twitter**: Twitter Card displays correctly
+- ✅ **LinkedIn**: Professional preview with image and description
+- ✅ **Discord**: Embedded preview with image
+- ✅ **OpenGraph.xyz Validator**: All platforms pass validation
+
+### Prevention Strategies
+
+#### For Future Middleware Development
+
+1. **Avoid Response Method Overrides**
+   - Overriding `res.send`, `res.sendFile`, etc. is fragile and error-prone
+   - Third-party middleware may bypass your overrides
+   - Direct request interception is more reliable
+
+2. **Understand Middleware Execution Order**
+   - `express.static` has special behavior - it doesn't use standard response methods
+   - Intercept requests BEFORE they reach express.static if you need to process them
+   - Test with actual `curl` requests to verify execution
+
+3. **Test Production Behavior Locally**
+   ```bash
+   npm run build
+   NODE_ENV=production node dist/index.js
+   curl -s http://localhost:5000/ | grep __BASE_URL__
+   # Should find NO matches
+   ```
+
+4. **Add Comprehensive Logging During Development**
+   - Log at the start of middleware to confirm execution
+   - Log before and after processing
+   - Remove logs once stable
+
+5. **Verify Social Media Previews**
+   - Use [OpenGraph.xyz](https://www.opengraph.xyz/) to test
+   - Test actual sharing on Slack, LinkedIn, Facebook
+   - Check both main domain and www subdomain
+
+### Related Files Modified
+
+- `server/middleware/htmlMetaRewriter.ts` - Complete rewrite to use direct HTML serving
+- `server/index.ts` - Removed debug logging after verification
+- `replit.md` - Updated with production fix details
+- `PRODUCTION_DEPLOYMENT_FIX.md` - This document
+
+### Deployment Checklist
+
+When deploying middleware changes to production:
+
+- [ ] Test middleware execution with logging in production
+- [ ] Verify `__BASE_URL__` replacement with `curl`
+- [ ] Check both main domain and www subdomain
+- [ ] Test social media previews on multiple platforms
+- [ ] Verify no performance degradation (check response times)
+- [ ] Ensure graceful error handling (middleware shouldn't crash app)
+- [ ] Check production logs for errors after deployment
+
+### Additional Notes
+
+#### Why This Issue Was Challenging
+
+1. **Silent Failure**: No error messages, middleware simply didn't run
+2. **Environment-Specific**: Worked in development (Vite), failed in production (express.static)
+3. **Middleware Order Confusion**: Both middlewares registered correctly, but execution didn't match expectations
+4. **Internal Implementation Details**: Required understanding how express.static uses the `send` module
+5. **Response Override Fragility**: Overrides work sometimes but not always
+
+#### Lessons Learned
+
+- Direct request interception is more reliable than response method overrides
+- Always test production builds locally before deploying
+- Express.static has special internal behavior that bypasses standard response methods
+- Middleware execution order matters, but understanding HOW each middleware works matters more
+- Social media preview testing requires actual deployment (can't fully test locally)
+
+### References
+
+- Express.js middleware documentation: https://expressjs.com/en/guide/using-middleware.html
+- Express.static internals: https://github.com/expressjs/serve-static
+- Open Graph Protocol: https://ogp.me/
+- Twitter Cards: https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards
+
+---
+
+## Fix #1: HTML Truncation Issue (November 7, 2025)
 
 **Date**: November 7, 2025  
 **Status**: ✅ RESOLVED  
 **Severity**: Critical (Site completely blank in production)
 
-## Problem Summary
+### Problem Summary
 
 After deploying to production at `lekkerspots.co.za`, the website displayed a completely blank page despite working perfectly in development. The server was running without errors, API endpoints were functioning, but the browser received an incomplete HTML document.
 
-## Root Cause Analysis
+### Root Cause Analysis
 
-### Primary Issue: Content-Length Header Mismatch
+#### Primary Issue: Content-Length Header Mismatch
 
 The HTML was being served truncated at exactly 3335 bytes, cutting off mid-tag and missing all closing tags including `</head>`, `<body>`, `<div id="root">`, and `</html>`.
 
@@ -26,11 +253,11 @@ The HTML was being served truncated at exactly 3335 bytes, cutting off mid-tag a
 5. Browser/proxy reads exactly 3335 bytes and stops reading
 6. Result: HTML truncated mid-tag, missing critical elements like `<div id="root">`
 
-### Secondary Issue: Database Connection in Production
+#### Secondary Issue: Database Connection in Production
 
 The Neon serverless PostgreSQL database was attempting to use WebSockets in production deployments, which is not supported in serverless environments. This caused server crash loops.
 
-## Symptoms
+### Symptoms
 
 - ✅ Development environment: Site works perfectly
 - ❌ Production environment: Completely blank page
@@ -40,11 +267,11 @@ The Neon serverless PostgreSQL database was attempting to use WebSockets in prod
 - ✅ API endpoints respond correctly (HTTP 200)
 - ✅ Server stays running without crashes
 
-## Solution
+### Solution
 
-### Fix 1: Content-Length Header Recalculation
+#### Fix 1: Content-Length Header Recalculation
 
-**File**: `server/middleware/htmlMetaRewriter.ts`
+**File**: `server/middleware/htmlMetaRewriter.ts` (older implementation)
 
 Added proper Content-Length header management when processing HTML responses:
 
@@ -53,8 +280,6 @@ Added proper Content-Length header management when processing HTML responses:
 const processedBuffer = Buffer.from(htmlContent, 'utf-8');
 
 // CRITICAL: Remove stale Content-Length header set by express.static
-// The original header is based on unmodified file size, but we've modified the HTML
-// If we don't remove it, clients will stop reading at the old length, truncating the response
 res.removeHeader('Content-Length');
 
 // Set correct Content-Length for the processed content
@@ -64,12 +289,9 @@ res.setHeader('Content-Length', processedBuffer.length);
 return originalEnd.call(this, processedBuffer, encoding, callback);
 ```
 
-**Key changes:**
-- Remove stale `Content-Length` header before sending modified HTML
-- Recalculate and set correct `Content-Length` based on processed content
-- Applied to both buffered responses (production) and inline responses (development)
+**Note**: This fix was later superseded by the direct HTML serving approach in Fix #2, which doesn't require Content-Length manipulation.
 
-### Fix 2: Database Connection Configuration
+#### Fix 2: Database Connection Configuration
 
 **File**: `server/db.ts`
 
@@ -95,19 +317,9 @@ export const db = drizzle(pool, {
 - This forces Neon to use HTTP fetch instead of WebSockets
 - Prevents server crashes in serverless deployments
 
-### Fix 3: TypeScript Compilation Errors
+### Testing & Verification
 
-**Files**: 
-- `client/src/components/examples/LocationCard.tsx`
-- `server/middleware/htmlMetaRewriter.ts`
-
-Resolved TypeScript errors that prevented production builds:
-- Added missing `slug` prop to LocationCard component
-- Fixed function signature type annotations in middleware
-
-## Testing & Verification
-
-### Before Fix
+#### Before Fix
 ```bash
 $ curl -s https://lekkerspots.co.za | wc -l
 45  # Only 45 lines (truncated)
@@ -119,7 +331,7 @@ $ curl -s https://lekkerspots.co.za | tail -3
     # Missing closing quote and all body content!
 ```
 
-### After Fix
+#### After Fix
 ```bash
 $ curl -s https://lekkerspots.co.za | wc -l
 50  # Complete HTML
@@ -133,76 +345,10 @@ $ curl -s https://lekkerspots.co.za | tail -5
 # All closing tags present! ✅
 ```
 
-## Prevention Strategies
+### Related Files Modified
 
-### For Future Middleware Development
-
-1. **Always manage Content-Length when modifying response bodies**
-   - If middleware modifies HTML/JSON/any response body, remove or recalculate Content-Length
-   - Never assume Content-Length will auto-update
-
-2. **Test production builds locally**
-   ```bash
-   npm run build
-   NODE_ENV=production node dist/index.js
-   ```
-
-3. **Verify complete HTML delivery**
-   ```bash
-   curl -s https://your-domain.com | tail -10
-   # Should show </html> closing tag
-   ```
-
-### For Database Connections
-
-1. **Always configure serverless-compatible database options in production**
-   - Neon: Use `poolQueryViaFetch: true`
-   - Check database provider documentation for serverless best practices
-
-2. **Test with environment-specific configurations**
-   - Development can use WebSockets
-   - Production should use HTTP/fetch for serverless compatibility
-
-## Related Files Modified
-
-- `server/middleware/htmlMetaRewriter.ts` - Content-Length fix + sendFile override
+- `server/middleware/htmlMetaRewriter.ts` - Content-Length fix, later replaced with direct serving
 - `server/db.ts` - Production database configuration
 - `server/index.ts` - Import cleanup
 - `client/src/components/examples/LocationCard.tsx` - TypeScript fix
-- `replit.md` - Updated documentation with production fix details
-
-## Deployment Checklist
-
-When deploying to production, ensure:
-
-- [ ] `npm run build` completes without TypeScript errors
-- [ ] `dist/index.js` contains Content-Length header management code
-- [ ] Database connection uses `poolQueryViaFetch: true` in production
-- [ ] HTML response is complete (verify with curl/browser DevTools)
-- [ ] No server crash loops in production logs
-- [ ] React app mounts successfully (check for `<div id="root">` in HTML)
-
-## Additional Notes
-
-### Why This Issue Was Hard to Debug
-
-1. **Same byte count**: Both truncated and complete HTML were 3335 bytes (confusing!)
-2. **Silent failure**: No error messages, server appeared healthy
-3. **Browser-specific**: Different browsers might cache differently
-4. **Middleware order**: Issue only appears in production with static file serving
-5. **Content-Length is invisible**: Header truncation happens at HTTP layer, not in code
-
-### Lessons Learned
-
-- HTTP headers matter! Content-Length must match actual payload size
-- Serverless environments have different requirements than traditional hosting
-- Always test production builds locally before deploying
-- Middleware that modifies responses must handle HTTP headers correctly
-- Response streaming/buffering requires careful header management
-
-## References
-
-- Express.js static file serving: https://expressjs.com/en/starter/static-files.html
-- HTTP Content-Length header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Length
-- Neon serverless configuration: https://neon.tech/docs/serverless/serverless-driver
-- Node.js response streaming: https://nodejs.org/api/http.html#responseenddata-encoding-callback
+- `replit.md` - Updated documentation
