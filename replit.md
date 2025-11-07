@@ -6,11 +6,17 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
-**Production Deployment Fix (Latest)**
-- **Database Connection Stability**: Fixed production server crashes by adding `poolQueryViaFetch` configuration for Neon database in production environments
-- **WebSocket Handling**: Production deployments now use HTTP fetch instead of WebSockets for database queries, ensuring better reliability in serverless environments
+**Critical Production Deployment Fix (Latest)** ⚠️
+- **HTML Truncation Issue Resolved**: Fixed critical bug where production site served truncated HTML causing blank page
+  - Root cause: `express.static` set `Content-Length` header based on original file, but `htmlMetaRewriter` middleware modified HTML making it longer
+  - Browsers stopped reading at original Content-Length, cutting off HTML mid-tag
+  - Missing critical elements: `</head>`, `<body>`, `<div id="root">`, `</html>`
+- **Solution**: Modified `htmlMetaRewriter` middleware to remove stale Content-Length header and recalculate based on processed HTML
+- **Database Connection Stability**: Added `poolQueryViaFetch: true` configuration for Neon database in production environments
+- **WebSocket Handling**: Production deployments now use HTTP fetch instead of WebSockets for database queries (serverless compatible)
 - **TypeScript Compilation**: Fixed all TypeScript errors preventing production builds (LocationCard slug prop, htmlMetaRewriter function signatures)
-- **Production Build**: Verified successful compilation and proper environment variable handling in deployed environments
+- **Documentation**: Created comprehensive fix documentation in `PRODUCTION_DEPLOYMENT_FIX.md` with root cause analysis, solutions, and prevention strategies
+- **Production Build**: Verified successful compilation and complete HTML delivery in deployed environments
 
 **Social Media & SEO Optimization**
 - **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
