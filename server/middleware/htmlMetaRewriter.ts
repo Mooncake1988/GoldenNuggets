@@ -216,12 +216,12 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       const processedBuffer = Buffer.from(htmlContent, 'utf-8');
 
       // Write the processed content using original methods
-      originalWrite.call(this, processedBuffer);
+      (originalWrite as any).call(this, processedBuffer);
       // Call originalEnd with just the callback (no chunk since we already wrote it)
       if (callback) {
-        return originalEnd.call(this, callback);
+        return (originalEnd as any).call(this, callback);
       } else {
-        return originalEnd.call(this);
+        return (originalEnd as any).call(this);
       }
     }
 
