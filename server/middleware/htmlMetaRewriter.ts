@@ -141,15 +141,15 @@ function processHtml(html: string, baseUrl: string, locationMeta?: LocationMeta)
 }
 
 /**
- * Simplified middleware that only intercepts index.html serving
- * This avoids complex response overriding and only processes what's necessary
+ * Middleware that directly serves processed HTML instead of relying on res.sendFile override
+ * This works in production where express.static uses the 'send' module internally
  */
 export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction) {
   console.log('[htmlMetaRewriter] Middleware hit for path:', req.path);
   
-  // Skip processing for non-HTML requests
+  // Skip processing for static assets
   if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot)$/)) {
-    console.log('[htmlMetaRewriter] Skipping non-HTML request');
+    console.log('[htmlMetaRewriter] Skipping static asset');
     return next();
   }
 
@@ -159,61 +159,46 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
     return next();
   }
 
+  // For HTML requests, serve processed index.html directly
   const baseUrl = getBaseUrl(req);
   const locationMeta = res.locals.locationMeta;
   
-  console.log('[htmlMetaRewriter] Setting up sendFile override for path:', req.path, 'baseUrl:', baseUrl);
+  console.log('[htmlMetaRewriter] Processing HTML request, baseUrl:', baseUrl);
 
-  // Intercept sendFile to process HTML files
-  const originalSendFile = res.sendFile.bind(res);
-  
-  res.sendFile = function (filePath: string, options?: any, callback?: any) {
-    // Handle callback in different parameter positions
-    if (typeof options === 'function') {
-      callback = options;
-      options = undefined;
-    }
-
-    // Only process index.html files
-    if (filePath.includes('index.html')) {
-      console.log('[htmlMetaRewriter] Processing index.html, baseUrl:', baseUrl);
-      try {
-        fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
-          if (err) {
-            console.error('[htmlMetaRewriter] Error reading HTML file:', err);
-            return originalSendFile(filePath, options, callback);
-          }
-
-          try {
-            console.log('[htmlMetaRewriter] Read HTML file, length:', htmlContent.length);
-            console.log('[htmlMetaRewriter] Contains __BASE_URL__:', htmlContent.includes('__BASE_URL__'));
-            
-            // Process the HTML
-            const processedHtml = processHtml(htmlContent, baseUrl, locationMeta);
-            
-            console.log('[htmlMetaRewriter] Processed HTML, __BASE_URL__ replaced:', !processedHtml.includes('__BASE_URL__'));
-            console.log('[htmlMetaRewriter] Sample og:image tag:', processedHtml.match(/<meta property="og:image" content="[^"]*"/)?.[0]);
-
-            // Send the processed HTML
-            res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-            res.setHeader('Content-Length', Buffer.byteLength(processedHtml, 'utf-8'));
-            res.send(processedHtml);
-            
-            if (callback) callback();
-          } catch (processError) {
-            console.error('[htmlMetaRewriter] Error processing HTML:', processError);
-            originalSendFile(filePath, options, callback);
-          }
-        });
-      } catch (err) {
-        console.error('[htmlMetaRewriter] Error in sendFile override:', err);
-        originalSendFile(filePath, options, callback);
+  // In production, read and process index.html
+  if (process.env.NODE_ENV === 'production') {
+    const indexPath = path.resolve(import.meta.dirname, 'public', 'index.html');
+    
+    console.log('[htmlMetaRewriter] Production mode, reading:', indexPath);
+    
+    fs.readFile(indexPath, 'utf-8', (err, htmlContent) => {
+      if (err) {
+        console.error('[htmlMetaRewriter] Error reading index.html:', err);
+        return next(); // Fall through to express.static
       }
-    } else {
-      // For non-HTML files, use original sendFile
-      originalSendFile(filePath, options, callback);
-    }
-  } as any;
 
-  next();
+      try {
+        console.log('[htmlMetaRewriter] Read HTML, length:', htmlContent.length);
+        console.log('[htmlMetaRewriter] Contains __BASE_URL__:', htmlContent.includes('__BASE_URL__'));
+        
+        // Process the HTML
+        const processedHtml = processHtml(htmlContent, baseUrl, locationMeta);
+        
+        console.log('[htmlMetaRewriter] Processed HTML, __BASE_URL__ replaced:', !processedHtml.includes('__BASE_URL__'));
+        console.log('[htmlMetaRewriter] Sample og:image:', processedHtml.match(/<meta property="og:image" content="[^"]*"/)?.[0]);
+
+        // Send the processed HTML directly
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.send(processedHtml);
+      } catch (processError) {
+        console.error('[htmlMetaRewriter] Error processing HTML:', processError);
+        next(); // Fall through on error
+      }
+    });
+  } else {
+    // In development, let Vite handle HTML
+    console.log('[htmlMetaRewriter] Development mode, passing to Vite');
+    next();
+  }
 }

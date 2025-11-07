@@ -21,6 +21,12 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
+// DEBUG: Log all requests to verify Express is handling them
+app.use((req, res, next) => {
+  console.log('[EXPRESS] Request:', req.method, req.path, 'Headers:', req.headers.host);
+  next();
+});
+
 // Apply location meta middleware FIRST to populate res.locals.locationMeta
 app.use(createLocationMetaMiddleware(storage));
 
