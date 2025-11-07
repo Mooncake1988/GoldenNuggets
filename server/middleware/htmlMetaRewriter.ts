@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { escapeHtml } from './locationMetaMiddleware';
+import fs from 'fs';
 
 interface LocationMeta {
   title: string;
@@ -93,6 +94,7 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
   const originalSend = res.send;
   const originalWrite = res.write;
   const originalEnd = res.end;
+  const originalSendFile = res.sendFile;
 
   // Buffer for accumulating HTML chunks
   const htmlChunks: Buffer[] = [];
@@ -241,6 +243,52 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
     
     return originalEnd.call(this, chunk, encoding, callback);
   };
+
+  // Override res.sendFile to process HTML files in production
+  res.sendFile = function (filePath: string, options?: any, callback?: any) {
+    // Handle callback in different parameter positions
+    if (typeof options === 'function') {
+      callback = options;
+      options = undefined;
+    }
+
+    // Check if this is an HTML file
+    if (filePath.endsWith('.html') || filePath.endsWith('index.html')) {
+      // Read the file and process it
+      fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
+        if (err) {
+          if (callback) {
+            callback(err);
+          } else {
+            res.status(500).send('Error reading file');
+          }
+          return;
+        }
+
+        // Process the HTML content
+        htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
+        
+        // Inject location-specific meta tags if available
+        if (res.locals.locationMeta) {
+          htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
+        }
+
+        // Set proper headers
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
+        
+        // Send the processed HTML
+        res.send(htmlContent);
+        
+        if (callback) {
+          callback();
+        }
+      });
+    } else {
+      // For non-HTML files, use original sendFile
+      return (originalSendFile as any).call(res, filePath, options, callback);
+    }
+  } as any;
 
   next();
 }
