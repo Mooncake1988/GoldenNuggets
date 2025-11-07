@@ -141,7 +141,7 @@ function processHtml(html: string, baseUrl: string, locationMeta?: LocationMeta)
 }
 
 /**
- * Simplified middleware that only intercepts index.html serving in production
+ * Simplified middleware that only intercepts index.html serving
  * This avoids complex response overriding and only processes what's necessary
  */
 export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction) {
@@ -158,51 +158,56 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
   const baseUrl = getBaseUrl(req);
   const locationMeta = res.locals.locationMeta;
 
-  // Only intercept sendFile in production mode
-  if (process.env.NODE_ENV === 'production') {
-    const originalSendFile = res.sendFile.bind(res);
-    
-    res.sendFile = function (filePath: string, options?: any, callback?: any) {
-      // Handle callback in different parameter positions
-      if (typeof options === 'function') {
-        callback = options;
-        options = undefined;
-      }
+  // Intercept sendFile to process HTML files
+  const originalSendFile = res.sendFile.bind(res);
+  
+  res.sendFile = function (filePath: string, options?: any, callback?: any) {
+    // Handle callback in different parameter positions
+    if (typeof options === 'function') {
+      callback = options;
+      options = undefined;
+    }
 
-      // Only process index.html files
-      if (filePath.includes('index.html')) {
-        try {
-          fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
-            if (err) {
-              console.error('Error reading HTML file:', err);
-              return originalSendFile(filePath, options, callback);
-            }
+    // Only process index.html files
+    if (filePath.includes('index.html')) {
+      console.log('[htmlMetaRewriter] Processing index.html, baseUrl:', baseUrl);
+      try {
+        fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
+          if (err) {
+            console.error('[htmlMetaRewriter] Error reading HTML file:', err);
+            return originalSendFile(filePath, options, callback);
+          }
 
-            try {
-              // Process the HTML
-              const processedHtml = processHtml(htmlContent, baseUrl, locationMeta);
+          try {
+            console.log('[htmlMetaRewriter] Read HTML file, length:', htmlContent.length);
+            console.log('[htmlMetaRewriter] Contains __BASE_URL__:', htmlContent.includes('__BASE_URL__'));
+            
+            // Process the HTML
+            const processedHtml = processHtml(htmlContent, baseUrl, locationMeta);
+            
+            console.log('[htmlMetaRewriter] Processed HTML, __BASE_URL__ replaced:', !processedHtml.includes('__BASE_URL__'));
+            console.log('[htmlMetaRewriter] Sample og:image tag:', processedHtml.match(/<meta property="og:image" content="[^"]*"/)?.[0]);
 
-              // Send the processed HTML
-              res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-              res.setHeader('Content-Length', Buffer.byteLength(processedHtml, 'utf-8'));
-              res.send(processedHtml);
-              
-              if (callback) callback();
-            } catch (processError) {
-              console.error('Error processing HTML:', processError);
-              originalSendFile(filePath, options, callback);
-            }
-          });
-        } catch (err) {
-          console.error('Error in sendFile override:', err);
-          originalSendFile(filePath, options, callback);
-        }
-      } else {
-        // For non-HTML files, use original sendFile
+            // Send the processed HTML
+            res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+            res.setHeader('Content-Length', Buffer.byteLength(processedHtml, 'utf-8'));
+            res.send(processedHtml);
+            
+            if (callback) callback();
+          } catch (processError) {
+            console.error('[htmlMetaRewriter] Error processing HTML:', processError);
+            originalSendFile(filePath, options, callback);
+          }
+        });
+      } catch (err) {
+        console.error('[htmlMetaRewriter] Error in sendFile override:', err);
         originalSendFile(filePath, options, callback);
       }
-    } as any;
-  }
+    } else {
+      // For non-HTML files, use original sendFile
+      originalSendFile(filePath, options, callback);
+    }
+  } as any;
 
   next();
 }
