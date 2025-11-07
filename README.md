@@ -165,7 +165,7 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Gradient logo text in header
 
 ### Hero Section Redesign
-- Professional Cape Town stock photo background
+- Professional Western Cape stock photo background
 - Area-map Lottie animation as accent icon
 - Gradient overlay for optimal text readability
 - Clean visual hierarchy
@@ -190,8 +190,8 @@ This project is licensed under the MIT License.
 - Lottie animations for smooth UI interactions
 - Shadcn/ui for beautiful, accessible components
 - OpenStreetMap for map tiles
-- The Cape Town community for inspiration
+- The Western Cape community for inspiration
 
 ---
 
-Built with ❤️ for Cape Town explorers
+Built with ❤️ for Western Cape explorers
