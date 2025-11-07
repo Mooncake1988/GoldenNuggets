@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { escapeHtml } from './locationMetaMiddleware';
+import fs from 'fs';
 
 interface LocationMeta {
   title: string;
@@ -93,6 +94,7 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
   const originalSend = res.send;
   const originalWrite = res.write;
   const originalEnd = res.end;
+  const originalSendFile = res.sendFile;
 
   // Buffer for accumulating HTML chunks
   const htmlChunks: Buffer[] = [];
@@ -215,14 +217,16 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
       
       const processedBuffer = Buffer.from(htmlContent, 'utf-8');
 
-      // Write the processed content using original methods
-      originalWrite.call(this, processedBuffer);
-      // Call originalEnd with just the callback (no chunk since we already wrote it)
-      if (callback) {
-        return originalEnd.call(this, callback);
-      } else {
-        return originalEnd.call(this);
-      }
+      // CRITICAL: Remove stale Content-Length header set by express.static
+      // The original header is based on unmodified file size, but we've modified the HTML
+      // If we don't remove it, clients will stop reading at the old length, truncating the response
+      res.removeHeader('Content-Length');
+      
+      // Optionally set correct Content-Length for the processed content
+      res.setHeader('Content-Length', processedBuffer.length);
+
+      // Send the complete processed buffer directly via end()
+      return (originalEnd as any).call(this, processedBuffer, encoding, callback);
     }
 
     // For non-buffered HTML responses (e.g., from Vite), process inline
@@ -242,11 +246,61 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
         
         // Convert back to Buffer if original was Buffer, preserving encoding
         chunk = Buffer.isBuffer(chunk) ? Buffer.from(htmlContent, 'utf-8') : htmlContent;
+        
+        // CRITICAL: Recalculate Content-Length after modifying HTML
+        res.removeHeader('Content-Length');
+        res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
       }
     }
     
     return originalEnd.call(this, chunk, encoding, callback);
   };
+
+  // Override res.sendFile to process HTML files in production
+  res.sendFile = function (filePath: string, options?: any, callback?: any) {
+    // Handle callback in different parameter positions
+    if (typeof options === 'function') {
+      callback = options;
+      options = undefined;
+    }
+
+    // Check if this is an HTML file
+    if (filePath.endsWith('.html') || filePath.endsWith('index.html')) {
+      // Read the file and process it
+      fs.readFile(filePath, 'utf-8', (err, htmlContent) => {
+        if (err) {
+          if (callback) {
+            callback(err);
+          } else {
+            res.status(500).send('Error reading file');
+          }
+          return;
+        }
+
+        // Process the HTML content
+        htmlContent = htmlContent.replace(/__BASE_URL__/g, baseUrl);
+        
+        // Inject location-specific meta tags if available
+        if (res.locals.locationMeta) {
+          htmlContent = injectLocationMeta(htmlContent, res.locals.locationMeta);
+        }
+
+        // Set proper headers
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.setHeader('Content-Length', Buffer.byteLength(htmlContent, 'utf-8'));
+        
+        // Send the processed HTML
+        res.send(htmlContent);
+        
+        if (callback) {
+          callback();
+        }
+      });
+    } else {
+      // For non-HTML files, use original sendFile
+      return (originalSendFile as any).call(res, filePath, options, callback);
+    }
+  } as any;
 
   next();
 }

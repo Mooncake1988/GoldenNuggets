@@ -4,6 +4,8 @@ import { setupVite, serveStatic, log } from "./vite";
 import { htmlMetaRewriter } from "./middleware/htmlMetaRewriter";
 import { createLocationMetaMiddleware } from "./middleware/locationMetaMiddleware";
 import { storage } from "./storage";
+import fs from "fs";
+import path from "path";
 
 const app = express();
 
@@ -72,6 +74,7 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
+    // Serve static assets first (express.static will handle js, css, images, etc.)
     serveStatic(app);
   }
 
