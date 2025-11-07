@@ -7,15 +7,16 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 ## Recent Updates (November 2025)
 
 **Social Media & SEO Optimization (Latest)**
-- Comprehensive Open Graph tags for Facebook, Twitter, and LinkedIn social sharing
+- **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
+- **Two-Tier Middleware System**:
+  - `locationMetaMiddleware`: Intercepts `/location/:slug` requests, fetches location data from database, populates `res.locals.locationMeta`
+  - `htmlMetaRewriter`: Replaces `__BASE_URL__` placeholders AND injects location-specific meta tags from `res.locals`
+- **Dynamic Meta Tags**: Each location page serves unique `<title>`, OG tags (title, description, image, url, type=place), Twitter Card tags, and JSON-LD structured data
+- **Works for All Crawlers**: Social media bots (Facebook, Twitter, LinkedIn) receive proper meta tags even without JavaScript execution
 - Custom OG image (1200×630px, 193KB) featuring Western Cape beach with LekkerSpots logo
-- Dynamic base URL system: __BASE_URL__ placeholder replaced at runtime with current domain
-- Stream-aware htmlMetaRewriter middleware intercepts HTML responses (buffers text/html only)
-- Works seamlessly across dev (Replit domain) and production (lekkerspots.co.za)
+- Dynamic base URL system works seamlessly across dev (Replit domain) and production (lekkerspots.co.za)
 - Strict host header validation with regex to prevent spoofing attacks
-- Dynamic meta tags on location pages using react-helmet-async + window.location.origin
-- Each location page has unique og:title, og:description, og:image from location data
-- JSON-LD structured data (LocalBusiness schema) for rich search results
+- HTML escaping for user-generated content prevents XSS attacks in meta tags
 - Complete SEO meta tags: keywords, canonical URLs, theme-color, author
 - Full Western Cape rebranding across entire application
 
