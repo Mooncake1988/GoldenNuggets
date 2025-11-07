@@ -6,7 +6,22 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
-**Critical Production Deployment Fix (Latest)** ⚠️
+**WWW Subdomain Error Handler Fix (November 7, 2025)** ⚠️
+- **Issue**: WWW subdomain (www.lekkerspots.co.za) showed "Internal Server Error" after publishing
+- **Root Cause**: Error handler in `server/index.ts` had critical bugs:
+  1. Always sent JSON responses regardless of client Accept header (HTML requests received JSON)
+  2. Re-threw errors after sending response, violating Express lifecycle and causing process crashes
+  3. When www subdomain triggered middleware errors, users saw raw JSON message instead of HTML error page
+- **Solution**: Completely rewrote error handler to:
+  1. Check `req.accepts('html')` and return styled HTML error page for browser requests
+  2. Return JSON only for API requests
+  3. Remove `throw err` statement - now logs error without re-throwing
+  4. Add proper logging with status, method, and path
+  5. Check `res.headersSent` to prevent double-sending responses
+- **Impact**: Both apex domain (lekkerspots.co.za) and www subdomain (www.lekkerspots.co.za) now work correctly
+- **Error Page**: Branded HTML error page with gradient background matching LekkerSpots design
+
+**Critical Production Deployment Fix** ⚠️
 - **HTML Truncation Issue Resolved**: Fixed critical bug where production site served truncated HTML causing blank page
   - Root cause: `express.static` set `Content-Length` header based on original file, but `htmlMetaRewriter` middleware modified HTML making it longer
   - Browsers stopped reading at original Content-Length, cutting off HTML mid-tag
