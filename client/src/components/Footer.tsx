@@ -55,7 +55,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative border-t bg-card">
+    <footer className="relative bg-card">
+      <div className="h-[3px]" style={{ background: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--orange)), hsl(var(--accent)))' }} />
       {showConfetti && (
         <div 
           className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center bg-transparent"

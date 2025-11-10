@@ -27,6 +27,19 @@ const getCategoryColor = (category: string) => {
   return categoryColors[category] || "bg-primary text-primary-foreground border-0";
 };
 
+const getCategoryBorderClass = (category: string) => {
+  const borderClasses: Record<string, string> = {
+    "Coffee Shop": "border-2 border-amber-500/40 hover:border-amber-500 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)]",
+    "Restaurant": "border-2 border-rose-500/40 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]",
+    "Beach": "border-2 border-cyan-500/40 hover:border-cyan-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]",
+    "Hike": "border-2 border-emerald-500/40 hover:border-emerald-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]",
+    "Market": "border-2 border-violet-500/40 hover:border-violet-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]",
+    "Bar": "border-2 border-fuchsia-500/40 hover:border-fuchsia-500 hover:shadow-[0_0_20px_rgba(217,70,239,0.3)]",
+  };
+  
+  return borderClasses[category] || "border-2 border-primary/40 hover:border-primary hover:shadow-[0_0_20px_rgba(0,150,136,0.3)]";
+};
+
 export default function LocationCard({
   id,
   slug,
@@ -40,7 +53,7 @@ export default function LocationCard({
   return (
     <Link href={`/location/${slug}`} data-testid={`link-location-${id}`}>
       <Card
-        className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer transition-all duration-300"
+        className={`overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 ${getCategoryBorderClass(category)}`}
         data-testid={`card-location-${id}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden">

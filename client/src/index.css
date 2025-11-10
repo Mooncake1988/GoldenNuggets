@@ -64,6 +64,10 @@
 
   --accent-foreground: 0 0% 100%;
 
+  --orange: 15 90% 65%;
+
+  --orange-foreground: 0 0% 100%;
+
   --destructive: 0 84% 60%;
 
   --destructive-foreground: 0 0% 100%;
@@ -117,6 +121,10 @@
   /* Fallback for older browsers */
   --accent-border: hsl(var(--accent));
   --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --orange-border: hsl(var(--orange));
+  --orange-border: hsl(from hsl(var(--orange)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 
   /* Fallback for older browsers */
   --destructive-border: hsl(var(--destructive));
@@ -183,6 +191,10 @@
 
   --accent-foreground: 0 0% 100%;
 
+  --orange: 15 90% 70%;
+
+  --orange-foreground: 0 0% 100%;
+
   --destructive: 0 84% 60%;
 
   --destructive-foreground: 0 0% 100%;
@@ -229,6 +241,10 @@
   /* Fallback for older browsers */
   --accent-border: hsl(var(--accent));
   --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --orange-border: hsl(var(--orange));
+  --orange-border: hsl(from hsl(var(--orange)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 
   /* Fallback for older browsers */
   --destructive-border: hsl(var(--destructive));

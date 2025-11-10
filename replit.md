@@ -77,6 +77,23 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 - Added `/robots.txt` endpoint with proper crawling rules (allows all, blocks /admin and /api)
 - Zero maintenance required - sitemap stays current automatically
 
+**UI Vibrancy Enhancement - Gradient Borders & Hover Effects (November 10, 2025)**
+- **Orange Color Addition**: Extended color palette with orange (15° hue, 90% saturation) to bridge pink and yellow from logo sunset gradient
+- **Navigation Header**: Added vibrant 2px gradient border-bottom using sunset colors (accent → orange → secondary → primary)
+- **Footer**: Added vibrant 3px gradient top border using logo colors (primary → secondary → orange → accent)
+- **Location Cards Enhancement**:
+  - Category-matching colored borders (2px) with distinct colors per category
+  - Coffee Shop: amber border with golden glow on hover
+  - Restaurant: rose border with pink glow on hover
+  - Beach: cyan border with teal glow on hover
+  - Hike: emerald border with green glow on hover
+  - Market: violet border with purple glow on hover
+  - Bar: fuchsia border with magenta glow on hover
+  - Smooth hover animation: gentle lift (-translate-y-1) + border brightness increase + soft glow shadow
+  - Applied consistently across homepage and categories page
+- **Color System**: All new colors support both light and dark modes with proper HSL format and automatic border computation
+- **Performance**: Transitions use CSS transforms for optimal performance (300ms duration)
+
 **Color Scheme Refresh**
 - Vibrant sunset gradient palette using LekkerSpots logo colors (turquoise, hot pink, coral, yellow)
 - Gradient category badges: orange for coffee shops, pink for restaurants, teal for beaches, green for hikes, purple for markets, fuchsia for bars

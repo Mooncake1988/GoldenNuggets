@@ -10,7 +10,7 @@ export default function Header() {
   const isActive = (path: string) => location === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex h-16 md:h-20 items-center justify-between">
           <Link href="/" data-testid="link-home">
@@ -57,6 +57,8 @@ export default function Header() {
           </button>
         </div>
       </div>
+      
+      <div className="h-[2px]" style={{ background: 'linear-gradient(to right, hsl(var(--accent)), hsl(var(--orange)), hsl(var(--secondary)), hsl(var(--primary)))' }} />
 
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-background">
