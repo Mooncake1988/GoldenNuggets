@@ -78,7 +78,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <img src={logoImage} alt="LekkerSpots" className="h-12 w-12" />
+              <img src={logoImage} alt="LekkerSpots" className="h-20 w-20" />
               <span className="font-bold text-lg leading-tight">LekkerSpots</span>
             </div>
             <p className="text-sm text-muted-foreground">
