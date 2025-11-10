@@ -6,6 +6,14 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
+**Footer Branding Update (November 10, 2025)**
+- **Logo Integration**: Replaced MapPin icon with LekkerSpots logo (80×80px) for stronger brand identity
+- **Text Updates**: Changed "Cape Town Golden Nuggets" to "LekkerSpots" throughout footer
+- **Description Refresh**: Updated tagline to "Discover hidden gems and lekker spots across the Western Cape, curated by locals" to emphasize regional scope
+- **Social Media Cleanup**: Removed Facebook link, kept Instagram (placeholder URL), linked envelope icon to Google Forms contact (https://forms.gle/GY4WUo9EPkBvv2Ja6)
+- **Security Enhancement**: Added `target="_blank"` and `rel="noopener noreferrer"` to all external social links
+- **Copyright Update**: Changed to "© 2025 LekkerSpots. All rights reserved."
+
 **Production Error Fix - Social Preview & Base URL Replacement (November 7, 2025)** ⚠️
 - **Issue**: Social media previews not working - `__BASE_URL__` placeholders remained in production HTML instead of being replaced with actual domain
 - **Root Cause**: `express.static` middleware uses internal `send` module (NOT `res.sendFile`) to serve index.html
