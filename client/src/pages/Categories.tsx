@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LocationCard from "@/components/LocationCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type { Location } from "@shared/schema";
 
 const categoryDescriptions: Record<string, string> = {
@@ -81,54 +81,17 @@ export default function Categories() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {categoryLocations.map((location) => (
-                        <Link key={location.id} href={`/location/${location.slug}`}>
-                          <Card className="overflow-hidden hover-elevate active-elevate-2 cursor-pointer h-full" data-testid={`card-location-${location.id}`}>
-                            {location.images && location.images.length > 0 && (
-                              <div className="aspect-video w-full overflow-hidden">
-                                <img
-                                  src={location.images[0]}
-                                  alt={location.name}
-                                  className="w-full h-full object-cover"
-                                  data-testid={`img-location-${location.id}`}
-                                />
-                              </div>
-                            )}
-                            <CardContent className="p-6">
-                              <h3 className="font-semibold text-lg mb-2" data-testid={`text-name-${location.id}`}>
-                                {location.name}
-                              </h3>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                                <MapPin className="h-4 w-4" />
-                                <span>{location.neighborhood}</span>
-                              </div>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {location.description}
-                              </p>
-                              {location.tags && location.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                  {location.tags.slice(0, 3).map((tag, index) => {
-                                    const tagColors = [
-                                      "bg-primary/10 text-primary dark:text-primary border border-primary/20",
-                                      "bg-accent/10 text-accent dark:text-accent border border-accent/20",
-                                      "bg-secondary/10 text-secondary-foreground dark:text-secondary border border-secondary/20",
-                                    ];
-                                    const colorClass = tagColors[index % tagColors.length];
-                                    
-                                    return (
-                                      <span
-                                        key={index}
-                                        className={`px-2 py-1 text-xs rounded-md ${colorClass}`}
-                                        data-testid={`tag-${tag}-${location.id}`}
-                                      >
-                                        {tag}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        </Link>
+                        <LocationCard
+                          key={location.id}
+                          id={location.id}
+                          slug={location.slug}
+                          name={location.name}
+                          category={location.category}
+                          neighborhood={location.neighborhood}
+                          description={location.description}
+                          image={location.images && location.images.length > 0 ? location.images[0] : ""}
+                          tags={location.tags || []}
+                        />
                       ))}
                     </div>
                   </div>
