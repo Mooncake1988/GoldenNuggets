@@ -4,8 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { newsletterSubscriptionSchema, type NewsletterSubscription } from "@shared/schema";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  newsletterSubscriptionSchema,
+  type NewsletterSubscription,
+} from "@shared/schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +26,7 @@ import logoImage from "@assets/LekkerSpots logo_1762766705530.png";
 export default function Footer() {
   const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(false);
-  
+
   const form = useForm<NewsletterSubscription>({
     resolver: zodResolver(newsletterSubscriptionSchema),
     defaultValues: {
@@ -34,15 +43,17 @@ export default function Footer() {
     onSuccess: () => {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
-      
+
       toast({
         title: "Success!",
-        description: "You've been subscribed to our newsletter. Check your email for confirmation.",
+        description:
+          "You've been subscribed to our newsletter. Check your email for confirmation.",
       });
       form.reset();
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || "Failed to subscribe. Please try again later.";
+      const errorMessage =
+        error?.message || "Failed to subscribe. Please try again later.";
       toast({
         title: "Subscription Failed",
         description: errorMessage,
@@ -57,9 +68,15 @@ export default function Footer() {
 
   return (
     <footer className="relative bg-card">
-      <div className="h-[3px]" style={{ background: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--orange)), hsl(var(--accent)))' }} />
+      <div
+        className="h-[3px]"
+        style={{
+          background:
+            "linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--orange)), hsl(var(--accent)))",
+        }}
+      />
       {showConfetti && (
-        <div 
+        <div
           className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center bg-transparent"
           data-testid="confetti-overlay"
         >
@@ -79,10 +96,13 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <img src={logoImage} alt="LekkerSpots" className="h-20 w-20" />
-              <span className="font-bold text-lg leading-tight">LekkerSpots</span>
+              <span className="font-bold text-lg leading-tight">
+                LekkerSpots
+              </span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Discover hidden gems and lekker spots across the Western Cape, curated by locals.
+              Discover hidden gems and lekker spots across the Western Cape,
+              curated by locals.
             </p>
           </div>
 
@@ -90,16 +110,24 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <nav className="flex flex-col gap-2">
               <Link href="/" data-testid="link-footer-home">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">Home</span>
+                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                  Home
+                </span>
               </Link>
               <Link href="/categories" data-testid="link-footer-categories">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">Categories</span>
+                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                  Categories
+                </span>
               </Link>
               <Link href="/map" data-testid="link-footer-map">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">Map View</span>
+                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                  Map View
+                </span>
               </Link>
               <Link href="/admin" data-testid="link-footer-admin">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">Admin</span>
+                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                  Admin
+                </span>
               </Link>
             </nav>
           </div>
@@ -107,10 +135,22 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Follow Us</h3>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground" target="_blank" rel="noopener noreferrer" data-testid="link-instagram">
+              <a
+                href="https://www.instagram.com/lekkerspots/"
+                className="text-muted-foreground hover:text-foreground"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="link-instagram"
+              >
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="https://forms.gle/GY4WUo9EPkBvv2Ja6" className="text-muted-foreground hover:text-foreground" target="_blank" rel="noopener noreferrer" data-testid="link-email">
+              <a
+                href="https://forms.gle/GY4WUo9EPkBvv2Ja6"
+                className="text-muted-foreground hover:text-foreground"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="link-email"
+              >
                 <Mail className="h-5 w-5" />
               </a>
             </div>
@@ -122,7 +162,10 @@ export default function Footer() {
               Get updates on new locations
             </p>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-2"
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -159,9 +202,9 @@ export default function Footer() {
                     </FormItem>
                   )}
                 />
-                <Button 
-                  type="submit" 
-                  size="sm" 
+                <Button
+                  type="submit"
+                  size="sm"
                   disabled={subscribeMutation.isPending}
                   data-testid="button-subscribe"
                 >
@@ -173,7 +216,9 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} LekkerSpots. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} LekkerSpots. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
