@@ -151,6 +151,16 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 
 ## 🎨 Recent Updates (November 2025)
 
+### Sitemap Route Fix (November 11, 2025)
+- **Issue**: Sitemap.xml endpoint was being intercepted by Vite's catch-all route, returning HTML instead of XML
+- **Root Cause**: SEO routes (sitemap.xml, robots.txt) were registered before Vite middleware setup, causing route precedence issues
+- **Solution**: 
+  - Moved sitemap and robots.txt route handlers to execute after registerRoutes() but before Vite middleware
+  - Added explicit skip logic in htmlMetaRewriter middleware to bypass /sitemap.xml and /robots.txt
+  - Routes now serve proper XML/text content in both development and production
+- **Impact**: Sitemap now works correctly for all SEO crawlers (Ahrefs, Google, Bing) while preserving social preview functionality
+- **Verification**: Tested in production with working XML sitemap at https://lekkerspots.co.za/sitemap.xml
+
 ### Production Deployment Fixes
 - **Critical Fix**: Resolved social media preview issue where `__BASE_URL__` placeholders weren't being replaced in production
 - **Root Cause**: `express.static` middleware uses internal `send` module, bypassing `res.sendFile` overrides
