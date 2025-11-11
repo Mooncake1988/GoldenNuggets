@@ -2,136 +2,7 @@
 
 ## Overview
 
-LekkerSpots is a travel discovery web application showcasing hidden gems and local favorites in the Western Cape, South Africa. It features a curated database of locations (coffee shops, restaurants, beaches, hikes, markets, bars), full-text search, dynamic tag filtering, and an interactive map. The platform includes an admin dashboard for content management with multi-image uploads, secure authentication, and integration with Google Cloud Storage for media. It is production-ready with full CRUD functionality, search, and image handling.
-
-## Recent Updates (November 2025)
-
-**Sitemap Route Fix (November 11, 2025)**
-- **Issue**: Sitemap.xml endpoint was being intercepted by Vite's catch-all route in development, returning HTML instead of XML
-- **Root Cause**: SEO routes (sitemap.xml, robots.txt) were registered inside registerRoutes() which executed before Vite middleware setup
-- **Solution**: 
-  - Moved sitemap.xml and robots.txt route handlers from server/routes.ts to server/index.ts
-  - Positioned them after registerRoutes() but before Vite/static middleware setup for proper route precedence
-  - Added explicit skip logic in htmlMetaRewriter middleware to bypass /sitemap.xml and /robots.txt routes
-  - This ensures routes serve proper XML/text content in both development and production
-- **Impact**: Sitemap now works correctly for SEO crawlers (Ahrefs, Google, etc.) while preserving social preview functionality
-- **Files Changed**: server/index.ts (added routes), server/routes.ts (removed routes), server/middleware/htmlMetaRewriter.ts (added skip logic)
-
-**Footer Branding Update (November 10, 2025)**
-- **Logo Integration**: Replaced MapPin icon with LekkerSpots logo (80×80px) for stronger brand identity
-- **Text Updates**: Changed "Cape Town Golden Nuggets" to "LekkerSpots" throughout footer
-- **Description Refresh**: Updated tagline to "Discover hidden gems and lekker spots across the Western Cape, curated by locals" to emphasize regional scope
-- **Social Media Cleanup**: Removed Facebook link, kept Instagram (placeholder URL), linked envelope icon to Google Forms contact (https://forms.gle/GY4WUo9EPkBvv2Ja6)
-- **Security Enhancement**: Added `target="_blank"` and `rel="noopener noreferrer"` to all external social links
-- **Copyright Update**: Changed to "© 2025 LekkerSpots. All rights reserved."
-
-**Production Error Fix - Social Preview & Base URL Replacement (November 7, 2025)** ⚠️
-- **Issue**: Social media previews not working - `__BASE_URL__` placeholders remained in production HTML instead of being replaced with actual domain
-- **Root Cause**: `express.static` middleware uses internal `send` module (NOT `res.sendFile`) to serve index.html
-  - Original middleware tried to override `res.sendFile` to intercept and process HTML
-  - When users request `/`, `express.static` serves index.html directly via `send` module
-  - The `res.sendFile` override never executes for homepage requests
-  - Social media crawlers hit `/` and receive unprocessed HTML with placeholders
-  - Location pages worked because they fell through to the catch-all handler
-- **Solution - Direct HTML Serving**:
-  - Completely rewrote `htmlMetaRewriter` middleware to intercept HTML requests BEFORE express.static
-  - In production, middleware directly reads `index.html`, processes it, and sends via `res.send()`
-  - Bypasses express.static entirely for HTML requests
-  - Processes all HTML requests uniformly (homepage and location pages)
-  - In development, lets Vite handle HTML transformation (no processing needed)
-- **How It Works**:
-  1. Request comes in (e.g., `/` or `/location/slug`)
-  2. Middleware checks if it's a static asset or API request → skip if yes
-  3. For HTML requests in production: read index.html from disk
-  4. Replace `__BASE_URL__` with actual domain (lekkerspots.co.za or www.lekkerspots.co.za)
-  5. Inject location-specific meta tags if applicable (from `res.locals.locationMeta`)
-  6. Send processed HTML directly with correct headers
-  7. Request never reaches express.static for HTML
-- **Testing**: Verified working on Slack, Facebook, Twitter, LinkedIn, Discord via OpenGraph.xyz
-- **Impact**: Social media previews now work perfectly on both lekkerspots.co.za and www.lekkerspots.co.za
-- **Key Learning**: Response method overrides (res.send, res.sendFile) are fragile - direct request interception is more reliable
-
-**Critical Production Deployment Fix** ⚠️
-- **HTML Truncation Issue Resolved**: Fixed critical bug where production site served truncated HTML causing blank page
-  - Root cause: `express.static` set `Content-Length` header based on original file, but `htmlMetaRewriter` middleware modified HTML making it longer
-  - Browsers stopped reading at original Content-Length, cutting off HTML mid-tag
-  - Missing critical elements: `</head>`, `<body>`, `<div id="root">`, `</html>`
-- **Solution**: Modified `htmlMetaRewriter` middleware to remove stale Content-Length header and recalculate based on processed HTML
-- **Database Connection Stability**: Added `poolQueryViaFetch: true` configuration for Neon database in production environments
-- **WebSocket Handling**: Production deployments now use HTTP fetch instead of WebSockets for database queries (serverless compatible)
-- **TypeScript Compilation**: Fixed all TypeScript errors preventing production builds (LocationCard slug prop, htmlMetaRewriter function signatures)
-- **Documentation**: Created comprehensive fix documentation in `PRODUCTION_DEPLOYMENT_FIX.md` with root cause analysis, solutions, and prevention strategies
-- **Production Build**: Verified successful compilation and complete HTML delivery in deployed environments
-
-**Social Media & SEO Optimization**
-- **Server-Side Meta Tag Injection**: Location pages now inject location-specific meta tags server-side for social crawlers
-- **Two-Tier Middleware System**:
-  - `locationMetaMiddleware`: Intercepts `/location/:slug` requests, fetches location data from database, populates `res.locals.locationMeta`
-  - `htmlMetaRewriter`: Replaces `__BASE_URL__` placeholders AND injects location-specific meta tags from `res.locals`
-- **Dynamic Meta Tags**: Each location page serves unique `<title>`, OG tags (title, description, image, url, type=place), Twitter Card tags, and JSON-LD structured data
-- **Works for All Crawlers**: Social media bots (Facebook, Twitter, LinkedIn) receive proper meta tags even without JavaScript execution
-- **Favicon System**: Multi-size favicon implementation for all platforms
-  - Browser icons: 16x16, 32x32, favicon.ico
-  - iOS: 180x180 apple-touch-icon
-  - Android: 192x192 and 512x512 icons with web manifest
-  - All sizes feature larger LekkerSpots logo with sunset gradient for better visibility
-- Custom OG image (1200×630px, 193KB) featuring Western Cape beach with LekkerSpots logo
-- Dynamic base URL system works seamlessly across dev (Replit domain) and production (lekkerspots.co.za)
-- Strict host header validation with regex to prevent spoofing attacks
-- HTML escaping for user-generated content prevents XSS attacks in meta tags
-- Complete SEO meta tags: keywords, canonical URLs, theme-color, author
-- Full Western Cape rebranding across entire application
-
-**Sitemap Domain Fix**
-- Fixed sitemap URL generation to use custom domain (lekkerspots.co.za) in production
-- Sitemap and robots.txt now dynamically use request host header for proper domain detection
-- Ensures all sitemap URLs use the correct production domain for optimal SEO
-- Works seamlessly across development and production environments
-
-**SEO Optimization - Dynamic Sitemap**
-- Implemented `/sitemap.xml` endpoint that generates SEO-optimized XML sitemap dynamically from database
-- Automatic synchronization: every location create/update/delete is instantly reflected in the sitemap
-- Proper SEO metadata: lastmod timestamps from database, priority levels, and changefreq values
-- Includes all static pages (home, categories, map) and dynamic location detail pages
-- Added `/robots.txt` endpoint with proper crawling rules (allows all, blocks /admin and /api)
-- Zero maintenance required - sitemap stays current automatically
-
-**UI Vibrancy Enhancement - Gradient Borders & Hover Effects (November 10, 2025)**
-- **Orange Color Addition**: Extended color palette with orange (15° hue, 90% saturation) to bridge pink and yellow from logo sunset gradient
-- **Navigation Header**: Added vibrant 2px gradient border-bottom using sunset colors (accent → orange → secondary → primary)
-- **Footer**: Added vibrant 3px gradient top border using logo colors (primary → secondary → orange → accent)
-- **Location Cards Enhancement**:
-  - Category-matching colored borders (2px) with distinct colors per category
-  - Coffee Shop: amber border with golden glow on hover
-  - Restaurant: rose border with pink glow on hover
-  - Beach: cyan border with teal glow on hover
-  - Hike: emerald border with green glow on hover
-  - Market: violet border with purple glow on hover
-  - Bar: fuchsia border with magenta glow on hover
-  - Smooth hover animation: gentle lift (-translate-y-1) + border brightness increase + soft glow shadow
-  - Applied consistently across homepage and categories page
-- **Color System**: All new colors support both light and dark modes with proper HSL format and automatic border computation
-- **Performance**: Transitions use CSS transforms for optimal performance (300ms duration)
-
-**Color Scheme Refresh**
-- Vibrant sunset gradient palette using LekkerSpots logo colors (turquoise, hot pink, coral, yellow)
-- Gradient category badges: orange for coffee shops, pink for restaurants, teal for beaches, green for hikes, purple for markets, fuchsia for bars
-- Colorful tag system using theme colors (primary, accent, secondary, pink, teal) with proper dark mode support
-- Gradient logo text in header using primary → accent → secondary gradient
-- All colors maintain WCAG-compliant contrast ratios in both light and dark modes
-
-**Hero Section Redesign**
-- Replaced Lottie background with professional Western Cape stock photo
-- Repositioned area-map animation as elegant accent icon above headline
-- Implemented subtle gradient overlay (black/30-50%) for optimal text readability
-- White text on photo creates premium, high-impact first impression
-- Clean visual hierarchy: Animation → Headline → Subtitle → Search
-
-**Lottie Animation Integration**
-- Created reusable `LottieAnimation` component with accessibility support
-- Integrated 3 custom animations: area-map (hero accent), confetti (newsletter), empty-state (search results)
-- All animations respect `prefers-reduced-motion` for accessibility
-- Confetti: Full-screen overlay (1920x1080 aspect ratio) with 3s auto-dismiss on newsletter subscription
+LekkerSpots is a travel discovery web application for the Western Cape, South Africa. It curates a database of local spots (coffee shops, restaurants, beaches, hikes, markets, bars) and offers full-text search, dynamic tag filtering, and an interactive map. The platform includes an admin dashboard for content management with multi-image uploads, secure authentication, and Google Cloud Storage integration. Its purpose is to showcase hidden gems and local favorites, providing a production-ready solution with full CRUD functionality and robust image handling. The project aims to become the go-to guide for exploring the Western Cape, featuring a professional UI/UX and strong SEO capabilities for broad market reach.
 
 ## User Preferences
 
@@ -141,25 +12,23 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend
 
-The frontend is built with React 18 and TypeScript, using Vite for development and Wouter for lightweight client-side routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, utilizing a mobile-first, responsive design with a custom HSL color system and typography (Inter and Merriweather). State management is handled by TanStack Query for server state and React hooks for UI state. Key design decisions include photography-first hero layouts, map-centric navigation with Leaflet, a reusable component architecture, and subtle Lottie animations that respect accessibility preferences (prefers-reduced-motion). The hero section features a Western Cape stock photo background with the area-map Lottie as a decorative accent icon, creating a professional, high-impact design.
+The frontend is a React 18 application built with TypeScript, using Vite for development and Wouter for routing. UI components are developed with Shadcn/ui (New York style) based on Radix UI and styled with Tailwind CSS, emphasizing a mobile-first, responsive design with a custom HSL color system and typography. State management leverages TanStack Query for server state and React hooks for UI state. Key design elements include a photography-first hero section with a Western Cape stock photo, map-centric navigation using Leaflet, a reusable component architecture, and subtle Lottie animations that respect accessibility (`prefers-reduced-motion`). The UI incorporates a vibrant sunset gradient color palette, dynamic gradient borders, and hover effects for enhanced user experience and branding. SEO is optimized with server-side rendered meta tags and dynamic sitemap generation.
 
 ### Backend
 
-The backend uses Node.js with Express.js, written entirely in TypeScript with shared types across the stack. It exposes RESTful API endpoints. Authentication is session-based for a single admin user, leveraging Passport.js with a Local Strategy, storing credentials securely in environment variables and sessions in PostgreSQL via `connect-pg-simple`. Drizzle ORM ensures type-safe database interactions. The file upload system uses Uppy on the client, integrating with Google Cloud Storage via pre-signed URLs and a custom ACL policy. Search and filtering are powered by PostgreSQL's `ILIKE` for full-text search across various fields and case-insensitive tag matching. Filters are URL-driven, with a custom `urlchange` event system for state synchronization.
+The backend is built with Node.js and Express.js, written entirely in TypeScript with shared types across the stack. It provides RESTful API endpoints. Authentication is session-based for a single admin user, utilizing Passport.js with a Local Strategy and PostgreSQL for session storage. Drizzle ORM ensures type-safe database interactions and migrations. The file upload system integrates Uppy on the client with Google Cloud Storage via pre-signed URLs. Search and filtering functionalities are powered by PostgreSQL's `ILIKE` for full-text search and case-insensitive tag matching, with URL-driven filters. The server implements gzip compression for improved performance and SEO, and dynamically generates `sitemap.xml` and `robots.txt`.
 
 ### Database
 
-The database is PostgreSQL (Neon serverless) with a schema including a `Locations` table (name, category, description, coordinates, images, tags, featured flag) and a `Sessions` table for authentication. Drizzle ORM manages type-safe queries and migrations, with connection pooling for serverless compatibility.
+The project uses a PostgreSQL database (Neon serverless) with a `Locations` table (storing name, category, description, coordinates, images, tags, featured status) and a `Sessions` table for authentication. Drizzle ORM manages type-safe queries and schema migrations, configured for serverless compatibility with connection pooling.
 
 ## External Dependencies
 
-**Authentication**: Passport.js (Local Strategy)
-**Cloud Services**: Google Cloud Storage, Neon Database, Replit Sidecar (for secrets)
+**Authentication**: Passport.js
+**Cloud Services**: Google Cloud Storage, Neon Database
 **Maps & Geolocation**: Leaflet.js, OpenStreetMap
-**File Upload**: Uppy (Core, Dashboard, adapted S3 plugin)
-**UI Components**: Radix UI, Lucide React (icons)
-**Development Tools**: Vite, Replit-specific plugins, TypeScript
-**Form Management**: React Hook Form, Zod, @hookform/resolvers
-**Utility Libraries**: `class-variance-authority`, `clsx`, `tailwind-merge`, `nanoid`
-**Animations**: Lottie React (custom animations for hero, confetti, empty states)
+**File Upload**: Uppy
+**UI Components**: Radix UI, Lucide React
+**Form Management**: React Hook Form, Zod
+**Animations**: Lottie React
 **Newsletter Integration**: Beehiiv API
