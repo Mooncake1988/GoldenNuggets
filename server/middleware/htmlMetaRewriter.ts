@@ -26,59 +26,59 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
   // Replace description meta tag
   html = html.replace(
     /<meta name="description" content="[^"]*" \/>/,
-    `<meta name="description" content="${meta.description}" />`
+    `<meta name="description" content="${meta.description}" data-rh="true" />`
   );
   
   // Replace Open Graph tags
   html = html.replace(
     /<meta property="og:title" content="[^"]*" \/>/,
-    `<meta property="og:title" content="${meta.title}" />`
+    `<meta property="og:title" content="${meta.title}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:description" content="[^"]*" \/>/,
-    `<meta property="og:description" content="${meta.description}" />`
+    `<meta property="og:description" content="${meta.description}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:url" content="[^"]*" \/>/,
-    `<meta property="og:url" content="${meta.url}" />`
+    `<meta property="og:url" content="${meta.url}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:image" content="[^"]*" \/>/,
-    `<meta property="og:image" content="${meta.ogImage}" />`
+    `<meta property="og:image" content="${meta.ogImage}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:image:secure_url" content="[^"]*" \/>/,
-    `<meta property="og:image:secure_url" content="${meta.ogImage}" />`
+    `<meta property="og:image:secure_url" content="${meta.ogImage}" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:image:alt" content="[^"]*" \/>/,
-    `<meta property="og:image:alt" content="${meta.locationName} - ${meta.category} in Western Cape" />`
+    `<meta property="og:image:alt" content="${meta.locationName} - ${meta.category} in Western Cape" data-rh="true" />`
   );
   html = html.replace(
     /<meta property="og:type" content="website" \/>/,
-    `<meta property="og:type" content="place" />`
+    `<meta property="og:type" content="place" data-rh="true" />`
   );
   
   // Replace Twitter Card tags
   html = html.replace(
     /<meta name="twitter:title" content="[^"]*" \/>/,
-    `<meta name="twitter:title" content="${meta.title}" />`
+    `<meta name="twitter:title" content="${meta.title}" data-rh="true" />`
   );
   html = html.replace(
     /<meta name="twitter:description" content="[^"]*" \/>/,
-    `<meta name="twitter:description" content="${meta.description}" />`
+    `<meta name="twitter:description" content="${meta.description}" data-rh="true" />`
   );
   html = html.replace(
     /<meta name="twitter:image" content="[^"]*" \/>/,
-    `<meta name="twitter:image" content="${meta.ogImage}" />`
+    `<meta name="twitter:image" content="${meta.ogImage}" data-rh="true" />`
   );
   html = html.replace(
     /<meta name="twitter:image:alt" content="[^"]*" \/>/,
-    `<meta name="twitter:image:alt" content="${meta.locationName} - ${meta.category} in Western Cape" />`
+    `<meta name="twitter:image:alt" content="${meta.locationName} - ${meta.category} in Western Cape" data-rh="true" />`
   );
   
   // Inject structured data before closing </head> tag
-  const structuredDataScript = `<script type="application/ld+json">\n${meta.structuredData}\n</script>\n</head>`;
+  const structuredDataScript = `<script type="application/ld+json" data-rh="true">\n${meta.structuredData}\n</script>\n</head>`;
   html = html.replace(/<\/head>/, structuredDataScript);
   
   return html;
