@@ -150,8 +150,11 @@ export function htmlMetaRewriter(req: Request, res: Response, next: NextFunction
     return next();
   }
 
-  // Skip processing for API requests
-  if (req.path.startsWith('/api/') || req.path.startsWith('/objects/')) {
+  // Skip processing for API requests and SEO files
+  if (req.path.startsWith('/api/') || 
+      req.path.startsWith('/objects/') || 
+      req.path === '/sitemap.xml' || 
+      req.path === '/robots.txt') {
     return next();
   }
 
