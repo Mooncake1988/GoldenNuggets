@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { htmlMetaRewriter } from "./middleware/htmlMetaRewriter";
@@ -20,6 +21,9 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false }));
+
+// Enable Gzip compression for all responses
+app.use(compression());
 
 // Apply location meta middleware FIRST to populate res.locals.locationMeta
 app.use(createLocationMetaMiddleware(storage));
