@@ -6,6 +6,17 @@ LekkerSpots is a travel discovery web application showcasing hidden gems and loc
 
 ## Recent Updates (November 2025)
 
+**Sitemap Route Fix (November 11, 2025)**
+- **Issue**: Sitemap.xml endpoint was being intercepted by Vite's catch-all route in development, returning HTML instead of XML
+- **Root Cause**: SEO routes (sitemap.xml, robots.txt) were registered inside registerRoutes() which executed before Vite middleware setup
+- **Solution**: 
+  - Moved sitemap.xml and robots.txt route handlers from server/routes.ts to server/index.ts
+  - Positioned them after registerRoutes() but before Vite/static middleware setup for proper route precedence
+  - Added explicit skip logic in htmlMetaRewriter middleware to bypass /sitemap.xml and /robots.txt routes
+  - This ensures routes serve proper XML/text content in both development and production
+- **Impact**: Sitemap now works correctly for SEO crawlers (Ahrefs, Google, etc.) while preserving social preview functionality
+- **Files Changed**: server/index.ts (added routes), server/routes.ts (removed routes), server/middleware/htmlMetaRewriter.ts (added skip logic)
+
 **Footer Branding Update (November 10, 2025)**
 - **Logo Integration**: Replaced MapPin icon with LekkerSpots logo (80×80px) for stronger brand identity
 - **Text Updates**: Changed "Cape Town Golden Nuggets" to "LekkerSpots" throughout footer
