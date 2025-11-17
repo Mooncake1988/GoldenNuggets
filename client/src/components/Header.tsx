@@ -41,6 +41,16 @@ export default function Header() {
                 Map View
               </span>
             </Link>
+            <a 
+              href="https://lekkerspots.beehiiv.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              data-testid="link-nav-stories"
+            >
+              <span className="text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer text-muted-foreground">
+                Stories
+              </span>
+            </a>
             <Link href="/admin/login" data-testid="link-nav-admin">
               <Button variant="outline" size="sm">
                 Admin Login
@@ -78,6 +88,16 @@ export default function Header() {
                 Map View
               </span>
             </Link>
+            <a 
+              href="https://lekkerspots.beehiiv.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              data-testid="link-mobile-stories"
+            >
+              <span className="block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer text-muted-foreground">
+                Stories
+              </span>
+            </a>
             <Link href="/admin/login" data-testid="link-mobile-admin">
               <Button variant="outline" size="sm" className="mt-2 w-full">
                 Admin Login
