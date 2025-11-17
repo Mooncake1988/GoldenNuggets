@@ -132,10 +132,14 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Real-time results with no page refresh
 
 ### Image Management
-- Multi-image upload with drag-and-drop support
+- Multi-image upload with drag-and-drop support via Uppy
+- Drag-and-drop reordering to control preview image selection
+- Individual delete controls with visible X buttons
+- Visual "Preview Image" badge on the first image
 - Automatic cloud storage via Google Cloud Storage
 - Pre-signed URLs for secure uploads
 - Image gallery with thumbnail navigation
+- Real-time visual feedback during drag operations
 
 ### Admin Panel
 - Secure session-based authentication
@@ -150,6 +154,14 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Responsive map controls
 
 ## 🎨 Recent Updates (November 2025)
+
+### Enhanced Image Management (November 17, 2025)
+- **Drag-and-Drop Reordering**: Admin can now reorder location images by dragging and dropping them
+- **Preview Image Control**: The first image in the array serves as the preview thumbnail on location cards, clearly marked with a "Preview Image" badge
+- **Enhanced Delete Buttons**: Larger, more visible delete buttons (red X icons) on each image for easy removal
+- **Visual Feedback**: Clear visual indicators during drag operations (reduced opacity, blue border, scale effect)
+- **Improved UX**: Better spacing, layout, and instructional text to guide admins
+- **Bug Fix**: Resolved issue where delete buttons were hidden by `overflow-hidden` CSS on rounded containers
 
 ### Sitemap Route Fix (November 11, 2025)
 - **Issue**: Sitemap.xml endpoint was being intercepted by Vite's catch-all route, returning HTML instead of XML
