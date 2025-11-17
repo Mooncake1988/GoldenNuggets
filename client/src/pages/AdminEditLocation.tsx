@@ -37,6 +37,7 @@ export default function AdminEditLocation() {
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
     queryKey: ["/api/locations"],
@@ -163,6 +164,31 @@ export default function AdminEditLocation() {
         description: `${uploadedUrls.length} image(s) uploaded successfully`,
       });
     }
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    
+    const newImages = [...uploadedImages];
+    const draggedImage = newImages[draggedIndex];
+    newImages.splice(draggedIndex, 1);
+    newImages.splice(index, 0, draggedImage);
+    
+    setUploadedImages(newImages);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -327,24 +353,47 @@ export default function AdminEditLocation() {
                   </ObjectUploader>
                   
                   {uploadedImages.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-4">
-                      {uploadedImages.map((imagePath, index) => (
-                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden border">
-                          <img
-                            src={imagePath}
-                            alt={`Upload ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setUploadedImages(prev => prev.filter((_, i) => i !== index))}
-                            className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover-elevate"
-                            data-testid={`button-remove-image-${index}`}
+                    <div className="mt-4 space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Drag images to reorder. The first image will be the preview thumbnail.
+                      </p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {uploadedImages.map((imagePath, index) => (
+                          <div
+                            key={index}
+                            draggable
+                            onDragStart={() => handleDragStart(index)}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragEnd={handleDragEnd}
+                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-move ${
+                              draggedIndex === index 
+                                ? 'opacity-50 border-primary scale-95' 
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                            data-testid={`image-item-${index}`}
                           >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      ))}
+                            <img
+                              src={imagePath}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {index === 0 && (
+                              <div className="absolute top-2 left-2 px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-md shadow-lg">
+                                Preview Image
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full hover-elevate active-elevate-2 shadow-lg transition-transform hover:scale-110"
+                              data-testid={`button-remove-image-${index}`}
+                              title="Remove image"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
