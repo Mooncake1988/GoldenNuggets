@@ -332,7 +332,7 @@ export default function AdminAddLocation() {
                             onDragStart={() => handleDragStart(index)}
                             onDragOver={(e) => handleDragOver(e, index)}
                             onDragEnd={handleDragEnd}
-                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-move ${
+                            className={`relative aspect-square rounded-lg border-2 transition-all cursor-move ${
                               draggedIndex === index 
                                 ? 'opacity-50 border-primary scale-95' 
                                 : 'border-border hover:border-primary/50'
@@ -342,7 +342,7 @@ export default function AdminAddLocation() {
                             <img
                               src={imagePath}
                               alt={`Upload ${index + 1}`}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover rounded-lg"
                             />
                             {index === 0 && (
                               <div className="absolute top-2 left-2 px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-md shadow-lg">
