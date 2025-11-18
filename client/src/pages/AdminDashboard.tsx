@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, MapPin, Edit, Trash2, LogOut } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, MapPin, Edit, Trash2, LogOut, Star } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -148,7 +149,15 @@ export default function AdminDashboard() {
                       data-testid={`card-admin-location-${location.id}`}
                     >
                       <div className="flex-1">
-                        <h3 className="font-semibold">{location.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold">{location.name}</h3>
+                          {location.featured && (
+                            <Badge variant="default" className="bg-primary text-primary-foreground gap-1" data-testid={`badge-featured-${location.id}`}>
+                              <Star className="h-3 w-3 fill-current" />
+                              Featured
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">{location.category} • {location.neighborhood}</p>
                       </div>
                       <div className="flex gap-2">
