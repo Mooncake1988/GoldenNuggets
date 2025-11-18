@@ -8,8 +8,14 @@ import emptyStateAnimation from "@assets/animations/empty-state.json";
 import { useQuery } from "@tanstack/react-query";
 import type { Location } from "@shared/schema";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 export default function Home() {
+  const [offset, setOffset] = useState(0);
+  const [allFeaturedLocations, setAllFeaturedLocations] = useState<Location[]>([]);
+  const ITEMS_PER_PAGE = 12;
+
   const [urlParams, setUrlParams] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return {
@@ -25,6 +31,8 @@ export default function Home() {
         searchQuery: params.get('search') || '',
         selectedTag: params.get('tag') || '',
       });
+      setOffset(0);
+      setAllFeaturedLocations([]);
     };
 
     window.addEventListener('popstate', handleUrlChange);
@@ -48,7 +56,7 @@ export default function Home() {
     } else if (selectedTag) {
       return ["/api/locations/by-tag", selectedTag];
     }
-    return ["/api/locations"];
+    return ["/api/locations/featured", offset];
   };
 
   const getQueryFn = async () => {
@@ -67,8 +75,8 @@ export default function Home() {
       if (!res.ok) throw new Error(`Failed to fetch locations by tag: ${res.statusText}`);
       return res.json();
     } else {
-      const res = await fetch('/api/locations');
-      if (!res.ok) throw new Error(`Failed to fetch locations: ${res.statusText}`);
+      const res = await fetch(`/api/locations/featured?limit=${ITEMS_PER_PAGE}&offset=${offset}`);
+      if (!res.ok) throw new Error(`Failed to fetch featured locations: ${res.statusText}`);
       return res.json();
     }
   };
@@ -77,6 +85,23 @@ export default function Home() {
     queryKey: getQueryKey(),
     queryFn: getQueryFn,
   });
+
+  useEffect(() => {
+    if (locations && !searchQuery && !selectedTag) {
+      if (offset === 0) {
+        setAllFeaturedLocations(locations);
+      } else {
+        setAllFeaturedLocations(prev => [...prev, ...locations]);
+      }
+    }
+  }, [locations, offset, searchQuery, selectedTag]);
+
+  const displayedLocations = (searchQuery || selectedTag) ? locations : allFeaturedLocations;
+  const hasMore = locations && locations.length === ITEMS_PER_PAGE && !searchQuery && !selectedTag;
+
+  const handleLoadMore = () => {
+    setOffset(prev => prev + ITEMS_PER_PAGE);
+  };
 
   const getTitle = () => {
     if (searchQuery && selectedTag) {
@@ -130,28 +155,63 @@ export default function Home() {
                 Error loading locations. Please try again.
               </p>
             </div>
-          ) : isLoading ? (
+          ) : isLoading && offset === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground" data-testid="text-loading">
                 Loading locations...
               </p>
             </div>
-          ) : locations && locations.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {locations.map((location) => (
-                <LocationCard 
-                  key={location.id}
-                  id={location.id}
-                  slug={location.slug}
-                  name={location.name}
-                  category={location.category}
-                  neighborhood={location.neighborhood}
-                  description={location.description}
-                  image={location.images[0] || ""}
-                  tags={location.tags}
-                />
-              ))}
-            </div>
+          ) : displayedLocations && displayedLocations.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {displayedLocations.map((location) => (
+                  <LocationCard 
+                    key={location.id}
+                    id={location.id}
+                    slug={location.slug}
+                    name={location.name}
+                    category={location.category}
+                    neighborhood={location.neighborhood}
+                    description={location.description}
+                    image={location.images[0] || ""}
+                    tags={location.tags}
+                  />
+                ))}
+              </div>
+              
+              {hasMore && (
+                <div className="mt-12 text-center">
+                  <Button 
+                    onClick={handleLoadMore} 
+                    disabled={isLoading}
+                    size="lg"
+                    data-testid="button-load-more"
+                  >
+                    {isLoading ? "Loading..." : "Load More Featured Locations"}
+                  </Button>
+                </div>
+              )}
+              
+              {!searchQuery && !selectedTag && (
+                <div className="mt-16 pt-8 border-t text-center">
+                  <p className="text-muted-foreground text-lg mb-4">
+                    Looking for something specific?
+                  </p>
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    <Link href="/categories">
+                      <Button variant="outline" size="lg" data-testid="link-browse-categories">
+                        Browse All Locations by Category
+                      </Button>
+                    </Link>
+                    <Link href="/map">
+                      <Button variant="outline" size="lg" data-testid="link-view-map">
+                        View All on Map
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
               <LottieAnimation

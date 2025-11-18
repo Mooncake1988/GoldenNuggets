@@ -3,8 +3,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LocationCard from "@/components/LocationCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import type { Location } from "@shared/schema";
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const categoryDescriptions: Record<string, string> = {
   "Coffee Shop": "Discover Cape Town's finest artisan coffee spots and cozy cafes",
@@ -16,6 +19,8 @@ const categoryDescriptions: Record<string, string> = {
 };
 
 export default function Categories() {
+  const [featuredOnly, setFeaturedOnly] = useState(false);
+
   const { data: locations, isLoading } = useQuery<Location[]>({
     queryKey: ["/api/locations"],
   });
@@ -28,7 +33,11 @@ export default function Categories() {
     );
   }
 
-  const locationsByCategory = locations?.reduce((acc, location) => {
+  const filteredLocations = featuredOnly
+    ? locations?.filter(loc => loc.featured)
+    : locations;
+
+  const locationsByCategory = filteredLocations?.reduce((acc, location) => {
     if (!acc[location.category]) {
       acc[location.category] = [];
     }
@@ -48,9 +57,21 @@ export default function Categories() {
             <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4" data-testid="heading-categories">
               Explore by Category
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground mb-6">
               Browse our curated collection of Cape Town's hidden gems organized by type
             </p>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="featured-only"
+                checked={featuredOnly}
+                onCheckedChange={(checked) => setFeaturedOnly(checked === true)}
+                data-testid="checkbox-featured-only"
+              />
+              <Label htmlFor="featured-only" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                Show Featured Locations Only
+              </Label>
+            </div>
           </div>
 
           {categories.length === 0 ? (

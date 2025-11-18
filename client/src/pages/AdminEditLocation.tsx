@@ -16,6 +16,7 @@ import { ObjectUploader } from "@/components/ObjectUploader";
 import { Upload, X, Loader2 } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Location, Category } from "@shared/schema";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function AdminEditLocation() {
   const { toast } = useToast();
@@ -34,6 +35,7 @@ export default function AdminEditLocation() {
     latitude: "-33.9249",
     longitude: "18.4241",
     tags: "",
+    featured: false,
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -89,6 +91,7 @@ export default function AdminEditLocation() {
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
         tags: currentLocation.tags.join(", "),
+        featured: currentLocation.featured,
       });
       setUploadedImages(currentLocation.images);
     }
@@ -336,6 +339,21 @@ export default function AdminEditLocation() {
                     placeholder="e.g. Specialty Coffee, Brunch, Instagram Worthy"
                     data-testid="input-tags"
                   />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="featured"
+                    checked={formData.featured}
+                    onCheckedChange={(checked) => setFormData({ ...formData, featured: checked === true })}
+                    data-testid="checkbox-featured"
+                  />
+                  <Label htmlFor="featured" className="text-sm font-medium cursor-pointer">
+                    Featured Location
+                  </Label>
+                  <p className="text-xs text-muted-foreground ml-2">
+                    (Featured locations appear on the homepage)
+                  </p>
                 </div>
 
                 <div className="space-y-2">

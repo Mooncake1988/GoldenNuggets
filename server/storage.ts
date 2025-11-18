@@ -33,6 +33,7 @@ export interface IStorage {
   searchLocations(query: string, tag?: string): Promise<Location[]>;
   getPopularTags(limit?: number): Promise<{ tag: string; count: number }[]>;
   getLocationsByTag(tag: string): Promise<Location[]>;
+  getFeaturedLocations(limit: number, offset: number): Promise<Location[]>;
   createLocation(location: InsertLocation): Promise<Location>;
   updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location>;
   deleteLocation(id: string): Promise<void>;
@@ -156,6 +157,15 @@ export class DatabaseStorage implements IStorage {
           WHERE LOWER(t) = LOWER(${tag})
         )`
       );
+  }
+
+  async getFeaturedLocations(limit: number, offset: number): Promise<Location[]> {
+    return await db
+      .select()
+      .from(locations)
+      .where(eq(locations.featured, true))
+      .limit(limit)
+      .offset(offset);
   }
 
   async createLocation(location: InsertLocation): Promise<Location> {

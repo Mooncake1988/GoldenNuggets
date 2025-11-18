@@ -216,6 +216,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/locations/featured", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 12;
+      const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
+      const locations = await storage.getFeaturedLocations(limit, offset);
+      res.json(locations);
+    } catch (error) {
+      console.error("Error fetching featured locations:", error);
+      res.status(500).json({ error: "Failed to fetch featured locations" });
+    }
+  });
+
   app.get("/api/locations/by-slug/:slug", async (req, res) => {
     try {
       const slug = decodeURIComponent(req.params.slug);
