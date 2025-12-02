@@ -59,6 +59,12 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
     `<meta property="og:type" content="place" data-rh="true" />`
   );
   
+  // Replace canonical link tag - CRITICAL for SEO to avoid soft 404
+  html = html.replace(
+    /<link rel="canonical" href="[^"]*" \/>/,
+    `<link rel="canonical" href="${meta.url}" data-rh="true" />`
+  );
+  
   // Replace Twitter Card tags
   html = html.replace(
     /<meta name="twitter:title" content="[^"]*" \/>/,
