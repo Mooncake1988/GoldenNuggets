@@ -9,7 +9,38 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+declare global {
+  interface Window {
+    __LOCATION_DATA__?: Location;
+  }
+}
+
+function getServerInjectedLocation(slug: string | undefined): Location | undefined {
+  if (typeof window !== 'undefined' && window.__LOCATION_DATA__) {
+    const serverData = window.__LOCATION_DATA__;
+    if (serverData.slug === slug) {
+      return serverData;
+    }
+  }
+  return undefined;
+}
+
+function clearServerData() {
+  if (typeof window !== 'undefined') {
+    delete window.__LOCATION_DATA__;
+  }
+}
+
+function removeSSRContent() {
+  if (typeof document !== 'undefined') {
+    const ssrContent = document.getElementById('ssr-location-content');
+    if (ssrContent) {
+      ssrContent.remove();
+    }
+  }
+}
 
 const getCategoryColor = (category: string) => {
   const categoryColors: Record<string, string> = {
@@ -29,12 +60,24 @@ export default function LocationDetail() {
   const [, setLocation] = useWouterLocation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   
-  const { data: location, isLoading } = useQuery<Location>({
-    queryKey: [`/api/locations/by-slug/${params?.slug}`],
-    enabled: !!params?.slug,
+  const serverLocation = getServerInjectedLocation(params?.slug);
+  
+  const { data: fetchedLocation, isLoading } = useQuery<Location>({
+    queryKey: ['/api/locations/by-slug', params?.slug],
+    enabled: !!params?.slug && !serverLocation,
+    initialData: serverLocation,
   });
+  
+  const location = fetchedLocation || serverLocation;
 
-  if (isLoading) {
+  useEffect(() => {
+    if (location) {
+      removeSSRContent();
+      clearServerData();
+    }
+  }, [location]);
+
+  if (isLoading && !location) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />

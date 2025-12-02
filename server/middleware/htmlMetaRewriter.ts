@@ -3,6 +3,14 @@ import { escapeHtml } from './locationMetaMiddleware';
 import fs from 'fs';
 import path from 'path';
 
+function escapeJsonForScript(json: string): string {
+  return json
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/'/g, '\\u0027');
+}
+
 interface LocationMeta {
   title: string;
   description: string;
@@ -11,6 +19,10 @@ interface LocationMeta {
   locationName: string;
   category: string;
   structuredData: string;
+  neighborhood: string;
+  address: string | null;
+  tags: string[];
+  fullLocationData: string;
 }
 
 /**
@@ -86,6 +98,45 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
   // Inject structured data before closing </head> tag
   const structuredDataScript = `<script type="application/ld+json" data-rh="true">\n${meta.structuredData}\n</script>\n</head>`;
   html = html.replace(/<\/head>/, structuredDataScript);
+  
+  // Inject server-rendered content into #root for SEO (fixes soft 404)
+  // This content is visible to crawlers immediately without waiting for JavaScript
+  const tagsHtml = meta.tags.length > 0 
+    ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">${meta.tags.map(tag => `<span style="background:#f1f5f9;padding:4px 12px;border-radius:9999px;font-size:14px">${tag}</span>`).join('')}</div>`
+    : '';
+  
+  const addressHtml = meta.address 
+    ? `<p style="color:#64748b;margin-top:12px"><strong>Address:</strong> ${meta.address}</p>`
+    : '';
+  
+  const serverRenderedContent = `
+    <div id="ssr-location-content" style="max-width:1200px;margin:0 auto;padding:32px 16px;font-family:system-ui,-apple-system,sans-serif">
+      <article>
+        <header style="margin-bottom:24px">
+          <h1 style="font-size:2.5rem;font-weight:700;margin:0 0 8px 0;color:#1e293b">${meta.locationName}</h1>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <span style="background:linear-gradient(to right,#f97316,#ea580c);color:white;padding:6px 16px;border-radius:9999px;font-weight:600">${meta.category}</span>
+            <span style="color:#64748b">${meta.neighborhood}, Western Cape</span>
+          </div>
+        </header>
+        <section>
+          <p style="font-size:1.125rem;line-height:1.75;color:#475569;margin:0">${meta.description}</p>
+          ${addressHtml}
+          ${tagsHtml}
+        </section>
+        <footer style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0">
+          <p style="color:#64748b;font-size:14px">Discover more hidden gems at <a href="https://lekkerspots.co.za" style="color:#f97316;text-decoration:none">LekkerSpots</a> - Western Cape's local travel guide.</p>
+        </footer>
+      </article>
+    </div>
+    <script>window.__LOCATION_DATA__ = ${escapeJsonForScript(meta.fullLocationData)};</script>
+  `;
+  
+  // Replace empty #root with server-rendered content
+  html = html.replace(
+    '<div id="root"></div>',
+    `<div id="root">${serverRenderedContent}</div>`
+  );
   
   return html;
 }
