@@ -105,7 +105,11 @@ export function createLocationMetaMiddleware(storage: IStorage) {
         ogImage,
         locationName: escapeHtml(location.name),
         category: escapeHtml(location.category),
-        structuredData: JSON.stringify(structuredData)
+        structuredData: JSON.stringify(structuredData),
+        neighborhood: escapeHtml(location.neighborhood),
+        address: location.address ? escapeHtml(location.address) : null,
+        tags: location.tags ? location.tags.map(t => escapeHtml(t)) : [],
+        fullLocationData: JSON.stringify(location)
       };
     } catch (error) {
       console.error('Error in locationMetaMiddleware:', error);
