@@ -38,6 +38,25 @@ The backend is built with Node.js and Express.js, written entirely in TypeScript
 
 The file upload system integrates Uppy on the client with Google Cloud Storage via pre-signed URLs. Search and filtering functionalities are powered by PostgreSQL's `ILIKE` for full-text search and case-insensitive tag matching, with URL-driven filters. The server implements gzip compression for improved performance and SEO, and dynamically generates `sitemap.xml` and `robots.txt`.
 
+**SEO Optimization - Lightweight SSR for Location Pages**:
+The application implements a hybrid SSR/SPA approach to satisfy both search engine crawlers and user experience requirements. When location pages (e.g., `/location/cape-town-luxury-car-rentals`) are requested in production mode, two middleware layers work together:
+
+1. `locationMetaMiddleware.ts` - Fetches location data from the database and attaches it to `res.locals.locationMeta` with all necessary fields (name, description, category, coordinates, images, tags, full location object).
+
+2. `htmlMetaRewriter.ts` - Processes the HTML before sending to client:
+   - Replaces `__BASE_URL__` placeholders with actual domain
+   - Injects correct canonical URL pointing to the specific location page
+   - Injects visible server-rendered content into `<div id="root">` including location name (h1), category badge, description, address, and tags
+   - Embeds `window.__LOCATION_DATA__` with properly escaped JSON for React hydration
+
+On the client side, `LocationDetail.tsx`:
+- Checks for `window.__LOCATION_DATA__` and validates it matches the current slug
+- Uses server data as `initialData` for TanStack Query, avoiding loading states
+- Removes SSR content stub and clears `window.__LOCATION_DATA__` after React hydration
+- Subsequent navigation triggers normal client-side fetches
+
+This approach provides Google's crawler with immediate, visible HTML content (eliminating soft 404 errors) while maintaining the smooth SPA experience for users. The solution is production-only; development mode uses Vite's standard SPA serving.
+
 ### Database
 
 The project uses a PostgreSQL database (Neon serverless) with a `Locations` table (storing name, category, description, coordinates, images, tags, featured status) and a `Sessions` table for authentication. Drizzle ORM manages type-safe queries and schema migrations, configured for serverless compatibility with connection pooling.
