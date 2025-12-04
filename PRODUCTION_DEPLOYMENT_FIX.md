@@ -4,6 +4,264 @@ This document tracks critical production issues encountered and their solutions.
 
 ---
 
+## Fix #3: Canonical Domain Enforcement for SEO (December 4, 2025)
+
+**Date**: December 4, 2025  
+**Status**: ✅ RESOLVED  
+**Severity**: Medium (SEO duplicate content causing search ranking dilution)
+
+### Problem Summary
+
+Google Search Console showed duplicate sitemaps and duplicate content issues because the website was accessible via both `www.lekkerspots.co.za` and `lekkerspots.co.za`. While both versions worked, search engines treated them as separate sites with duplicate content, splitting SEO authority between the two domains.
+
+### Root Cause Analysis
+
+#### The Duplicate Content Issue
+
+The application dynamically generated canonical URLs based on the incoming request's host header. This meant:
+
+1. **User accesses** `https://www.lekkerspots.co.za/location/africa-padel-waterfront`
+   - Canonical tag: `<link rel="canonical" href="https://www.lekkerspots.co.za/location/africa-padel-waterfront">`
+   
+2. **User accesses** `https://lekkerspots.co.za/location/africa-padel-waterfront`
+   - Canonical tag: `<link rel="canonical" href="https://lekkerspots.co.za/location/africa-padel-waterfront">`
+
+This created two different canonical URLs for identical content, confusing search engines.
+
+#### Where Dynamic URLs Were Generated
+
+1. **Server-side (3 locations)**:
+   - `server/index.ts` - Sitemap and robots.txt generation
+   - `server/middleware/locationMetaMiddleware.ts` - Server-rendered meta tags
+   - `server/middleware/htmlMetaRewriter.ts` - HTML placeholder replacement
+
+2. **Client-side (1 location)**:
+   - `client/src/pages/LocationDetail.tsx` - React Helmet canonical and Open Graph tags
+
+All four locations used dynamic host resolution from request headers or `window.location`, mirroring whatever domain the visitor used.
+
+### Symptoms
+
+- ✅ Both www and non-www domains accessible and functional
+- ❌ Google Search Console showing duplicate sitemaps
+- ❌ Split SEO authority between two domain variations
+- ❌ Canonical tags reflecting access method instead of canonical domain
+- ❌ Open Graph URLs varying based on how page was accessed
+
+### Solution: Hardcoded Canonical Domain in Production
+
+**Philosophy**: In production, always use the canonical domain. In development, preserve flexibility for local testing.
+
+#### Server-side Changes
+
+**File 1**: `server/index.ts`
+
+```typescript
+// Sitemap generation
+app.get('/sitemap.xml', async (req, res) => {
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://lekkerspots.co.za' 
+    : `${req.protocol}://${req.get('host')}`;
+  // ... rest of sitemap logic
+});
+
+// Robots.txt
+app.get('/robots.txt', (req, res) => {
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://lekkerspots.co.za' 
+    : `${req.protocol}://${req.get('host')}`;
+  // ... rest of robots.txt logic
+});
+```
+
+**File 2**: `server/middleware/locationMetaMiddleware.ts`
+
+```typescript
+function resolveBaseUrl(req: Request): string {
+  // In production, always use canonical domain
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lekkerspots.co.za';
+  }
+  
+  // In development, use dynamic resolution for local testing
+  // ... dynamic host resolution logic
+}
+```
+
+**File 3**: `server/middleware/htmlMetaRewriter.ts`
+
+```typescript
+function getBaseUrl(req: Request): string {
+  // In production, always use canonical domain
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lekkerspots.co.za';
+  }
+  
+  // In development, use dynamic resolution for local testing
+  // ... dynamic host resolution logic
+}
+```
+
+#### Client-side Changes
+
+**File 4**: `client/src/lib/config.ts` (new file)
+
+```typescript
+export const CANONICAL_BASE_URL = 
+  import.meta.env.MODE === 'production'
+    ? 'https://lekkerspots.co.za'
+    : window.location.origin;
+```
+
+**File 5**: `client/src/pages/LocationDetail.tsx`
+
+```typescript
+import { CANONICAL_BASE_URL } from '@/lib/config';
+
+// Before: Used window.location.origin (dynamic)
+const pageUrl = `${window.location.origin}/location/${slug}`;
+
+// After: Use canonical constant
+const pageUrl = `${CANONICAL_BASE_URL}/location/${slug}`;
+```
+
+### Testing & Verification
+
+#### Before Fix
+```bash
+# Test www version
+$ curl -s https://www.lekkerspots.co.za/location/africa-padel-waterfront | grep canonical
+<link rel="canonical" href="https://www.lekkerspots.co.za/location/africa-padel-waterfront">
+
+# Test non-www version
+$ curl -s https://lekkerspots.co.za/location/africa-padel-waterfront | grep canonical
+<link rel="canonical" href="https://lekkerspots.co.za/location/africa-padel-waterfront">
+# Different canonical URLs! ❌
+```
+
+#### After Fix
+```bash
+# Test www version
+$ curl -s https://www.lekkerspots.co.za/location/africa-padel-waterfront | grep canonical
+<link rel="canonical" href="https://lekkerspots.co.za/location/africa-padel-waterfront">
+
+# Test non-www version
+$ curl -s https://lekkerspots.co.za/location/africa-padel-waterfront | grep canonical
+<link rel="canonical" href="https://lekkerspots.co.za/location/africa-padel-waterfront">
+# Same canonical URL regardless of access method! ✅
+```
+
+#### Google Search Console Verification
+
+Using GSC's URL Inspection tool on `https://www.lekkerspots.co.za/location/step-brothers-restaurant-and-bar`:
+
+- **User-declared canonical**: `https://lekkerspots.co.za/location/step-brothers-restaurant-and-bar` ✅
+- **Google-selected canonical**: "Only determined after indexing" (will eventually match user-declared)
+
+### Impact & Expected Results
+
+#### Immediate Effects
+- All canonical tags point to non-www domain regardless of access method
+- Sitemap only references canonical URLs (non-www)
+- Open Graph tags consistently use canonical domain for social sharing
+- Structured data uses canonical URLs
+
+#### Long-term SEO Benefits (3-6 weeks)
+- Google consolidates www and non-www URLs into canonical versions
+- SEO authority concentrates on single domain variation
+- Search rankings improve due to consolidated signals
+- Duplicate content warnings disappear from GSC
+- "Google-selected canonical" will match "User-declared canonical"
+
+### Prevention Strategies
+
+#### For Future SEO Projects
+
+1. **Choose Canonical Domain Early**
+   - Decide on www vs non-www preference before launch
+   - Document the choice in project README
+   - Enforce it consistently across all URL generation
+
+2. **Hardcode Canonical Domain in Production**
+   - Never use dynamic host resolution for canonical URLs in production
+   - Development can be flexible for local testing
+   - Use environment-based conditionals
+
+3. **Comprehensive Canonical Enforcement**
+   - Server-side: sitemap, robots.txt, meta tags
+   - Client-side: React Helmet, Open Graph, structured data
+   - Test both access methods (www and non-www)
+
+4. **Google Search Console Monitoring**
+   - Use URL Inspection tool to verify canonical tags
+   - Submit only canonical sitemap version
+   - Monitor "Coverage" report for duplicate detection
+   - Watch for "Google chose different canonical than user" notices
+
+5. **Testing Checklist**
+   ```bash
+   # Test canonical tags on both versions
+   curl -s https://www.example.com/page | grep canonical
+   curl -s https://example.com/page | grep canonical
+   
+   # Test sitemap URLs
+   curl -s https://example.com/sitemap.xml | grep '<loc>'
+   
+   # Verify all use same canonical domain
+   ```
+
+### Related Files Modified
+
+- `server/index.ts` - Sitemap and robots.txt canonical domain enforcement
+- `server/middleware/locationMetaMiddleware.ts` - Server meta tag canonical URL
+- `server/middleware/htmlMetaRewriter.ts` - HTML rewriter canonical URL
+- `client/src/lib/config.ts` - New canonical domain constant (created)
+- `client/src/pages/LocationDetail.tsx` - React Helmet canonical and OG tags
+- `replit.md` - Updated SEO documentation section
+- `README.md` - Added canonical domain fix to recent updates
+- `PRODUCTION_DEPLOYMENT_FIX.md` - This documentation
+
+### Deployment Checklist
+
+When deploying canonical domain fixes:
+
+- [x] Update all server-side URL generation to use canonical domain in production
+- [x] Update client-side meta tags to use canonical domain
+- [x] Test both www and non-www access methods
+- [x] Verify canonical tags in HTML source
+- [x] Submit canonical sitemap to Google Search Console
+- [x] Remove alternate domain sitemap from GSC
+- [x] Monitor GSC for duplicate content warnings
+- [x] Document canonical domain choice in project README
+
+### Additional Notes
+
+#### Why This Was Important
+
+1. **SEO Authority**: Split between two domains instead of concentrated
+2. **Search Ranking**: Duplicate content can trigger ranking penalties
+3. **Analytics**: Traffic and metrics split across two domain variations
+4. **Link Equity**: Inbound links to www vs non-www don't consolidate
+5. **User Confusion**: Inconsistent URLs in search results
+
+#### Design Decision: Non-WWW Preference
+
+Chose `https://lekkerspots.co.za` (without www) as canonical domain because:
+- Shorter, cleaner URLs
+- Modern web convention trending away from www
+- Easier to type and remember
+- Consistent with major platforms (google.com, facebook.com, twitter.com)
+
+#### Google's Canonicalization Process
+
+1. **Discovery**: Google finds both www and non-www versions
+2. **Signal Detection**: Sees user-declared canonical tags pointing to non-www
+3. **Evaluation**: Determines which version to show in search results
+4. **Consolidation**: Over 2-6 weeks, consolidates signals to canonical version
+5. **Final State**: "Google-selected canonical" matches user-declared canonical
+
+---
+
 ## Fix #2: Social Media Preview & Base URL Replacement (November 7, 2025)
 
 **Date**: November 7, 2025  
