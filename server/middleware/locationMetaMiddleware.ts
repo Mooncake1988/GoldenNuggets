@@ -3,6 +3,12 @@ import type { IStorage } from '../storage';
 
 // Helper function to resolve base URL from request
 export function resolveBaseUrl(req: Request): string {
+  // In production, always use canonical domain to avoid SEO duplicate content issues
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lekkerspots.co.za';
+  }
+  
+  // In development, use dynamic resolution for local testing
   const protocol = req.get('x-forwarded-proto') || 
                   (req.secure ? 'https' : 'http');
   
@@ -17,8 +23,8 @@ export function resolveBaseUrl(req: Request): string {
   // Validate host to prevent header injection
   const validHostPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(:[\d]{1,5})?$/;
   if (!validHostPattern.test(host)) {
-    // Fallback to production domain if host is invalid
-    return 'https://lekkerspots.co.za';
+    // Fallback to localhost for development
+    return 'http://localhost:5000';
   }
   
   return `${protocol}://${host}`;
