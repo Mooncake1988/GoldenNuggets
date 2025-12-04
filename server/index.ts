@@ -68,9 +68,8 @@ app.use((req, res, next) => {
   app.get("/sitemap.xml", async (req, res) => {
     try {
       const locations = await storage.getAllLocations();
-      const host = req.get('host') || 'lekkerspots.co.za';
-      const protocol = req.get('x-forwarded-proto') || 'https';
-      const baseUrl = `${protocol}://${host}`;
+      // Use canonical domain to avoid duplicate content issues
+      const baseUrl = 'https://lekkerspots.co.za';
 
       const now = new Date().toISOString();
 
@@ -116,9 +115,8 @@ app.use((req, res, next) => {
 
   // SEO: Robots.txt endpoint - must be before Vite middleware
   app.get("/robots.txt", (req, res) => {
-    const host = req.get('host') || 'lekkerspots.co.za';
-    const protocol = req.get('x-forwarded-proto') || 'https';
-    const baseUrl = `${protocol}://${host}`;
+    // Use canonical domain to avoid duplicate content issues
+    const baseUrl = 'https://lekkerspots.co.za';
 
     const robotsTxt = `# LekkerSpots - Cape Town Hidden Gems
 User-agent: *

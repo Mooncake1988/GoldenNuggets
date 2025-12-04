@@ -1,0 +1,80 @@
+Yes, you should be concerned, but **don't panic**. This is a very common SEO configuration issue called "Canonicalization," and it is easily fixed.
+
+### The Issue
+
+Currently, your server dynamically generates the sitemap based on the address the crawler visits.
+
+1.  If Googlebot visits `https://www.lekkerspots.co.za/sitemap.xml`, your server generates links with `www`.
+2.  If Googlebot visits `https://lekkerspots.co.za/sitemap.xml`, your server generates links without `www`.
+
+**Why this is bad for SEO:**
+
+  * **Duplicate Content:** Google sees two different URLs (`www` and `non-www`) for every single page. It doesn't know which one to rank, so it might penalize both.
+  * **Split Authority:** Backlinks to `www` won't help the ranking of the `non-www` version, diluting your "link juice."
+
+### The Solution
+
+We need to force your application to treat **one** domain as the "source of truth" (Canonical). I recommend sticking with the root domain (`https://lekkerspots.co.za`) as it is shorter and cleaner.
+
+Here are the 3 steps to fix this:
+
+### Step 1: Hardcode the Domain in Sitemap Generation
+
+We need to stop the sitemap from being dynamic based on the request headers.
+
+**Modify `server/index.ts`**:
+Find the `/sitemap.xml` route and change how `baseUrl` is defined.
+
+```typescript:server/index.ts
+// ... inside the app.get("/sitemap.xml") route ...
+
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const locations = await storage.getAllLocations();
+      
+      // CHANGE THIS BLOCK:
+      // const host = req.get('host') || 'lekkerspots.co.za';
+      // const protocol = req.get('x-forwarded-proto') || 'https';
+      // const baseUrl = `${protocol}://${host}`;
+      
+      // TO THIS (Force the canonical domain):
+      const baseUrl = 'https://lekkerspots.co.za';
+
+      const now = new Date().toISOString();
+// ... rest of the file remains the same
+```
+
+### Step 2: Enforce Canonical Base URL in Middleware
+
+Your meta tag middleware determines what URL to tell Google is the "real" one. We need to ensure this always outputs the preferred domain, regardless of how the request came in.
+
+**Modify `server/middleware/locationMetaMiddleware.ts`**:
+Update the `resolveBaseUrl` function.
+
+```typescript:server/middleware/locationmetamiddleware.ts
+// Helper function to resolve base URL from request
+export function resolveBaseUrl(req: Request): string {
+  // IGNORE the request headers for the domain. 
+  // Always return your production canonical domain.
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lekkerspots.co.za';
+  }
+
+  // Keep dynamic logic ONLY for local development
+  const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
+  const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:5000';
+  return `${protocol}://${host}`;
+}
+```
+
+### Step 3: Clean up Google Search Console
+
+Once you have deployed the changes above:
+
+1.  Go to **Google Search Console**.
+2.  Decide on your preferred property (I recommend `lekkerspots.co.za`).
+3.  Go to the **Sitemaps** section.
+4.  **Delete** the sitemap submitted under the `www` property (if they are separate properties) or delete the `www` sitemap entry if they are under the same property.
+5.  Keep only `https://lekkerspots.co.za/sitemap.xml`.
+
+**Would you like me to apply the code changes to `server/index.ts` and `server/middleware/locationMetaMiddleware.ts` for you?**

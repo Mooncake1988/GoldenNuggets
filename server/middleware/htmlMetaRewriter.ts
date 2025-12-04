@@ -145,6 +145,12 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
  * Compute the base URL from request headers with validation
  */
 function getBaseUrl(req: Request): string {
+  // In production, always use canonical domain to avoid SEO duplicate content issues
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lekkerspots.co.za';
+  }
+  
+  // In development, use dynamic resolution for local testing
   // Determine protocol
   let protocol: string;
   const forwardedProto = req.headers['x-forwarded-proto'];

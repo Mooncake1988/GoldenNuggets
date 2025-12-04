@@ -57,6 +57,15 @@ On the client side, `LocationDetail.tsx`:
 
 This approach provides Google's crawler with immediate, visible HTML content (eliminating soft 404 errors) while maintaining the smooth SPA experience for users. The solution is production-only; development mode uses Vite's standard SPA serving.
 
+**Canonical Domain Enforcement (December 2025)**:
+To prevent SEO duplicate content issues, all URL generation is hardcoded to the canonical domain (`https://lekkerspots.co.za` without www) in production mode:
+
+- **Server-side**: `server/index.ts` (sitemap/robots.txt), `locationMetaMiddleware.ts`, and `htmlMetaRewriter.ts` all force the canonical domain when `NODE_ENV=production`
+- **Client-side**: `LocationDetail.tsx` uses `CANONICAL_BASE_URL` constant from `client/src/lib/config.ts` for all canonical tags, Open Graph URLs, and structured data
+- **Development mode**: Dynamic host resolution preserved for local testing flexibility
+
+This ensures that whether users or crawlers access the site via `www.lekkerspots.co.za` or `lekkerspots.co.za`, all canonical URLs, sitemaps, and meta tags consistently point to the non-www canonical domain, consolidating SEO authority and preventing duplicate content penalties.
+
 ### Database
 
 The project uses a PostgreSQL database (Neon serverless) with a `Locations` table (storing name, category, description, coordinates, images, tags, featured status) and a `Sessions` table for authentication. Drizzle ORM manages type-safe queries and schema migrations, configured for serverless compatibility with connection pooling.

@@ -153,7 +153,18 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Click markers to view location details
 - Responsive map controls
 
-## 🎨 Recent Updates (November 2025)
+## 🎨 Recent Updates
+
+### Canonical Domain SEO Fix (December 2025)
+- **Issue**: Duplicate content in Google Search Console caused by www vs non-www URL variations
+- **Impact**: Search engines saw identical content at both `www.lekkerspots.co.za` and `lekkerspots.co.za`, diluting SEO authority
+- **Solution**: Enforced canonical domain (`https://lekkerspots.co.za`) across all URL generation:
+  - Server-side: sitemap.xml, robots.txt, and all middleware now hardcode canonical domain in production
+  - Client-side: React Helmet meta tags use canonical constant instead of window.location
+  - Development: Dynamic host resolution preserved for local testing
+- **Result**: All canonical tags, Open Graph URLs, and sitemap entries consistently reference non-www domain
+- **Verified**: Google Search Console URL Inspection confirms canonical tags work correctly regardless of access method (www or non-www)
+- See `PRODUCTION_DEPLOYMENT_FIX.md` for technical details
 
 ### Enhanced Image Management (November 17, 2025)
 - **Drag-and-Drop Reordering**: Admin can now reorder location images by dragging and dropping them

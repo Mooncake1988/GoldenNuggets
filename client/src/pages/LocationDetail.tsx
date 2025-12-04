@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
+import { CANONICAL_BASE_URL } from "@/lib/config";
 
 declare global {
   interface Window {
@@ -116,16 +117,16 @@ export default function LocationDetail() {
     ? `${location.description.slice(0, 157)}...` 
     : location.description;
   
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lekkerspots.co.za';
-  const ogImage = hasImages ? location.images[0] : `${baseUrl}/og-image.jpg`;
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : `${baseUrl}/location/${location.slug}`;
+  // Always use canonical domain for SEO - prevents duplicate content issues
+  const ogImage = hasImages ? location.images[0] : `${CANONICAL_BASE_URL}/og-image.jpg`;
+  const pageUrl = `${CANONICAL_BASE_URL}/location/${location.slug}`;
   
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": location.name,
     "description": location.description,
-    "image": hasImages ? location.images : [`${baseUrl}/og-image.jpg`],
+    "image": hasImages ? location.images : [`${CANONICAL_BASE_URL}/og-image.jpg`],
     "address": location.address ? {
       "@type": "PostalAddress",
       "streetAddress": location.address,
@@ -239,7 +240,7 @@ export default function LocationDetail() {
                   <ShareButton
                     title={location.name}
                     text={`Check out ${location.name} in the Western Cape - ${location.description}`}
-                    url={typeof window !== 'undefined' ? window.location.href : ''}
+                    url={pageUrl}
                     variant="outline"
                   />
                 </div>
