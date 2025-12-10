@@ -75,7 +75,7 @@ The application implements IndexNow protocol to instantly notify search engines 
 
 **Implementation Details**:
 - **Service Module**: `server/indexnow.ts` handles all IndexNow API communication
-- **API Key Verification**: Dynamic endpoint at `/{INDEXNOW_API_KEY}.txt` serves the key file for search engine verification
+- **API Key Verification**: Dynamic endpoint at `/{INDEXNOW_API_KEY}.txt` serves the key file for search engine verification. **Critical**: This route is registered at the TOP of `server/index.ts`, BEFORE the `htmlMetaRewriter` middleware, to prevent HTML processing from intercepting the plain-text response.
 - **Automatic Notifications**: Location create/update/delete operations in `server/routes.ts` trigger asynchronous IndexNow submissions
 - **Fire-and-Forget**: IndexNow calls are non-blocking and errors are logged but don't affect core functionality
 - **Environment Variable**: `INDEXNOW_API_KEY` secret stores the API key

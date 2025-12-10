@@ -31,19 +31,14 @@ app.get(/^\/([a-f0-9]+)\.txt$/, (req, res, next) => {
   const indexNowApiKey = process.env.INDEXNOW_API_KEY;
   const requestedKey = req.params[0];
   
-  console.log(`[IndexNow] Verification request for key: ${requestedKey?.substring(0, 8)}...`);
-  console.log(`[IndexNow] Has API key configured: ${!!indexNowApiKey}`);
-  
   // Only serve the key file if it matches our configured IndexNow API key
   if (indexNowApiKey && requestedKey === indexNowApiKey) {
-    console.log(`[IndexNow] Key matched, serving verification file`);
     res.setHeader('Content-Type', 'text/plain');
     res.send(indexNowApiKey);
-    return; // Don't call next() - we handled the request
+    return;
   }
   
   // Not an IndexNow key request, pass to next handler
-  console.log(`[IndexNow] Key did not match, passing to next handler`);
   next();
 });
 
