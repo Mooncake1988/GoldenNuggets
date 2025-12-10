@@ -25,6 +25,28 @@ app.use(express.urlencoded({ extended: false }));
 // Enable Gzip compression for all responses
 app.use(compression());
 
+// IndexNow: API key verification file endpoint - MUST be before any HTML rewriting middleware
+// Search engines verify ownership by requesting /{apiKey}.txt
+app.get(/^\/([a-f0-9]+)\.txt$/, (req, res, next) => {
+  const indexNowApiKey = process.env.INDEXNOW_API_KEY;
+  const requestedKey = req.params[0];
+  
+  console.log(`[IndexNow] Verification request for key: ${requestedKey?.substring(0, 8)}...`);
+  console.log(`[IndexNow] Has API key configured: ${!!indexNowApiKey}`);
+  
+  // Only serve the key file if it matches our configured IndexNow API key
+  if (indexNowApiKey && requestedKey === indexNowApiKey) {
+    console.log(`[IndexNow] Key matched, serving verification file`);
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(indexNowApiKey);
+    return; // Don't call next() - we handled the request
+  }
+  
+  // Not an IndexNow key request, pass to next handler
+  console.log(`[IndexNow] Key did not match, passing to next handler`);
+  next();
+});
+
 // Apply location meta middleware FIRST to populate res.locals.locationMeta
 app.use(createLocationMetaMiddleware(storage));
 
@@ -129,37 +151,6 @@ Sitemap: ${baseUrl}/sitemap.xml
 
     res.setHeader('Content-Type', 'text/plain');
     res.send(robotsTxt);
-  });
-
-  // Debug endpoint to check if IndexNow key is configured (remove after debugging)
-  app.get("/api/indexnow-status", (req, res) => {
-    const hasKey = !!process.env.INDEXNOW_API_KEY;
-    const keyLength = process.env.INDEXNOW_API_KEY?.length || 0;
-    res.json({ 
-      configured: hasKey, 
-      keyLength,
-      env: process.env.NODE_ENV || 'unknown'
-    });
-  });
-
-  // IndexNow: API key verification file endpoint
-  // Search engines verify ownership by requesting /{apiKey}.txt
-  app.get(/^\/([a-f0-9]+)\.txt$/, (req, res, next) => {
-    const indexNowApiKey = process.env.INDEXNOW_API_KEY;
-    const requestedKey = req.params[0];
-    
-    console.log(`[IndexNow] Verification request for key: ${requestedKey?.substring(0, 8)}...`);
-    console.log(`[IndexNow] Has API key configured: ${!!indexNowApiKey}`);
-    
-    // Only serve the key file if it matches our configured IndexNow API key
-    if (indexNowApiKey && requestedKey === indexNowApiKey) {
-      console.log(`[IndexNow] Key matched, serving verification file`);
-      res.setHeader('Content-Type', 'text/plain');
-      res.send(indexNowApiKey);
-    } else {
-      console.log(`[IndexNow] Key did not match, passing to next handler`);
-      next();
-    }
   });
 
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
