@@ -131,6 +131,17 @@ Sitemap: ${baseUrl}/sitemap.xml
     res.send(robotsTxt);
   });
 
+  // Debug endpoint to check if IndexNow key is configured (remove after debugging)
+  app.get("/api/indexnow-status", (req, res) => {
+    const hasKey = !!process.env.INDEXNOW_API_KEY;
+    const keyLength = process.env.INDEXNOW_API_KEY?.length || 0;
+    res.json({ 
+      configured: hasKey, 
+      keyLength,
+      env: process.env.NODE_ENV || 'unknown'
+    });
+  });
+
   // IndexNow: API key verification file endpoint
   // Search engines verify ownership by requesting /{apiKey}.txt
   app.get(/^\/([a-f0-9]+)\.txt$/, (req, res, next) => {
@@ -138,6 +149,7 @@ Sitemap: ${baseUrl}/sitemap.xml
     const requestedKey = req.params[0];
     
     console.log(`[IndexNow] Verification request for key: ${requestedKey?.substring(0, 8)}...`);
+    console.log(`[IndexNow] Has API key configured: ${!!indexNowApiKey}`);
     
     // Only serve the key file if it matches our configured IndexNow API key
     if (indexNowApiKey && requestedKey === indexNowApiKey) {
