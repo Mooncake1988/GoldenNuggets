@@ -133,16 +133,19 @@ Sitemap: ${baseUrl}/sitemap.xml
 
   // IndexNow: API key verification file endpoint
   // Search engines verify ownership by requesting /{apiKey}.txt
-  app.get("/:key.txt", (req, res, next) => {
-    const requestedKey = req.params.key;
+  app.get(/^\/([a-f0-9]+)\.txt$/, (req, res, next) => {
     const indexNowApiKey = process.env.INDEXNOW_API_KEY;
-
+    const requestedKey = req.params[0];
+    
+    console.log(`[IndexNow] Verification request for key: ${requestedKey?.substring(0, 8)}...`);
+    
     // Only serve the key file if it matches our configured IndexNow API key
     if (indexNowApiKey && requestedKey === indexNowApiKey) {
+      console.log(`[IndexNow] Key matched, serving verification file`);
       res.setHeader('Content-Type', 'text/plain');
       res.send(indexNowApiKey);
     } else {
-      // Not an IndexNow key request, pass to next handler
+      console.log(`[IndexNow] Key did not match, passing to next handler`);
       next();
     }
   });
