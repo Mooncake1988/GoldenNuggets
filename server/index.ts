@@ -25,6 +25,23 @@ app.use(express.urlencoded({ extended: false }));
 // Enable Gzip compression for all responses
 app.use(compression());
 
+// IndexNow: API key verification file endpoint - MUST be before any HTML rewriting middleware
+// Search engines verify ownership by requesting /{apiKey}.txt
+app.get(/^\/([a-f0-9]+)\.txt$/, (req, res, next) => {
+  const indexNowApiKey = process.env.INDEXNOW_API_KEY;
+  const requestedKey = req.params[0];
+  
+  // Only serve the key file if it matches our configured IndexNow API key
+  if (indexNowApiKey && requestedKey === indexNowApiKey) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(indexNowApiKey);
+    return;
+  }
+  
+  // Not an IndexNow key request, pass to next handler
+  next();
+});
+
 // Apply location meta middleware FIRST to populate res.locals.locationMeta
 app.use(createLocationMetaMiddleware(storage));
 
