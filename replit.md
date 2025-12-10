@@ -70,6 +70,20 @@ This ensures that whether users or crawlers access the site via `www.lekkerspots
 
 The project uses a PostgreSQL database (Neon serverless) with a `Locations` table (storing name, category, description, coordinates, images, tags, featured status) and a `Sessions` table for authentication. Drizzle ORM manages type-safe queries and schema migrations, configured for serverless compatibility with connection pooling.
 
+**IndexNow Integration (December 2025)**:
+The application implements IndexNow protocol to instantly notify search engines (Bing, Yandex, Seznam, Naver, Yep) when location content changes. This complements the existing sitemap-based discovery by providing real-time indexing notifications.
+
+**Implementation Details**:
+- **Service Module**: `server/indexnow.ts` handles all IndexNow API communication
+- **API Key Verification**: Dynamic endpoint at `/{INDEXNOW_API_KEY}.txt` serves the key file for search engine verification
+- **Automatic Notifications**: Location create/update/delete operations in `server/routes.ts` trigger asynchronous IndexNow submissions
+- **Fire-and-Forget**: IndexNow calls are non-blocking and errors are logged but don't affect core functionality
+- **Environment Variable**: `INDEXNOW_API_KEY` secret stores the API key
+
+**Supported Search Engines**: Bing, Yandex, Seznam, Naver, Yep (Google is not supported)
+
+**Note**: IndexNow notifies search engines of URL changes but does not guarantee indexing. Search engines apply their own selection criteria.
+
 ## External Dependencies
 
 **Authentication**: Passport.js
@@ -80,3 +94,4 @@ The project uses a PostgreSQL database (Neon serverless) with a `Locations` tabl
 **Form Management**: React Hook Form, Zod
 **Animations**: Lottie React
 **Newsletter Integration**: Beehiiv API
+**SEO**: IndexNow Protocol

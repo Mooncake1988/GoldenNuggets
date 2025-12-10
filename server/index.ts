@@ -131,6 +131,22 @@ Sitemap: ${baseUrl}/sitemap.xml
     res.send(robotsTxt);
   });
 
+  // IndexNow: API key verification file endpoint
+  // Search engines verify ownership by requesting /{apiKey}.txt
+  app.get("/:key.txt", (req, res, next) => {
+    const requestedKey = req.params.key;
+    const indexNowApiKey = process.env.INDEXNOW_API_KEY;
+
+    // Only serve the key file if it matches our configured IndexNow API key
+    if (indexNowApiKey && requestedKey === indexNowApiKey) {
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(indexNowApiKey);
+    } else {
+      // Not an IndexNow key request, pass to next handler
+      next();
+    }
+  });
+
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";

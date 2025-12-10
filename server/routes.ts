@@ -5,6 +5,7 @@ import { setupAuth, isAuthenticated } from "./auth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema } from "@shared/schema";
 import passport from "passport";
+import { notifyLocationCreated, notifyLocationUpdated, notifyLocationDeleted } from "./indexnow";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
@@ -259,6 +260,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const parsed = insertLocationSchema.parse(req.body);
       const location = await storage.createLocation(parsed);
+      
+      // Notify IndexNow about the new location (fire and forget, but log errors)
+      notifyLocationCreated(location.slug).catch((err) => {
+        console.error("[IndexNow] Failed to notify location creation:", err);
+      });
+      
       res.status(201).json(location);
     } catch (error) {
       console.error("Error creating location:", error);
@@ -270,6 +277,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const parsed = insertLocationSchema.partial().parse(req.body);
       const location = await storage.updateLocation(req.params.id, parsed);
+      
+      // Notify IndexNow about the updated location (fire and forget, but log errors)
+      if (location) {
+        notifyLocationUpdated(location.slug).catch((err) => {
+          console.error("[IndexNow] Failed to notify location update:", err);
+        });
+      }
+      
       res.json(location);
     } catch (error) {
       console.error("Error updating location:", error);
@@ -279,7 +294,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/locations/:id", isAuthenticated, async (req, res) => {
     try {
+      // Get the location before deleting to access the slug for IndexNow
+      const location = await storage.getLocation(req.params.id);
+      const slug = location?.slug;
+      
       await storage.deleteLocation(req.params.id);
+      
+      // Notify IndexNow about the deleted location (fire and forget, but log errors)
+      if (slug) {
+        notifyLocationDeleted(slug).catch((err) => {
+          console.error("[IndexNow] Failed to notify location deletion:", err);
+        });
+      }
+      
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting location:", error);
