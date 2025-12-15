@@ -79,3 +79,33 @@ export const newsletterSubscriptionSchema = z.object({
 });
 
 export type NewsletterSubscription = z.infer<typeof newsletterSubscriptionSchema>;
+
+// News Ticker Items
+export const tickerItems = pgTable("ticker_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  linkUrl: text("link_url"),
+  priority: text("priority").notNull().default("0"),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertTickerItemSchema = createInsertSchema(tickerItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTickerItem = z.infer<typeof insertTickerItemSchema>;
+export type TickerItem = typeof tickerItems.$inferSelect;
+
+export const tickerCategories = [
+  { value: "new-spots", label: "New Spots", color: "bg-emerald-500" },
+  { value: "featured", label: "Featured", color: "bg-amber-500" },
+  { value: "events", label: "Events", color: "bg-purple-500" },
+  { value: "tips", label: "Tips", color: "bg-blue-500" },
+  { value: "offers", label: "Offers", color: "bg-rose-500" },
+  { value: "updates", label: "Updates", color: "bg-cyan-500" },
+  { value: "seasonal", label: "Seasonal", color: "bg-orange-500" },
+] as const;

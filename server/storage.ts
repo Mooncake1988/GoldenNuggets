@@ -2,14 +2,17 @@ import {
   users,
   locations,
   categories,
+  tickerItems,
   type User,
   type Location,
   type InsertLocation,
   type Category,
   type InsertCategory,
+  type TickerItem,
+  type InsertTickerItem,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, or, ilike, sql } from "drizzle-orm";
+import { eq, or, ilike, sql, desc, and, gt, isNull } from "drizzle-orm";
 
 export interface UpsertUser {
   id: string;
@@ -37,6 +40,13 @@ export interface IStorage {
   createLocation(location: InsertLocation): Promise<Location>;
   updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location>;
   deleteLocation(id: string): Promise<void>;
+  // Ticker items
+  getAllTickerItems(): Promise<TickerItem[]>;
+  getActiveTickerItems(): Promise<TickerItem[]>;
+  getTickerItem(id: string): Promise<TickerItem | undefined>;
+  createTickerItem(item: InsertTickerItem): Promise<TickerItem>;
+  updateTickerItem(id: string, item: Partial<InsertTickerItem>): Promise<TickerItem>;
+  deleteTickerItem(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -184,6 +194,53 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLocation(id: string): Promise<void> {
     await db.delete(locations).where(eq(locations.id, id));
+  }
+
+  async getAllTickerItems(): Promise<TickerItem[]> {
+    return await db
+      .select()
+      .from(tickerItems)
+      .orderBy(desc(tickerItems.priority), desc(tickerItems.createdAt));
+  }
+
+  async getActiveTickerItems(): Promise<TickerItem[]> {
+    const now = new Date();
+    return await db
+      .select()
+      .from(tickerItems)
+      .where(
+        and(
+          eq(tickerItems.isActive, true),
+          or(
+            isNull(tickerItems.endDate),
+            gt(tickerItems.endDate, now)
+          )
+        )
+      )
+      .orderBy(desc(tickerItems.priority), desc(tickerItems.createdAt));
+  }
+
+  async getTickerItem(id: string): Promise<TickerItem | undefined> {
+    const [item] = await db.select().from(tickerItems).where(eq(tickerItems.id, id));
+    return item;
+  }
+
+  async createTickerItem(item: InsertTickerItem): Promise<TickerItem> {
+    const [newItem] = await db.insert(tickerItems).values(item).returning();
+    return newItem;
+  }
+
+  async updateTickerItem(id: string, itemData: Partial<InsertTickerItem>): Promise<TickerItem> {
+    const [updated] = await db
+      .update(tickerItems)
+      .set(itemData)
+      .where(eq(tickerItems.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteTickerItem(id: string): Promise<void> {
+    await db.delete(tickerItems).where(eq(tickerItems.id, id));
   }
 }
 
