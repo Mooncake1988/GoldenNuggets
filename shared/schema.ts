@@ -86,15 +86,34 @@ export const tickerItems = pgTable("ticker_items", {
   title: text("title").notNull(),
   category: text("category").notNull(),
   linkUrl: text("link_url"),
-  priority: text("priority").notNull().default("0"),
+  priority: text("priority").notNull().default("50"),
   endDate: timestamp("end_date"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const insertTickerItemSchema = createInsertSchema(tickerItems).omit({
+const baseTickerItemSchema = createInsertSchema(tickerItems).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertTickerItemSchema = baseTickerItemSchema.extend({
+  priority: z.string().refine(
+    (val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num >= 0 && num <= 100;
+    },
+    { message: "Priority must be a number between 0 and 100" }
+  ).default("50"),
+  linkUrl: z.string().url("Invalid URL format").nullable().optional().or(z.literal("")),
+  endDate: z.union([
+    z.date(),
+    z.string().refine(
+      (val) => val === "" || !isNaN(Date.parse(val)),
+      { message: "Invalid date format" }
+    ).transform((val) => val === "" ? null : new Date(val)),
+    z.null(),
+  ]).nullable().optional(),
 });
 
 export type InsertTickerItem = z.infer<typeof insertTickerItemSchema>;

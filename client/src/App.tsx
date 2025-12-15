@@ -13,6 +13,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminCategories from "@/pages/AdminCategories";
 import AdminAddLocation from "@/pages/AdminAddLocation";
 import AdminEditLocation from "@/pages/AdminEditLocation";
+import AdminTicker from "@/pages/AdminTicker";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/categories" component={AdminCategories} />
+      <Route path="/admin/ticker" component={AdminTicker} />
       <Route path="/admin/add" component={AdminAddLocation} />
       <Route path="/admin/edit/:id" component={AdminEditLocation} />
       <Route component={NotFound} />

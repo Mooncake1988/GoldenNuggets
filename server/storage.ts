@@ -200,7 +200,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(tickerItems)
-      .orderBy(desc(tickerItems.priority), desc(tickerItems.createdAt));
+      .orderBy(sql`CAST(${tickerItems.priority} AS INTEGER) DESC`, desc(tickerItems.createdAt));
   }
 
   async getActiveTickerItems(): Promise<TickerItem[]> {
@@ -217,7 +217,7 @@ export class DatabaseStorage implements IStorage {
           )
         )
       )
-      .orderBy(desc(tickerItems.priority), desc(tickerItems.createdAt));
+      .orderBy(sql`CAST(${tickerItems.priority} AS INTEGER) DESC`, desc(tickerItems.createdAt));
   }
 
   async getTickerItem(id: string): Promise<TickerItem | undefined> {

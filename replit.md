@@ -84,6 +84,25 @@ The application implements IndexNow protocol to instantly notify search engines 
 
 **Note**: IndexNow notifies search engines of URL changes but does not guarantee indexing. Search engines apply their own selection criteria.
 
+**News Ticker Feature (December 2025)**:
+The homepage displays an animated horizontal scrolling ticker for announcements, promotions, and updates. Admins can manage ticker items through a dedicated admin page.
+
+**Implementation Details**:
+- **Database Table**: `tickerItems` stores announcements with title, category, linkUrl, priority, endDate, and isActive fields
+- **Categories**: Seven color-coded categories (New Spots, Featured, Events, Tips, Offers, Updates, Seasonal)
+- **Priority System**: Items sorted by priority (0-100, higher = first in ticker)
+- **Expiration**: Optional endDate for time-limited announcements
+- **Admin Page**: `/admin/ticker` provides full CRUD for managing announcements with live preview
+
+**API Endpoints**:
+- `GET /api/ticker` - Public endpoint returning only active, non-expired items
+- `GET /api/admin/ticker` - Authenticated endpoint returning all items
+- `POST/PUT/DELETE /api/admin/ticker/:id` - CRUD operations (authenticated)
+
+**Frontend Components**:
+- `NewsTicker.tsx` - Animated marquee with pause-on-hover, colored category badges, clickable links
+- `AdminTicker.tsx` - Management page with create/edit dialog, status toggles, and live preview
+
 ## External Dependencies
 
 **Authentication**: Passport.js

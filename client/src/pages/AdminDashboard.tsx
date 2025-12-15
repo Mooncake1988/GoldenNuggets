@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Edit, Trash2, LogOut, Star } from "lucide-react";
+import { Plus, MapPin, Edit, Trash2, LogOut, Star, Megaphone } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -99,10 +99,16 @@ export default function AdminDashboard() {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
               <p className="text-muted-foreground">Manage your Cape Town Golden Nuggets</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Link href="/admin/categories">
                 <Button variant="outline" data-testid="button-manage-categories">
                   Manage Categories
+                </Button>
+              </Link>
+              <Link href="/admin/ticker">
+                <Button variant="outline" data-testid="button-manage-ticker">
+                  <Megaphone className="h-4 w-4 mr-2" />
+                  News Ticker
                 </Button>
               </Link>
               <Link href="/admin/add">
