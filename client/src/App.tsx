@@ -14,6 +14,7 @@ import AdminCategories from "@/pages/AdminCategories";
 import AdminAddLocation from "@/pages/AdminAddLocation";
 import AdminEditLocation from "@/pages/AdminEditLocation";
 import AdminTicker from "@/pages/AdminTicker";
+import AboutUs from "@/pages/AboutUs";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/categories" component={Categories} />
       <Route path="/map" component={MapPage} />
+      <Route path="/about" component={AboutUs} />
       <Route path="/location/:slug" component={LocationDetail} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
