@@ -120,11 +120,11 @@ export type InsertTickerItem = z.infer<typeof insertTickerItemSchema>;
 export type TickerItem = typeof tickerItems.$inferSelect;
 
 export const tickerCategories = [
-  { value: "new-spots", label: "New Spots", color: "bg-emerald-500" },
-  { value: "featured", label: "Featured", color: "bg-amber-500" },
-  { value: "events", label: "Events", color: "bg-purple-500" },
-  { value: "tips", label: "Tips", color: "bg-blue-500" },
-  { value: "offers", label: "Offers", color: "bg-rose-500" },
-  { value: "updates", label: "Updates", color: "bg-cyan-500" },
-  { value: "seasonal", label: "Seasonal", color: "bg-orange-500" },
+  { value: "new-spots", label: "New Spots", color: "bg-emerald-600" },
+  { value: "featured", label: "Featured", color: "bg-amber-600" },
+  { value: "events", label: "Events", color: "bg-purple-600" },
+  { value: "tips", label: "Tips", color: "bg-blue-600" },
+  { value: "offers", label: "Offers", color: "bg-rose-600" },
+  { value: "updates", label: "Updates", color: "bg-sky-700" },
+  { value: "seasonal", label: "Seasonal", color: "bg-orange-600" },
 ] as const;

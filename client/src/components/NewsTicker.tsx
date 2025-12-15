@@ -63,9 +63,12 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
     >
       <div 
         ref={tickerRef}
-        className={`flex whitespace-nowrap ${isPaused ? "" : "animate-ticker"}`}
+        className="flex whitespace-nowrap animate-ticker"
         style={{
           animationPlayState: isPaused ? "paused" : "running",
+          willChange: "transform",
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
         }}
       >
         {[...activeItems, ...activeItems].map((item, index) => {
