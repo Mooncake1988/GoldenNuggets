@@ -94,6 +94,15 @@ The homepage displays an animated horizontal scrolling ticker for announcements,
 - **Expiration**: Optional endDate for time-limited announcements
 - **Admin Page**: `/admin/ticker` provides full CRUD for managing announcements with live preview
 
+**Animation Technical Details**:
+- **Pixel-based animation**: Uses JavaScript to measure exact content width (`scrollWidth / 3`) and animates by precise pixel distance via CSS variable `--ticker-distance`. This prevents mobile browser percentage rounding issues that caused premature loop resets.
+- **Triple content buffer**: Content is rendered 3x for seamless infinite looping on all screen sizes
+- **Speed**: 7 seconds per item (minimum 18s total duration)
+- **GPU optimization**: Uses `translateZ(0)`, `willChange: transform`, and `backfaceVisibility: hidden` for smooth animation
+- **Pause on hover**: Animation pauses when user hovers over ticker
+- **Responsive**: Recalculates animation distance on window resize
+- **Tailwind safelist**: Category badge colors (`bg-emerald-600`, `bg-amber-600`, `bg-purple-600`, `bg-blue-600`, `bg-rose-600`, `bg-sky-700`, `bg-orange-600`) are safelisted in `tailwind.config.ts` to ensure dynamic classes compile correctly
+
 **API Endpoints**:
 - `GET /api/ticker` - Public endpoint returning only active, non-expired items
 - `GET /api/admin/ticker` - Authenticated endpoint returning all items
