@@ -33,13 +33,9 @@ export default function AboutUs() {
               The Story Behind LekkerSpots
             </h1>
 
-            <h2 className="text-xl md:text-2xl font-semibold text-muted-foreground mb-6">
-              It started with a VW Polo and a messy notes problem.
-            </h2>
-
             <div className="space-y-6 text-base leading-relaxed">
               <p>
-                LekkerSpots was born out of a simple love for exploration. For the last few years, I've spent at least one weekend a month exploring the Western Cape in my VW Polo. Sometimes the goal is to find a brand new location; other times, it's just to visit a regular cottage to recharge, escape the city noise, and get a digital detox.
+                It started with a VW Polo and a messy notes problem. LekkerSpots was born out of a simple love for exploration. For the last few years, I've spent at least one weekend a month exploring the Western Cape in my VW Polo. Sometimes the goal is to find a brand new location; other times, it's just to visit a regular cottage to recharge, escape the city noise, and get a digital detox.
               </p>
 
               <p>
