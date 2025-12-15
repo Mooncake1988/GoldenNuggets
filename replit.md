@@ -22,6 +22,7 @@ The frontend is a React 18 application built with TypeScript, using Vite for dev
 - **Homepage**: Displays only featured locations in a grid layout with pagination (12 items per page, "Load More" button for additional featured content). Includes navigation links to Categories and Map pages for full catalog browsing.
 - **Categories Page**: Shows all locations organized by category with optional "Featured Only" checkbox filter. Provides category descriptions and location counts.
 - **Map Page**: Interactive Leaflet map displaying all locations geographically with optional "Featured Only" checkbox filter.
+- **About Us Page** (`/about`): Static content page sharing the personal story behind LekkerSpots. Includes SEO meta tags (title, description, Open Graph, Twitter cards) and canonical URL. Linked from the footer's Quick Links section.
 
 The admin dashboard features comprehensive image management with HTML5 drag-and-drop functionality for reordering images, individual delete controls for each image, and visual indicators showing which image serves as the location preview thumbnail (the first image in the array). Admins can mark locations as "featured" using a checkbox in both Add and Edit forms. The dashboard displays featured status with a star badge next to featured locations. The interface provides clear visual feedback during drag operations and hover states, ensuring an intuitive content management experience.
 
