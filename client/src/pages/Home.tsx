@@ -137,8 +137,8 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <div className="sticky top-0 z-50">
         <Header />
-        <NewsTicker />
       </div>
+      <NewsTicker />
       <HeroSection />
       <TagFilter />
       

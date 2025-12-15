@@ -37,7 +37,7 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
   if (!activeItems || activeItems.length === 0) {
     if (previewMode) {
       return (
-        <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 py-3 px-4">
+        <div className="bg-muted border-b border-border py-3 px-4">
           <p className="text-center text-muted-foreground text-sm">
             No active announcements. Create one to see the preview.
           </p>
@@ -56,7 +56,7 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
 
   return (
     <div 
-      className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 border-b"
+      className="relative overflow-hidden bg-muted border-b border-border"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       data-testid="news-ticker"
