@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema } from "@shared/schema";
+import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema, insertTickerItemSchema } from "@shared/schema";
 import passport from "passport";
 import { notifyLocationCreated, notifyLocationUpdated, notifyLocationDeleted } from "./indexnow";
 
@@ -311,6 +311,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting location:", error);
       res.status(500).json({ error: "Failed to delete location" });
+    }
+  });
+
+  // Ticker Items Routes
+  app.get("/api/ticker", async (req, res) => {
+    try {
+      const items = await storage.getActiveTickerItems();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching active ticker items:", error);
+      res.status(500).json({ error: "Failed to fetch ticker items" });
+    }
+  });
+
+  app.get("/api/admin/ticker", isAuthenticated, async (req, res) => {
+    try {
+      const items = await storage.getAllTickerItems();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching all ticker items:", error);
+      res.status(500).json({ error: "Failed to fetch ticker items" });
+    }
+  });
+
+  app.get("/api/admin/ticker/:id", isAuthenticated, async (req, res) => {
+    try {
+      const item = await storage.getTickerItem(req.params.id);
+      if (!item) {
+        return res.status(404).json({ error: "Ticker item not found" });
+      }
+      res.json(item);
+    } catch (error) {
+      console.error("Error fetching ticker item:", error);
+      res.status(500).json({ error: "Failed to fetch ticker item" });
+    }
+  });
+
+  app.post("/api/admin/ticker", isAuthenticated, async (req, res) => {
+    try {
+      const parsed = insertTickerItemSchema.parse(req.body);
+      const item = await storage.createTickerItem(parsed);
+      res.status(201).json(item);
+    } catch (error) {
+      console.error("Error creating ticker item:", error);
+      res.status(400).json({ error: "Invalid ticker item data" });
+    }
+  });
+
+  app.put("/api/admin/ticker/:id", isAuthenticated, async (req, res) => {
+    try {
+      const existing = await storage.getTickerItem(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Ticker item not found" });
+      }
+      const parsed = insertTickerItemSchema.partial().parse(req.body);
+      const item = await storage.updateTickerItem(req.params.id, parsed);
+      res.json(item);
+    } catch (error) {
+      console.error("Error updating ticker item:", error);
+      res.status(400).json({ error: "Invalid ticker item data" });
+    }
+  });
+
+  app.delete("/api/admin/ticker/:id", isAuthenticated, async (req, res) => {
+    try {
+      const existing = await storage.getTickerItem(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Ticker item not found" });
+      }
+      await storage.deleteTickerItem(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting ticker item:", error);
+      res.status(500).json({ error: "Failed to delete ticker item" });
     }
   });
 

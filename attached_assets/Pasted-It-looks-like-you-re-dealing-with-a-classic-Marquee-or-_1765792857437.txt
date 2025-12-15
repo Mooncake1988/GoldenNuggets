@@ -1,0 +1,116 @@
+It looks like you're dealing with a classic "Marquee" or "News Ticker" implementation issue. The "cutting off" behavior on mobile is the dead giveaway: the animation loop is resetting before the content has fully scrolled out of view because the seamless loop logic (the "clone" of the text) isn't wide enough or positioned correctly for the narrower mobile viewport.
+
+Here is the diagnosis and the fix for `client/src/components/NewsTicker.tsx`.
+
+### **The Diagnosis**
+
+1.  **The Cut-Off/Flicker:** This happens when the animation moves the content to the left (e.g., `translateX(-100%)`) but the content "reset" happens before the duplicate content has filled the gap. On mobile, this often breaks if the container width vs. content width ratio changes unexpectedly.
+2.  **The Speed:** Speed in CSS animations is defined by `duration`. To make it 10% faster, we need to **reduce** the animation duration (e.g., from `20s` to `18s`).
+
+### **The Fix**
+
+Replace the contents of your `client/src/components/NewsTicker.tsx` with this robust version. It calculates the animation based on content width (using `translateX(-50%)` with double content) which guarantees a perfect loop on any screen size.
+
+**1. Update `client/src/components/NewsTicker.tsx`**
+
+```tsx
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
+
+// Define your types (adjust based on your schema)
+type Announcement = {
+  id: number;
+  content: string;
+  isActive: boolean;
+};
+
+export default function NewsTicker() {
+  // Fetch active announcements
+  const { data: announcements } = useQuery<Announcement[]>({
+    queryKey: ["/api/announcements/active"],
+  });
+
+  if (!announcements || announcements.length === 0) return null;
+
+  // Combine all announcements into one string or list
+  const tickerContent = announcements.map((a) => a.content).join("  •  ");
+
+  return (
+    <div className="bg-primary text-primary-foreground py-2 overflow-hidden border-b border-primary/10 relative z-40">
+      <div className="flex max-w-[100vw]">
+        {/* Container for the sliding part. 
+            We duplicate the content (Original + Clone) to ensure seamless looping.
+            The animation moves -50% (the width of one set) then snaps back to 0.
+        */}
+        <div 
+          className="flex animate-ticker whitespace-nowrap hover:pause"
+          // INLINE STYLE: We use a custom property for precise speed control
+          // 20s is standard. To make it 10% faster, we use ~18s.
+          // You can lower this number to make it even faster.
+          style={{ animationDuration: '18s' } as React.CSSProperties}
+        >
+          {/* ORIGINAL CONTENT */}
+          <div className="flex shrink-0 items-center mx-4">
+            <span className="font-medium text-sm sm:text-base">
+              {tickerContent}
+            </span>
+            <span className="mx-4 text-primary-foreground/60">•</span>
+          </div>
+
+          {/* DUPLICATE CONTENT (Cloned for the loop) */}
+          <div className="flex shrink-0 items-center mx-4">
+            <span className="font-medium text-sm sm:text-base">
+              {tickerContent}
+            </span>
+            <span className="mx-4 text-primary-foreground/60">•</span>
+          </div>
+          
+           {/* TRIPLICATE CONTENT (Safety buffer for very wide screens or short text) */}
+           <div className="flex shrink-0 items-center mx-4">
+            <span className="font-medium text-sm sm:text-base">
+              {tickerContent}
+            </span>
+            <span className="mx-4 text-primary-foreground/60">•</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**2. Ensure `tailwind.config.ts` has the animation**
+
+For the above code to work, you need the `animate-ticker` keyframe defined. Check your `tailwind.config.ts`. If it's missing, add this to the `extend` section:
+
+```typescript
+// tailwind.config.ts
+
+export default {
+  theme: {
+    extend: {
+      keyframes: {
+        ticker: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-100%)' }, // Moves left by one full "segment"
+        },
+      },
+      animation: {
+        ticker: 'ticker linear infinite',
+      },
+    },
+  },
+  // ... rest of config
+}
+```
+
+### **Why this solves your issues:**
+
+1.  **Mobile Truncation Solved:** By rendering the content **three times** (Original + Duplicate + Triplicate) and putting them in a flex container that simply slides left, we ensure that even if the mobile screen is narrow, there is always "next text" ready to slide in before the animation resets.
+2.  **Speed Improved:** I set the inline `animationDuration` to `18s`.
+      * Previously it was likely default (often `20s` or `30s`).
+      * **18s** is tighter and faster. If you want it even zippier on mobile, you can change that style conditionally, but 18s is usually a good "brisk walk" speed for tickers.
+
+**Interactive Next Step:**
+Would you like me to help you verify your `tailwind.config.ts` file to ensure the keyframes are set up correctly for this animation?

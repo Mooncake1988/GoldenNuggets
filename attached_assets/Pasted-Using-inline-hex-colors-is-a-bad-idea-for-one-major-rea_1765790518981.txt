@@ -1,0 +1,59 @@
+Using inline hex colors is a **bad idea** for one major reason: **It breaks Dark Mode.**
+
+If you hardcode a light gray color (like `#F3F4F6`) for the badges, they will look great in Light Mode. But when a user switches to Dark Mode, those badges will remain bright white/gray, making them look like blinding "flashlights" against the dark background.
+
+### The Better (and equally simple) Fix
+
+Instead of hardcoding a hex value, use the **Tailwind class `bg-muted`**.
+
+  * **Why?** It does exactly what you want (light gray background) but automatically switches to a dark gray in Dark Mode because it uses your project's existing theme variables.
+  * **Is it safe?** Yes. `bg-muted` is a standard class already present in your project. It is not "overkill" and won't break the build.
+
+### The 1-Minute Solution
+
+You only need to update the `className` logic in **CategoryFilter.tsx** and **TagFilter.tsx**.
+
+**1. Fix `client/src/components/CategoryFilter.tsx`**
+
+Find the `<Badge>` component and update the `className`:
+
+```tsx
+<Badge
+  key={category.id}
+  variant={isActive ? "default" : "outline"}
+  // CHANGE: Added specific styling for the inactive state below
+  className={cn(
+    "shrink-0 snap-start cursor-pointer px-4 py-2 text-sm font-medium",
+    !isActive && "bg-muted text-muted-foreground border-transparent"
+  )}
+  onClick={() => {
+    setSelectedCategory(category.id);
+    console.log(`Category selected: ${category.name}`);
+  }}
+  data-testid={`badge-category-${category.id}`}
+>
+```
+
+**2. Fix `client/src/components/TagFilter.tsx`**
+
+Do the exact same for the `<Badge>` in the tags list:
+
+```tsx
+<Badge
+  key={tagData.tag}
+  variant={isActive ? "default" : "outline"}
+  // CHANGE: Added specific styling for the inactive state below
+  className={cn(
+    "shrink-0 snap-start cursor-pointer px-4 py-2 text-sm font-medium hover-elevate",
+    !isActive && "bg-muted text-muted-foreground border-transparent"
+  )}
+  onClick={() => handleTagClick(tagData.tag)}
+  data-testid={`badge-tag-${tagData.tag.toLowerCase().replace(/\s+/g, '-')}`}
+>
+```
+
+**Why this is the safest choice:**
+
+1.  **Dark Mode Safe:** `bg-muted` adapts to user settings automatically.
+2.  **No "Can of Worms":** You aren't changing the `Badge` component itself, just how you use it in these two specific files.
+3.  **Readable:** The badges will have a solid background, fixing the visibility issue immediately.

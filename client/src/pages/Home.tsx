@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import NewsTicker from "@/components/NewsTicker";
 import HeroSection from "@/components/HeroSection";
 import TagFilter from "@/components/TagFilter";
 import LocationCard from "@/components/LocationCard";
@@ -134,7 +135,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <div className="sticky top-0 z-50">
+        <Header />
+      </div>
+      <NewsTicker />
       <HeroSection />
       <TagFilter />
       

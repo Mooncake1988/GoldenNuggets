@@ -79,3 +79,52 @@ export const newsletterSubscriptionSchema = z.object({
 });
 
 export type NewsletterSubscription = z.infer<typeof newsletterSubscriptionSchema>;
+
+// News Ticker Items
+export const tickerItems = pgTable("ticker_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  linkUrl: text("link_url"),
+  priority: text("priority").notNull().default("50"),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+const baseTickerItemSchema = createInsertSchema(tickerItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTickerItemSchema = baseTickerItemSchema.extend({
+  priority: z.string().refine(
+    (val) => {
+      const num = parseInt(val, 10);
+      return !isNaN(num) && num >= 0 && num <= 100;
+    },
+    { message: "Priority must be a number between 0 and 100" }
+  ).default("50"),
+  linkUrl: z.string().url("Invalid URL format").nullable().optional().or(z.literal("")),
+  endDate: z.union([
+    z.date(),
+    z.string().refine(
+      (val) => val === "" || !isNaN(Date.parse(val)),
+      { message: "Invalid date format" }
+    ).transform((val) => val === "" ? null : new Date(val)),
+    z.null(),
+  ]).nullable().optional(),
+});
+
+export type InsertTickerItem = z.infer<typeof insertTickerItemSchema>;
+export type TickerItem = typeof tickerItems.$inferSelect;
+
+export const tickerCategories = [
+  { value: "new-spots", label: "New Spots", color: "bg-emerald-600" },
+  { value: "featured", label: "Featured", color: "bg-amber-600" },
+  { value: "events", label: "Events", color: "bg-purple-600" },
+  { value: "tips", label: "Tips", color: "bg-blue-600" },
+  { value: "offers", label: "Offers", color: "bg-rose-600" },
+  { value: "updates", label: "Updates", color: "bg-sky-700" },
+  { value: "seasonal", label: "Seasonal", color: "bg-orange-600" },
+] as const;
