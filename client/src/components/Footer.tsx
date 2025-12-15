@@ -124,6 +124,11 @@ export default function Footer() {
                   Map View
                 </span>
               </Link>
+              <Link href="/about" data-testid="link-footer-about">
+                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                  About Us
+                </span>
+              </Link>
               <a 
                 href="https://lekkerspots.beehiiv.com/" 
                 target="_blank" 
