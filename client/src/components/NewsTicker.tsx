@@ -71,7 +71,7 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
           backfaceVisibility: "hidden",
         }}
       >
-        {[...activeItems, ...activeItems].map((item, index) => {
+        {[...activeItems, ...activeItems, ...activeItems].map((item, index) => {
           const catInfo = getCategoryInfo(item.category);
           const isClickable = !!item.linkUrl;
           
@@ -105,12 +105,12 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            transform: translateX(-33.333%);
           }
         }
         
         .animate-ticker {
-          animation: ticker ${Math.max(activeItems.length * 8, 20)}s linear infinite;
+          animation: ticker ${Math.max(activeItems.length * 7, 18)}s linear infinite;
         }
       `}</style>
     </div>
