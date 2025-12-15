@@ -10,6 +10,7 @@ interface NewsTickerProps {
 
 export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
   const [isPaused, setIsPaused] = useState(false);
+  const [tickerDistance, setTickerDistance] = useState(0);
   const tickerRef = useRef<HTMLDivElement>(null);
   
   const { data: tickerItems, isLoading } = useQuery<TickerItem[]>({
@@ -29,6 +30,21 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
   const activeItems = previewMode 
     ? tickerItems?.filter(item => item.isActive && !isExpired(item)) || []
     : tickerItems || [];
+
+  useEffect(() => {
+    const measureWidth = () => {
+      if (tickerRef.current && activeItems.length > 0) {
+        const totalWidth = tickerRef.current.scrollWidth;
+        const oneSegmentWidth = totalWidth / 3;
+        setTickerDistance(oneSegmentWidth);
+      }
+    };
+
+    measureWidth();
+    
+    window.addEventListener('resize', measureWidth);
+    return () => window.removeEventListener('resize', measureWidth);
+  }, [activeItems]);
 
   if (isLoading) {
     return null;
@@ -54,6 +70,8 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
     }
   };
 
+  const animationDuration = Math.max(activeItems.length * 7, 18);
+
   return (
     <div 
       className="relative overflow-hidden bg-muted border-b border-border"
@@ -63,12 +81,14 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
     >
       <div 
         ref={tickerRef}
-        className="flex whitespace-nowrap animate-ticker"
+        className="flex whitespace-nowrap"
         style={{
+          animation: tickerDistance > 0 ? `ticker ${animationDuration}s linear infinite` : 'none',
           animationPlayState: isPaused ? "paused" : "running",
           willChange: "transform",
           transform: "translateZ(0)",
           backfaceVisibility: "hidden",
+          ["--ticker-distance" as string]: `${tickerDistance}px`,
         }}
       >
         {[...activeItems, ...activeItems, ...activeItems].map((item, index) => {
@@ -78,7 +98,7 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
           return (
             <div
               key={`${item.id}-${index}`}
-              className={`inline-flex items-center gap-3 px-6 py-2.5 ${isClickable ? "cursor-pointer hover:bg-white/30 dark:hover:bg-black/20 transition-colors" : ""}`}
+              className={`inline-flex items-center gap-3 px-6 py-2.5 shrink-0 ${isClickable ? "cursor-pointer hover:bg-white/30 dark:hover:bg-black/20 transition-colors" : ""}`}
               onClick={(e) => handleItemClick(item, e)}
               data-testid={`ticker-item-${item.id}`}
             >
@@ -102,15 +122,11 @@ export default function NewsTicker({ previewMode = false }: NewsTickerProps) {
       <style>{`
         @keyframes ticker {
           0% {
-            transform: translateX(0);
+            transform: translateX(0) translateZ(0);
           }
           100% {
-            transform: translateX(-33.333%);
+            transform: translateX(calc(-1 * var(--ticker-distance))) translateZ(0);
           }
-        }
-        
-        .animate-ticker {
-          animation: ticker ${Math.max(activeItems.length * 7, 18)}s linear infinite;
         }
       `}</style>
     </div>
