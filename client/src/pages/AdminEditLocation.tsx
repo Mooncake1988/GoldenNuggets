@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ObjectUploader } from "@/components/ObjectUploader";
+import InsiderTipsManager from "@/components/InsiderTipsManager";
 import { Upload, X, Loader2 } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Location, Category } from "@shared/schema";
@@ -436,6 +437,8 @@ export default function AdminEditLocation() {
               </form>
             </CardContent>
           </Card>
+
+          <InsiderTipsManager locationId={locationId!} />
         </div>
       </main>
       

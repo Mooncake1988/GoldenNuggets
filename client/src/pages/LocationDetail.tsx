@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
+import InsiderBrief from "@/components/InsiderBrief";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CANONICAL_BASE_URL } from "@/lib/config";
@@ -307,6 +308,8 @@ export default function LocationDetail() {
                   </div>
                 </CardContent>
               </Card>
+
+              <InsiderBrief locationId={location.id} />
 
               {location.tags && location.tags.length > 0 && (
                 <div>

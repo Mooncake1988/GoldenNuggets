@@ -3,6 +3,7 @@ import {
   locations,
   categories,
   tickerItems,
+  insiderTips,
   type User,
   type Location,
   type InsertLocation,
@@ -10,6 +11,8 @@ import {
   type InsertCategory,
   type TickerItem,
   type InsertTickerItem,
+  type InsiderTip,
+  type InsertInsiderTip,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, or, ilike, sql, desc, and, gt, isNull } from "drizzle-orm";
@@ -47,6 +50,12 @@ export interface IStorage {
   createTickerItem(item: InsertTickerItem): Promise<TickerItem>;
   updateTickerItem(id: string, item: Partial<InsertTickerItem>): Promise<TickerItem>;
   deleteTickerItem(id: string): Promise<void>;
+  // Insider tips
+  getInsiderTipsByLocationId(locationId: string): Promise<InsiderTip[]>;
+  getInsiderTip(id: string): Promise<InsiderTip | undefined>;
+  createInsiderTip(tip: InsertInsiderTip): Promise<InsiderTip>;
+  updateInsiderTip(id: string, tip: Partial<InsertInsiderTip>): Promise<InsiderTip>;
+  deleteInsiderTip(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -241,6 +250,37 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTickerItem(id: string): Promise<void> {
     await db.delete(tickerItems).where(eq(tickerItems.id, id));
+  }
+
+  async getInsiderTipsByLocationId(locationId: string): Promise<InsiderTip[]> {
+    return await db
+      .select()
+      .from(insiderTips)
+      .where(eq(insiderTips.locationId, locationId))
+      .orderBy(sql`CAST(${insiderTips.sortOrder} AS INTEGER) ASC`);
+  }
+
+  async getInsiderTip(id: string): Promise<InsiderTip | undefined> {
+    const [tip] = await db.select().from(insiderTips).where(eq(insiderTips.id, id));
+    return tip;
+  }
+
+  async createInsiderTip(tip: InsertInsiderTip): Promise<InsiderTip> {
+    const [newTip] = await db.insert(insiderTips).values(tip).returning();
+    return newTip;
+  }
+
+  async updateInsiderTip(id: string, tipData: Partial<InsertInsiderTip>): Promise<InsiderTip> {
+    const [updated] = await db
+      .update(insiderTips)
+      .set({ ...tipData, updatedAt: new Date() })
+      .where(eq(insiderTips.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteInsiderTip(id: string): Promise<void> {
+    await db.delete(insiderTips).where(eq(insiderTips.id, id));
   }
 }
 
