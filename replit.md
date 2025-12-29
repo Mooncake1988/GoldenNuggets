@@ -113,6 +113,28 @@ The homepage displays an animated horizontal scrolling ticker for announcements,
 - `NewsTicker.tsx` - Animated marquee with pause-on-hover, colored category badges, clickable links
 - `AdminTicker.tsx` - Management page with create/edit dialog, status toggles, and live preview
 
+**Insider Brief Feature (December 2025)**:
+Location pages now support "Insider Tips" - quick-fire FAQ-style information to help visitors plan their trip. This feature captures SEO-friendly content like WiFi availability, parking, pet policies, and best times to visit.
+
+**Implementation Details**:
+- **Database Table**: `insider_tips` stores tips with question, answer, icon (from predefined set), optional images, and sortOrder
+- **Foreign Key**: Each tip links to a location via `locationId` with cascade delete
+- **Icons**: 13 predefined icons (wifi, dog, camera, clock, utensils, car, wallet, users, sun, map-pin, info, star, image)
+- **Admin Interface**: Tips are managed via the location edit page (`/admin/edit/{locationId}`) in a dedicated "Insider Tips" section
+- **Image Support**: Each tip can have up to 4 attached images (e.g., menu photos)
+
+**Frontend Components**:
+- `InsiderBrief.tsx` - Displays tips on public location pages in an accordion format with icon-decorated questions. Shows "Good to Know" heading with lightbulb icon. Only renders when tips exist.
+- `InsiderTipsManager.tsx` - Admin component for CRUD operations with dialog-based editing and image upload support
+
+**API Endpoints**:
+- `GET /api/locations/:locationId/insider-tips` - Public endpoint returning tips sorted by sortOrder
+- `POST /api/admin/insider-tips` - Create new tip (authenticated)
+- `PUT /api/admin/insider-tips/:id` - Update tip (authenticated)
+- `DELETE /api/admin/insider-tips/:id` - Delete tip (authenticated)
+
+**SEO Benefits**: Structured FAQ content targets "People Also Ask" queries and captures long-tail keywords like "Is there WiFi at [location]?" or "Can I bring my dog to [location]?"
+
 ## External Dependencies
 
 **Authentication**: Passport.js
