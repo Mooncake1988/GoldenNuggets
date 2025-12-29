@@ -70,6 +70,9 @@ export function createLocationMetaMiddleware(storage: IStorage) {
         return next();
       }
 
+      // Fetch insider tips for this location
+      const insiderTips = await storage.getInsiderTipsByLocationId(location.id);
+
       // Prepare meta tag data
       const baseUrl = resolveBaseUrl(req);
       const pageTitle = escapeHtml(`${location.name} - ${location.category} in ${location.neighborhood} | LekkerSpots`);
@@ -81,26 +84,48 @@ export function createLocationMetaMiddleware(storage: IStorage) {
       const ogImage = hasImages ? location.images[0] : `${baseUrl}/og-image.jpg`;
       const pageUrl = `${baseUrl}/location/${location.slug}`;
       
-      // Prepare structured data
+      // Prepare structured data with FAQPage for insider tips (SEO enhancement)
+      // Using @graph to combine LocalBusiness and FAQPage in a single schema
+      const graphEntities: any[] = [
+        {
+          "@type": "LocalBusiness",
+          "name": location.name,
+          "description": location.description,
+          "image": hasImages ? location.images : [`${baseUrl}/og-image.jpg`],
+          "address": location.address ? {
+            "@type": "PostalAddress",
+            "streetAddress": location.address,
+            "addressLocality": location.neighborhood,
+            "addressRegion": "Western Cape",
+            "addressCountry": "ZA"
+          } : undefined,
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": location.latitude,
+            "longitude": location.longitude
+          },
+          "url": pageUrl
+        }
+      ];
+
+      // Add FAQPage to the graph if insider tips exist
+      if (insiderTips && insiderTips.length > 0) {
+        graphEntities.push({
+          "@type": "FAQPage",
+          "mainEntity": insiderTips.map(tip => ({
+            "@type": "Question",
+            "name": tip.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": tip.answer
+            }
+          }))
+        });
+      }
+
       const structuredData = {
         "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": location.name,
-        "description": location.description,
-        "image": hasImages ? location.images : [`${baseUrl}/og-image.jpg`],
-        "address": location.address ? {
-          "@type": "PostalAddress",
-          "streetAddress": location.address,
-          "addressLocality": location.neighborhood,
-          "addressRegion": "Western Cape",
-          "addressCountry": "ZA"
-        } : undefined,
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": location.latitude,
-          "longitude": location.longitude
-        },
-        "url": pageUrl
+        "@graph": graphEntities
       };
 
       // Store in res.locals for htmlMetaRewriter to use
@@ -115,7 +140,8 @@ export function createLocationMetaMiddleware(storage: IStorage) {
         neighborhood: escapeHtml(location.neighborhood),
         address: location.address ? escapeHtml(location.address) : null,
         tags: location.tags ? location.tags.map(t => escapeHtml(t)) : [],
-        fullLocationData: JSON.stringify(location)
+        insiderTips: insiderTips || [],
+        fullLocationData: JSON.stringify({ ...location, insiderTips: insiderTips || [] })
       };
     } catch (error) {
       console.error('Error in locationMetaMiddleware:', error);

@@ -42,11 +42,14 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 interface InsiderBriefProps {
   locationId: string;
+  initialData?: InsiderTip[];
 }
 
-export default function InsiderBrief({ locationId }: InsiderBriefProps) {
+export default function InsiderBrief({ locationId, initialData }: InsiderBriefProps) {
   const { data: tips, isLoading } = useQuery<InsiderTip[]>({
-    queryKey: [`/api/locations/${locationId}/insider-tips`],
+    queryKey: ['/api/locations', locationId, 'insider-tips'],
+    initialData: initialData,
+    staleTime: initialData ? 60000 : 0,
   });
 
   if (isLoading || !tips || tips.length === 0) {
