@@ -65,6 +65,19 @@ export default function InsiderBrief({ locationId, initialData }: InsiderBriefPr
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
+        {/* SEO: Hidden content for search engine crawlers - answers always in DOM */}
+        <div className="sr-only" aria-hidden="true" data-testid="seo-insider-tips">
+          {tips.map((tip) => (
+            <div key={`seo-${tip.id}`} itemScope itemType="https://schema.org/Question">
+              <h3 itemProp="name">{tip.question}</h3>
+              <div itemScope itemType="https://schema.org/Answer" itemProp="acceptedAnswer">
+                <p itemProp="text">{tip.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Interactive accordion for users */}
         <Accordion type="single" collapsible className="w-full">
           {tips.map((tip) => {
             const IconComponent = iconMap[tip.icon || "info"] || Info;
