@@ -128,3 +128,42 @@ export const tickerCategories = [
   { value: "updates", label: "Updates", color: "bg-sky-700" },
   { value: "seasonal", label: "Seasonal", color: "bg-orange-600" },
 ] as const;
+
+// Insider Tips - Quick-Fire FAQs for location pages
+export const insiderTips = pgTable("insider_tips", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  locationId: varchar("location_id").notNull().references(() => locations.id, { onDelete: "cascade" }),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  icon: text("icon").default("info"),
+  images: text("images").array().notNull().default(sql`ARRAY[]::text[]`),
+  sortOrder: text("sort_order").notNull().default("0"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertInsiderTipSchema = createInsertSchema(insiderTips).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertInsiderTip = z.infer<typeof insertInsiderTipSchema>;
+export type InsiderTip = typeof insiderTips.$inferSelect;
+
+// Predefined icons for insider tips
+export const insiderTipIcons = [
+  { value: "wifi", label: "WiFi/Signal" },
+  { value: "dog", label: "Pet Friendly" },
+  { value: "camera", label: "Photo Spot" },
+  { value: "clock", label: "Timing" },
+  { value: "utensils", label: "Food & Drink" },
+  { value: "car", label: "Parking/Access" },
+  { value: "wallet", label: "Price/Payment" },
+  { value: "users", label: "Crowd Level" },
+  { value: "sun", label: "Weather" },
+  { value: "map-pin", label: "Navigation" },
+  { value: "info", label: "General Info" },
+  { value: "star", label: "Must Know" },
+  { value: "image", label: "Menu/Photos" },
+] as const;

@@ -8,17 +8,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
+import InsiderBrief from "@/components/InsiderBrief";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CANONICAL_BASE_URL } from "@/lib/config";
 
+import type { InsiderTip } from "@shared/schema";
+
+interface LocationWithTips extends Location {
+  insiderTips?: InsiderTip[];
+}
+
 declare global {
   interface Window {
-    __LOCATION_DATA__?: Location;
+    __LOCATION_DATA__?: LocationWithTips;
   }
 }
 
-function getServerInjectedLocation(slug: string | undefined): Location | undefined {
+function getServerInjectedLocation(slug: string | undefined): LocationWithTips | undefined {
   if (typeof window !== 'undefined' && window.__LOCATION_DATA__) {
     const serverData = window.__LOCATION_DATA__;
     if (serverData.slug === slug) {
@@ -63,13 +70,15 @@ export default function LocationDetail() {
   
   const serverLocation = getServerInjectedLocation(params?.slug);
   
-  const { data: fetchedLocation, isLoading } = useQuery<Location>({
+  const { data: fetchedLocation, isLoading } = useQuery<LocationWithTips>({
     queryKey: ['/api/locations/by-slug', params?.slug],
     enabled: !!params?.slug && !serverLocation,
     initialData: serverLocation,
   });
   
   const location = fetchedLocation || serverLocation;
+  
+  const ssrInsiderTips = serverLocation?.insiderTips;
 
   useEffect(() => {
     if (location) {
@@ -307,6 +316,8 @@ export default function LocationDetail() {
                   </div>
                 </CardContent>
               </Card>
+
+              <InsiderBrief locationId={location.id} initialData={ssrInsiderTips} />
 
               {location.tags && location.tags.length > 0 && (
                 <div>

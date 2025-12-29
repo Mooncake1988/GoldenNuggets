@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema, insertTickerItemSchema } from "@shared/schema";
+import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema, insertTickerItemSchema, insertInsiderTipSchema } from "@shared/schema";
 import passport from "passport";
 import { notifyLocationCreated, notifyLocationUpdated, notifyLocationDeleted } from "./indexnow";
 
@@ -385,6 +385,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting ticker item:", error);
       res.status(500).json({ error: "Failed to delete ticker item" });
+    }
+  });
+
+  // Insider Tips Routes
+  app.get("/api/locations/:locationId/insider-tips", async (req, res) => {
+    try {
+      const tips = await storage.getInsiderTipsByLocationId(req.params.locationId);
+      res.json(tips);
+    } catch (error) {
+      console.error("Error fetching insider tips:", error);
+      res.status(500).json({ error: "Failed to fetch insider tips" });
+    }
+  });
+
+  app.get("/api/admin/insider-tips/:id", isAuthenticated, async (req, res) => {
+    try {
+      const tip = await storage.getInsiderTip(req.params.id);
+      if (!tip) {
+        return res.status(404).json({ error: "Insider tip not found" });
+      }
+      res.json(tip);
+    } catch (error) {
+      console.error("Error fetching insider tip:", error);
+      res.status(500).json({ error: "Failed to fetch insider tip" });
+    }
+  });
+
+  app.post("/api/admin/insider-tips", isAuthenticated, async (req, res) => {
+    try {
+      const parsed = insertInsiderTipSchema.parse(req.body);
+      const tip = await storage.createInsiderTip(parsed);
+      res.status(201).json(tip);
+    } catch (error) {
+      console.error("Error creating insider tip:", error);
+      res.status(400).json({ error: "Invalid insider tip data" });
+    }
+  });
+
+  app.put("/api/admin/insider-tips/:id", isAuthenticated, async (req, res) => {
+    try {
+      const existing = await storage.getInsiderTip(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Insider tip not found" });
+      }
+      const parsed = insertInsiderTipSchema.partial().parse(req.body);
+      const tip = await storage.updateInsiderTip(req.params.id, parsed);
+      res.json(tip);
+    } catch (error) {
+      console.error("Error updating insider tip:", error);
+      res.status(400).json({ error: "Invalid insider tip data" });
+    }
+  });
+
+  app.delete("/api/admin/insider-tips/:id", isAuthenticated, async (req, res) => {
+    try {
+      const existing = await storage.getInsiderTip(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ error: "Insider tip not found" });
+      }
+      await storage.deleteInsiderTip(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting insider tip:", error);
+      res.status(500).json({ error: "Failed to delete insider tip" });
     }
   });
 

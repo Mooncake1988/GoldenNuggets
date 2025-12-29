@@ -11,6 +11,15 @@ function escapeJsonForScript(json: string): string {
     .replace(/'/g, '\\u0027');
 }
 
+interface InsiderTip {
+  id: string;
+  question: string;
+  answer: string;
+  icon: string;
+  images: string[] | null;
+  sortOrder: number;
+}
+
 interface LocationMeta {
   title: string;
   description: string;
@@ -22,6 +31,7 @@ interface LocationMeta {
   neighborhood: string;
   address: string | null;
   tags: string[];
+  insiderTips: InsiderTip[];
   fullLocationData: string;
 }
 
@@ -96,8 +106,10 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
   );
   
   // Inject structured data before closing </head> tag
-  const structuredDataScript = `<script type="application/ld+json" data-rh="true">\n${meta.structuredData}\n</script>\n</head>`;
-  html = html.replace(/<\/head>/, structuredDataScript);
+  // FAQPage data is now included in the main structuredData @graph
+  const structuredDataScript = `<script type="application/ld+json" data-rh="true">\n${meta.structuredData}\n</script>`;
+  
+  html = html.replace(/<\/head>/, structuredDataScript + '\n</head>');
   
   // Inject server-rendered content into #root for SEO (fixes soft 404)
   // This content is visible to crawlers immediately without waiting for JavaScript
@@ -107,6 +119,22 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
   
   const addressHtml = meta.address 
     ? `<p style="color:#64748b;margin-top:12px"><strong>Address:</strong> ${meta.address}</p>`
+    : '';
+  
+  // Render insider tips as FAQ-style content for SEO (visible to crawlers)
+  // Note: This is SSR content that will be removed after React hydrates
+  const insiderTipsHtml = meta.insiderTips && meta.insiderTips.length > 0 
+    ? `<section style="margin-top:32px;padding:24px;background:#f8fafc;border-radius:12px">
+        <h2 style="font-size:1.5rem;font-weight:600;margin:0 0 16px 0;color:#1e293b">Good to Know</h2>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          ${meta.insiderTips.map(tip => `
+            <div style="background:white;padding:16px;border-radius:8px;border:1px solid #e2e8f0">
+              <h3 style="font-size:1rem;font-weight:600;margin:0 0 8px 0;color:#1e293b">${escapeHtml(tip.question)}</h3>
+              <p style="margin:0;color:#475569;line-height:1.6">${escapeHtml(tip.answer)}</p>
+            </div>
+          `).join('')}
+        </div>
+      </section>`
     : '';
   
   const serverRenderedContent = `
@@ -124,6 +152,7 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
           ${addressHtml}
           ${tagsHtml}
         </section>
+        ${insiderTipsHtml}
         <footer style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0">
           <p style="color:#64748b;font-size:14px">Discover more hidden gems at <a href="https://lekkerspots.co.za" style="color:#f97316;text-decoration:none">LekkerSpots</a> - Western Cape's local travel guide.</p>
         </footer>
