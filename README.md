@@ -14,6 +14,9 @@ A vibrant travel discovery web application showcasing hidden gems and local favo
 - **Admin Dashboard**: Secure admin panel for content management
 - **Multi-Image Upload**: Upload multiple images per location with Google Cloud Storage integration
 - **Newsletter Integration**: Beehiiv newsletter signup with celebratory confetti animation
+- **Continue Your Adventure**: Related spots recommendations on location pages for improved engagement and SEO
+- **Insider Tips**: FAQ-style tips (WiFi, parking, pet policies) with JSON-LD structured data for rich search results
+- **News Ticker**: Animated announcements banner on homepage with admin management
 - **Dark Mode**: Full dark mode support with accessible color contrast
 - **Accessibility**: Respects `prefers-reduced-motion` and maintains WCAG-compliant contrast ratios
 
@@ -154,6 +157,14 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Responsive map controls
 
 ## 🎨 Recent Updates
+
+### Continue Your Adventure Feature (January 2026)
+- **New Feature**: Added "Continue Your Adventure" section to location detail pages
+- **Purpose**: Reduces bounce rate and improves SEO through internal linking between related locations
+- **Admin Control**: Admins can manually curate 2-3 related nearby spots for each location via multi-select dropdown in the edit form
+- **Display**: Related spots appear below the Insider Tips section with category badges and direct links
+- **API Endpoint**: `GET /api/locations/:id/related` returns related location data
+- **Database**: Added `relatedLocationIds` text array column to locations table
 
 ### Canonical Domain SEO Fix (December 2025)
 - **Issue**: Duplicate content in Google Search Console caused by www vs non-www URL variations

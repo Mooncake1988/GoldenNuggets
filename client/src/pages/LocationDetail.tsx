@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
 import InsiderBrief from "@/components/InsiderBrief";
+import ContinueYourAdventure from "@/components/ContinueYourAdventure";
 import { MapPin, Navigation, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CANONICAL_BASE_URL } from "@/lib/config";
@@ -318,6 +319,11 @@ export default function LocationDetail() {
               </Card>
 
               <InsiderBrief locationId={location.id} initialData={ssrInsiderTips} />
+
+              <ContinueYourAdventure 
+                locationId={location.id} 
+                currentNeighborhood={location.neighborhood} 
+              />
 
               {location.tags && location.tags.length > 0 && (
                 <div>

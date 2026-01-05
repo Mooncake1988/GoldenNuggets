@@ -15,7 +15,7 @@ import {
   type InsertInsiderTip,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, or, ilike, sql, desc, and, gt, isNull } from "drizzle-orm";
+import { eq, or, ilike, sql, desc, and, gt, isNull, inArray } from "drizzle-orm";
 
 export interface UpsertUser {
   id: string;
@@ -36,6 +36,7 @@ export interface IStorage {
   getAllLocations(): Promise<Location[]>;
   getLocation(id: string): Promise<Location | undefined>;
   getLocationBySlug(slug: string): Promise<Location | undefined>;
+  getLocationsByIds(ids: string[]): Promise<Location[]>;
   searchLocations(query: string, tag?: string): Promise<Location[]>;
   getPopularTags(limit?: number): Promise<{ tag: string; count: number }[]>;
   getLocationsByTag(tag: string): Promise<Location[]>;
@@ -118,6 +119,14 @@ export class DatabaseStorage implements IStorage {
   async getLocationBySlug(slug: string): Promise<Location | undefined> {
     const [location] = await db.select().from(locations).where(eq(locations.slug, slug));
     return location;
+  }
+
+  async getLocationsByIds(ids: string[]): Promise<Location[]> {
+    if (ids.length === 0) return [];
+    return await db
+      .select()
+      .from(locations)
+      .where(inArray(locations.id, ids));
   }
 
   async searchLocations(query: string, tag?: string): Promise<Location[]> {

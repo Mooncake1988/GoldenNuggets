@@ -44,6 +44,7 @@ export const locations = pgTable("locations", {
   images: text("images").array().notNull().default(sql`ARRAY[]::text[]`),
   tags: text("tags").array().notNull().default(sql`ARRAY[]::text[]`),
   featured: boolean("featured").notNull().default(false),
+  relatedLocationIds: text("related_location_ids").array().notNull().default(sql`ARRAY[]::text[]`),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -8,13 +8,14 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import InsiderTipsManager from "@/components/InsiderTipsManager";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, MapPin, Plus, Compass } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Location, Category } from "@shared/schema";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,6 +42,7 @@ export default function AdminEditLocation() {
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [selectedRelatedIds, setSelectedRelatedIds] = useState<string[]>([]);
 
   const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
     queryKey: ["/api/locations"],
@@ -95,6 +97,7 @@ export default function AdminEditLocation() {
         featured: currentLocation.featured,
       });
       setUploadedImages(currentLocation.images);
+      setSelectedRelatedIds(currentLocation.relatedLocationIds || []);
     }
   }, [currentLocation]);
 
@@ -105,6 +108,7 @@ export default function AdminEditLocation() {
         ...formData,
         tags: tagsArray,
         images: uploadedImages,
+        relatedLocationIds: selectedRelatedIds,
       });
     },
     onSuccess: () => {
@@ -355,6 +359,72 @@ export default function AdminEditLocation() {
                   <p className="text-xs text-muted-foreground ml-2">
                     (Featured locations appear on the homepage)
                   </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <Label className="flex items-center gap-2">
+                      <Compass className="h-4 w-4 text-primary" />
+                      Continue Your Adventure (Related Spots)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Link 2-3 nearby spots visitors might explore next. This improves SEO and keeps visitors engaged.
+                    </p>
+                  </div>
+
+                  {selectedRelatedIds.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedRelatedIds.map((relatedId) => {
+                        const relatedLoc = locations?.find(loc => loc.id === relatedId);
+                        if (!relatedLoc) return null;
+                        return (
+                          <Badge 
+                            key={relatedId} 
+                            variant="secondary" 
+                            className="flex items-center gap-1 pr-1"
+                            data-testid={`badge-related-${relatedId}`}
+                          >
+                            <MapPin className="h-3 w-3" />
+                            <span className="max-w-[150px] truncate">{relatedLoc.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedRelatedIds(prev => prev.filter(id => id !== relatedId))}
+                              className="ml-1 p-0.5 rounded-full hover:bg-destructive/20"
+                              data-testid={`button-remove-related-${relatedId}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <select
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value && !selectedRelatedIds.includes(e.target.value)) {
+                        setSelectedRelatedIds(prev => [...prev, e.target.value]);
+                      }
+                    }}
+                    data-testid="select-related-location"
+                  >
+                    <option value="">Add a related spot...</option>
+                    {locations
+                      ?.filter(loc => loc.id !== locationId && !selectedRelatedIds.includes(loc.id))
+                      .map((loc) => (
+                        <option key={loc.id} value={loc.id}>
+                          {loc.name} ({loc.neighborhood})
+                        </option>
+                      ))}
+                  </select>
+                  
+                  {selectedRelatedIds.length >= 3 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                      Tip: 2-3 related spots is optimal. More can overwhelm visitors.
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
