@@ -163,7 +163,8 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - **Purpose**: Reduces bounce rate and improves SEO through internal linking between related locations
 - **Admin Control**: Admins can manually curate 2-3 related nearby spots for each location via multi-select dropdown in the edit form
 - **Display**: Related spots appear below the Insider Tips section with category badges and direct links
-- **API Endpoint**: `GET /api/locations/:id/related` returns related location data
+- **SSR Support**: Related locations are server-side rendered for SEO crawlers, ensuring Google can see and index the internal links without JavaScript execution
+- **API Endpoint**: `GET /api/locations/:id/related` returns related location data (blocked by robots.txt, but SSR ensures crawler visibility)
 - **Database**: Added `relatedLocationIds` text array column to locations table
 
 ### Canonical Domain SEO Fix (December 2025)
