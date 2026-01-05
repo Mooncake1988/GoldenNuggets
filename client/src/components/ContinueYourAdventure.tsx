@@ -8,6 +8,7 @@ import type { Location } from "@shared/schema";
 interface ContinueYourAdventureProps {
   locationId: string;
   currentNeighborhood: string;
+  initialData?: Location[];
 }
 
 const getCategoryColor = (category: string) => {
@@ -23,10 +24,11 @@ const getCategoryColor = (category: string) => {
   return categoryColors[category] || "bg-primary text-primary-foreground border-0";
 };
 
-export default function ContinueYourAdventure({ locationId, currentNeighborhood }: ContinueYourAdventureProps) {
+export default function ContinueYourAdventure({ locationId, currentNeighborhood, initialData }: ContinueYourAdventureProps) {
   const { data: relatedLocations, isLoading } = useQuery<Location[]>({
     queryKey: [`/api/locations/${locationId}/related`],
-    enabled: !!locationId,
+    enabled: !!locationId && !initialData,
+    initialData: initialData,
   });
 
   if (isLoading) {

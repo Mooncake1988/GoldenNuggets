@@ -73,6 +73,12 @@ export function createLocationMetaMiddleware(storage: IStorage) {
       // Fetch insider tips for this location
       const insiderTips = await storage.getInsiderTipsByLocationId(location.id);
 
+      // Fetch related locations for "Continue Your Adventure" section (SEO enhancement)
+      let relatedLocations: any[] = [];
+      if (location.relatedLocationIds && location.relatedLocationIds.length > 0) {
+        relatedLocations = await storage.getLocationsByIds(location.relatedLocationIds);
+      }
+
       // Prepare meta tag data
       const baseUrl = resolveBaseUrl(req);
       const pageTitle = escapeHtml(`${location.name} - ${location.category} in ${location.neighborhood} | LekkerSpots`);
@@ -141,7 +147,8 @@ export function createLocationMetaMiddleware(storage: IStorage) {
         address: location.address ? escapeHtml(location.address) : null,
         tags: location.tags ? location.tags.map(t => escapeHtml(t)) : [],
         insiderTips: insiderTips || [],
-        fullLocationData: JSON.stringify({ ...location, insiderTips: insiderTips || [] })
+        relatedLocations: relatedLocations || [],
+        fullLocationData: JSON.stringify({ ...location, insiderTips: insiderTips || [], relatedLocations: relatedLocations || [] })
       };
     } catch (error) {
       console.error('Error in locationMetaMiddleware:', error);

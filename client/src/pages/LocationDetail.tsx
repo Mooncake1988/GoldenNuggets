@@ -18,6 +18,7 @@ import type { InsiderTip } from "@shared/schema";
 
 interface LocationWithTips extends Location {
   insiderTips?: InsiderTip[];
+  relatedLocations?: Location[];
 }
 
 declare global {
@@ -80,6 +81,7 @@ export default function LocationDetail() {
   const location = fetchedLocation || serverLocation;
   
   const ssrInsiderTips = serverLocation?.insiderTips;
+  const ssrRelatedLocations = serverLocation?.relatedLocations;
 
   useEffect(() => {
     if (location) {
@@ -322,7 +324,8 @@ export default function LocationDetail() {
 
               <ContinueYourAdventure 
                 locationId={location.id} 
-                currentNeighborhood={location.neighborhood} 
+                currentNeighborhood={location.neighborhood}
+                initialData={ssrRelatedLocations}
               />
 
               {location.tags && location.tags.length > 0 && (

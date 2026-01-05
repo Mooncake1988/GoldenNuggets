@@ -20,6 +20,15 @@ interface InsiderTip {
   sortOrder: number;
 }
 
+interface RelatedLocation {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  neighborhood: string;
+  images: string[] | null;
+}
+
 interface LocationMeta {
   title: string;
   description: string;
@@ -32,6 +41,7 @@ interface LocationMeta {
   address: string | null;
   tags: string[];
   insiderTips: InsiderTip[];
+  relatedLocations: RelatedLocation[];
   fullLocationData: string;
 }
 
@@ -136,6 +146,32 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
         </div>
       </section>`
     : '';
+
+  // Render related locations as "Continue Your Adventure" for SEO (visible to crawlers)
+  // This is critical for internal linking and cluster topic SEO strategy
+  const relatedLocationsHtml = meta.relatedLocations && meta.relatedLocations.length > 0
+    ? `<section style="margin-top:32px;padding:24px;background:#f8fafc;border-radius:12px">
+        <h2 style="font-size:1.5rem;font-weight:600;margin:0 0 8px 0;color:#1e293b">Continue Your Adventure</h2>
+        <p style="color:#64748b;font-size:14px;margin:0 0 16px 0">Nearby gems to explore while you're in the area</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${meta.relatedLocations.map(loc => `
+            <a href="/location/${escapeHtml(loc.slug)}" style="display:flex;gap:16px;padding:12px;background:white;border-radius:8px;border:1px solid #e2e8f0;text-decoration:none;color:inherit">
+              <div style="width:80px;height:80px;flex-shrink:0;border-radius:6px;overflow:hidden;background:#e2e8f0">
+                ${loc.images && loc.images.length > 0 
+                  ? `<img src="${escapeHtml(loc.images[0])}" alt="${escapeHtml(loc.name)}" style="width:100%;height:100%;object-fit:cover" />`
+                  : ''
+                }
+              </div>
+              <div style="flex:1;min-width:0">
+                <h3 style="font-size:1rem;font-weight:600;margin:0 0 4px 0;color:#1e293b">${escapeHtml(loc.name)}</h3>
+                <p style="margin:0 0 8px 0;color:#64748b;font-size:14px">${escapeHtml(loc.neighborhood)}</p>
+                <span style="display:inline-block;background:#f97316;color:white;padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:500">${escapeHtml(loc.category)}</span>
+              </div>
+            </a>
+          `).join('')}
+        </div>
+      </section>`
+    : '';
   
   const serverRenderedContent = `
     <div id="ssr-location-content" style="max-width:1200px;margin:0 auto;padding:32px 16px;font-family:system-ui,-apple-system,sans-serif">
@@ -153,6 +189,7 @@ function injectLocationMeta(html: string, meta: LocationMeta): string {
           ${tagsHtml}
         </section>
         ${insiderTipsHtml}
+        ${relatedLocationsHtml}
         <footer style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0">
           <p style="color:#64748b;font-size:14px">Discover more hidden gems at <a href="https://lekkerspots.co.za" style="color:#f97316;text-decoration:none">LekkerSpots</a> - Western Cape's local travel guide.</p>
         </footer>
