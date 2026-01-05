@@ -32,6 +32,7 @@ The backend is built with Node.js and Express.js in TypeScript, providing RESTfu
 - **IndexNow Integration**: Notifies search engines (Bing, Yandex, etc.) of content changes via `server/indexnow.ts` and an API key verification endpoint.
 - **News Ticker**: An animated horizontal scrolling ticker on the homepage for announcements, managed via `/admin/ticker` with category, priority, and expiration settings.
 - **Insider Brief**: Location pages include "Insider Tips" (FAQ-style information like WiFi, parking, pet policies) managed within the location edit page. These tips are fully crawlable via SSR, hidden DOM content for crawlers (`sr-only` div), and JSON-LD structured data (FAQPage schema) for rich results.
+- **Continue Your Adventure**: A manual curation system for linking 2-3 related nearby spots on each location detail page. Admins select related locations via multi-select in the edit form, and visitors see these recommendations displayed below Insider Tips. This reduces bounce rate and improves SEO through internal linking. API endpoint: `GET /api/locations/:id/related`.
 
 ### Database
 

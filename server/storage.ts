@@ -15,7 +15,7 @@ import {
   type InsertInsiderTip,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, or, ilike, sql, desc, and, gt, isNull } from "drizzle-orm";
+import { eq, or, ilike, sql, desc, and, gt, isNull, inArray } from "drizzle-orm";
 
 export interface UpsertUser {
   id: string;
@@ -126,7 +126,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(locations)
-      .where(sql`${locations.id} = ANY(${ids})`);
+      .where(inArray(locations.id, ids));
   }
 
   async searchLocations(query: string, tag?: string): Promise<Location[]> {
