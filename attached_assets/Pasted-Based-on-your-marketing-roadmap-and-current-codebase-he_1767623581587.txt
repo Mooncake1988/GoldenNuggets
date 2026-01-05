@@ -1,0 +1,54 @@
+Based on your marketing roadmap and current codebase, here are some ideas for the **lekkerspots.co.za/w17** landing page, specifically tailored for the Workshop17 community of digital nomads and remote workers.
+
+### 1. The "Weekend Blueprint" Interactive List
+
+The primary goal of the page is to deliver "The Digital Nomad’s Weekend Blueprint". Instead of a static list, you can leverage your existing `locations` and `insider_tips` database structure:
+
+* 
+**Curated "Nomad" Filter:** Display the 5 curated spots with a specific focus on attributes W17 members care about, such as WiFi quality, power outlet availability, and "vibe".
+
+
+* **Leverage Insider Tips:** Use the `insider_tips` table to prominently display "Quick-Fire FAQs" for these 5 spots. For this audience, prioritize the `wifi` (WiFi/Signal), `car` (Parking/Access), and `utensils` (Food & Drink) icons from your `insiderTipIcons` list.
+
+### 2. Tailored Technical Implementation
+
+Since you have access to the code, you will first need to update your routing:
+
+* **New Route:** Add a new route for `/w17` in your `App.tsx` file to point to a new `W17LandingPage` component.
+* 
+**Visual Continuity:** Apply your "sunset gradient" palette (turquoise, hot pink, coral/orange) as defined in your creative brief to ensure the landing page feels like a direct extension of the screen advertisement.
+
+
+
+### 3. Feature: "Distance from Workshop17"
+
+A highly relevant feature for this community would be showing how far these "LekkerSpots" are from specific W17 locations (like the V&A Waterfront or Newlands):
+
+* **Map Integration:** Use your existing `MapPage` logic to show a mini-map on the landing page specifically highlighting the 5 blueprint spots in relation to the nearest W17 hub.
+* **The "Local Friend" Recommendation:** Use the `description` field in your `locations` table to add a personal "Founder's Note". For example: *"I often work from W17 Watershed, and this is where I head on a Saturday when I need to escape the city noise"*.
+
+
+
+### 4. Conversion: The "Saturday Morning Scout"
+
+The roadmap emphasizes using this page as a "Lead Magnet" to capture emails for your Beehiiv newsletter.
+
+* 
+**Signup Hook:** Position the newsletter signup not just as a mailing list, but as joining "The Saturday Morning Scout".
+
+
+* 
+**Exclusive Unlock:** Offer a referral hook on the landing page: "Sign up to unlock my private Google Maps 'Hidden Gem' layer," which aligns with your Phase 2 growth strategy.
+
+
+
+### 5. Content Aesthetic
+
+To match the "Creative Direction" in your brief:
+
+* 
+**High-Vibe Visuals:** Use the high-resolution scenery or astrophotography you mentioned in the brief to create a "digital detox" feeling.
+
+
+* 
+**Tone:** Keep the copy "personal, curious, and inviting" to reinforce the brand's position as a "local friend" rather than a commercial travel agency.
