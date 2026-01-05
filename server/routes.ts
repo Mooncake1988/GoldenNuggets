@@ -243,6 +243,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/locations/:id/related", async (req, res) => {
+    try {
+      const location = await storage.getLocation(req.params.id);
+      if (!location) {
+        return res.status(404).json({ error: "Location not found" });
+      }
+      if (!location.relatedLocationIds || location.relatedLocationIds.length === 0) {
+        return res.json([]);
+      }
+      const relatedLocations = await storage.getLocationsByIds(location.relatedLocationIds);
+      res.json(relatedLocations);
+    } catch (error) {
+      console.error("Error fetching related locations:", error);
+      res.status(500).json({ error: "Failed to fetch related locations" });
+    }
+  });
+
   app.get("/api/locations/:id", async (req, res) => {
     try {
       const location = await storage.getLocation(req.params.id);

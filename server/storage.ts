@@ -36,6 +36,7 @@ export interface IStorage {
   getAllLocations(): Promise<Location[]>;
   getLocation(id: string): Promise<Location | undefined>;
   getLocationBySlug(slug: string): Promise<Location | undefined>;
+  getLocationsByIds(ids: string[]): Promise<Location[]>;
   searchLocations(query: string, tag?: string): Promise<Location[]>;
   getPopularTags(limit?: number): Promise<{ tag: string; count: number }[]>;
   getLocationsByTag(tag: string): Promise<Location[]>;
@@ -118,6 +119,14 @@ export class DatabaseStorage implements IStorage {
   async getLocationBySlug(slug: string): Promise<Location | undefined> {
     const [location] = await db.select().from(locations).where(eq(locations.slug, slug));
     return location;
+  }
+
+  async getLocationsByIds(ids: string[]): Promise<Location[]> {
+    if (ids.length === 0) return [];
+    return await db
+      .select()
+      .from(locations)
+      .where(sql`${locations.id} = ANY(${ids})`);
   }
 
   async searchLocations(query: string, tag?: string): Promise<Location[]> {
