@@ -25,12 +25,7 @@ const getCategoryColor = (category: string) => {
 
 export default function ContinueYourAdventure({ locationId, currentNeighborhood }: ContinueYourAdventureProps) {
   const { data: relatedLocations, isLoading } = useQuery<Location[]>({
-    queryKey: ["/api/locations", locationId, "related"],
-    queryFn: async () => {
-      const response = await fetch(`/api/locations/${locationId}/related`);
-      if (!response.ok) throw new Error("Failed to fetch related locations");
-      return response.json();
-    },
+    queryKey: [`/api/locations/${locationId}/related`],
     enabled: !!locationId,
   });
 
