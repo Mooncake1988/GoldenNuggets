@@ -51,6 +51,16 @@ export default function Header() {
                 Stories
               </span>
             </a>
+            <a 
+              href="https://forms.gle/8o1vywaSgnaiUnNu7" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              data-testid="link-nav-contact"
+            >
+              <span className="text-sm font-medium hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer text-muted-foreground">
+                Get in Touch
+              </span>
+            </a>
             <Link href="/admin/login" data-testid="link-nav-admin">
               <Button variant="outline" size="sm">
                 Admin Login
@@ -96,6 +106,16 @@ export default function Header() {
             >
               <span className="block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer text-muted-foreground">
                 Stories
+              </span>
+            </a>
+            <a 
+              href="https://forms.gle/8o1vywaSgnaiUnNu7" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              data-testid="link-mobile-contact"
+            >
+              <span className="block px-3 py-2 rounded-md text-sm font-medium hover-elevate active-elevate-2 cursor-pointer text-muted-foreground">
+                Get in Touch
               </span>
             </a>
             <Link href="/admin/login" data-testid="link-mobile-admin">
