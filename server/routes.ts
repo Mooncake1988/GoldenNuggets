@@ -513,6 +513,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           : null,
       })) || [];
 
+      // Sort by publish date descending (newest first)
+      stories.sort((a: any, b: any) => (b.publishedAt || 0) - (a.publishedAt || 0));
+
       res.json(stories);
     } catch (error) {
       console.error("Error fetching stories:", error);
