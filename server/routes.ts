@@ -469,6 +469,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/stories", async (req, res) => {
+    try {
+      const beehiivApiKey = process.env.BEEHIIV_API_KEY;
+      const beehiivPublicationId = process.env.BEEHIIV_PUBLICATION_ID;
+
+      if (!beehiivApiKey || !beehiivPublicationId) {
+        console.error("Missing Beehiiv credentials");
+        return res.status(500).json({ error: "Stories service is not configured" });
+      }
+
+      const limit = Math.min(parseInt(req.query.limit as string) || 3, 10);
+
+      const response = await fetch(
+        `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/posts?status=confirmed&limit=${limit}&expand=free_web_content`,
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${beehiivApiKey}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Beehiiv API error:", response.status, errorData);
+        return res.status(500).json({ error: "Failed to fetch stories" });
+      }
+
+      const data = await response.json();
+      
+      const stories = data.data?.map((post: any) => ({
+        id: post.id,
+        title: post.title || post.subject_line,
+        subtitle: post.subtitle || "",
+        excerpt: post.preview_text || "",
+        thumbnail: post.thumbnail_url || null,
+        url: post.web_url,
+        publishedAt: post.publish_date,
+        readTime: post.stats?.email?.read_time_seconds 
+          ? Math.ceil(post.stats.email.read_time_seconds / 60) 
+          : null,
+      })) || [];
+
+      res.json(stories);
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      res.status(500).json({ error: "Failed to fetch stories" });
+    }
+  });
+
   app.post("/api/newsletter/subscribe", async (req, res) => {
     try {
       const parsed = newsletterSubscriptionSchema.parse(req.body);

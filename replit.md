@@ -15,10 +15,11 @@ Preferred communication style: Simple, everyday language.
 The frontend is a React 18 application with TypeScript, Vite, and Wouter for routing. UI components use Shadcn/ui (New York style) based on Radix UI, styled with Tailwind CSS for a mobile-first, responsive design. It incorporates a custom HSL color system, photography-first hero sections, Leaflet for maps, and subtle Lottie animations. State management is handled by TanStack Query for server state and React hooks for UI state. Key design elements include a vibrant sunset gradient color palette and dynamic gradient borders. SEO is optimized with server-side rendered meta tags and dynamic sitemap generation.
 
 **Content Discovery Pages**:
-- **Homepage**: Displays 12 featured locations with pagination.
+- **Homepage**: Displays 12 featured locations with pagination, followed by a Stories section showcasing the latest Beehiiv newsletter posts.
 - **Categories Page**: Shows all locations by category with optional "Featured Only" filter.
 - **Map Page**: Interactive Leaflet map of all locations with optional "Featured Only" filter.
 - **About Us Page**: Static content with SEO meta tags.
+- **Stories Section**: Embedded on the homepage below Featured Locations, fetches and displays the 3 most recent newsletter stories from Beehiiv API with thumbnails, titles, excerpts, and publish dates. Links to full stories on Beehiiv platform.
 
 The admin dashboard provides comprehensive image management with drag-and-drop reordering, individual delete controls, and visual indicators for preview thumbnails. Admins can mark locations as "featured" and manage "Insider Tips" and "News Ticker" items.
 
@@ -47,5 +48,5 @@ The project uses a PostgreSQL database (Neon serverless) with `Locations` (name,
 **UI Components**: Radix UI, Lucide React
 **Form Management**: React Hook Form, Zod
 **Animations**: Lottie React
-**Newsletter Integration**: Beehiiv API
+**Newsletter Integration**: Beehiiv API (subscription and posts/stories endpoints)
 **SEO**: IndexNow Protocol

@@ -3,6 +3,7 @@ import NewsTicker from "@/components/NewsTicker";
 import HeroSection from "@/components/HeroSection";
 import TagFilter from "@/components/TagFilter";
 import LocationCard from "@/components/LocationCard";
+import StoriesSection from "@/components/StoriesSection";
 import Footer from "@/components/Footer";
 import LottieAnimation from "@/components/LottieAnimation";
 import emptyStateAnimation from "@assets/animations/empty-state.json";
@@ -196,25 +197,6 @@ export default function Home() {
                 </div>
               )}
               
-              {!searchQuery && !selectedTag && (
-                <div className="mt-16 pt-8 border-t text-center">
-                  <p className="text-muted-foreground text-lg mb-4">
-                    Looking for something specific?
-                  </p>
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    <Link href="/categories">
-                      <Button variant="outline" size="lg" data-testid="link-browse-categories">
-                        Browse All Locations by Category
-                      </Button>
-                    </Link>
-                    <Link href="/map">
-                      <Button variant="outline" size="lg" data-testid="link-view-map">
-                        View All on Map
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              )}
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
@@ -231,6 +213,32 @@ export default function Home() {
           )}
         </section>
       </main>
+
+      {!searchQuery && !selectedTag && (
+        <>
+          <StoriesSection />
+          
+          <section className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 border-t">
+            <div className="text-center">
+              <p className="text-muted-foreground text-lg mb-4">
+                Looking for something specific?
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link href="/categories">
+                  <Button variant="outline" size="lg" data-testid="link-browse-categories">
+                    Browse All Locations by Category
+                  </Button>
+                </Link>
+                <Link href="/map">
+                  <Button variant="outline" size="lg" data-testid="link-view-map">
+                    View All on Map
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
       
       <Footer />
     </div>
