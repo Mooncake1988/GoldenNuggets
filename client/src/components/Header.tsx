@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, MapPin } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import logoImage from "@assets/LekkerSpots logo_1762766705530.png";
 
 export default function Header() {
   const [location] = useLocation();
@@ -15,9 +16,7 @@ export default function Header() {
         <div className="flex h-16 md:h-20 items-center justify-between">
           <Link href="/" data-testid="link-home">
             <div className="flex items-center gap-2 hover-elevate active-elevate-2 cursor-pointer px-2 py-1 rounded-md">
-              <div className="relative">
-                <MapPin className="h-6 w-6 text-primary" />
-              </div>
+              <img src={logoImage} alt="LekkerSpots" className="h-10 w-10" />
               <div className="flex flex-col">
                 <span className="font-bold text-lg leading-tight bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">LekkerSpots</span>
                 <span className="text-xs text-muted-foreground leading-tight">Western Cape Hidden Gems</span>

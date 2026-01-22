@@ -14,6 +14,10 @@ Preferred communication style: Simple, everyday language.
 
 The frontend is a React 18 application with TypeScript, Vite, and Wouter for routing. UI components use Shadcn/ui (New York style) based on Radix UI, styled with Tailwind CSS for a mobile-first, responsive design. It incorporates a custom HSL color system, photography-first hero sections, Leaflet for maps, and subtle Lottie animations. State management is handled by TanStack Query for server state and React hooks for UI state. Key design elements include a vibrant sunset gradient color palette and dynamic gradient borders. SEO is optimized with server-side rendered meta tags and dynamic sitemap generation.
 
+**Header & Footer Branding**:
+- **Header**: Features the official LekkerSpots circular logo (palm tree with sunset colors) alongside gradient-styled brand text and tagline "Western Cape Hidden Gems".
+- **Footer**: Dark-themed design (slate-900 background) with a colorful sunset gradient bar at the top. Social media icons use brand-appropriate colors (Instagram pink, email cyan) for visual impact. Newsletter subscription form with dark-styled inputs.
+
 **Content Discovery Pages**:
 - **Homepage**: Displays 12 featured locations with pagination, followed by a Stories section showcasing the latest Beehiiv newsletter posts.
 - **Categories Page**: Shows all locations by category with optional "Featured Only" filter.

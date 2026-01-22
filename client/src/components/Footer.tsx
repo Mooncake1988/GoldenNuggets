@@ -67,7 +67,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-card">
+    <footer className="relative bg-slate-900 text-slate-100">
       <div
         className="h-[3px]"
         style={{
@@ -96,36 +96,36 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <img src={logoImage} alt="LekkerSpots" className="h-20 w-20" />
-              <span className="font-bold text-lg leading-tight">
+              <span className="font-bold text-lg leading-tight text-white">
                 LekkerSpots
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-slate-400">
               Discover hidden gems and lekker spots across the Western Cape,
               curated by locals.
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
+            <h3 className="font-semibold mb-4 text-white">Quick Links</h3>
             <nav className="flex flex-col gap-2">
               <Link href="/" data-testid="link-footer-home">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                <span className="text-sm text-slate-400 hover:text-white cursor-pointer transition-colors">
                   Home
                 </span>
               </Link>
               <Link href="/categories" data-testid="link-footer-categories">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                <span className="text-sm text-slate-400 hover:text-white cursor-pointer transition-colors">
                   Categories
                 </span>
               </Link>
               <Link href="/map" data-testid="link-footer-map">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                <span className="text-sm text-slate-400 hover:text-white cursor-pointer transition-colors">
                   Map View
                 </span>
               </Link>
               <Link href="/about" data-testid="link-footer-about">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                <span className="text-sm text-slate-400 hover:text-white cursor-pointer transition-colors">
                   About Us
                 </span>
               </Link>
@@ -135,12 +135,12 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 data-testid="link-footer-stories"
               >
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                <span className="text-sm text-slate-400 hover:text-white cursor-pointer transition-colors">
                   Stories
                 </span>
               </a>
               <Link href="/admin" data-testid="link-footer-admin">
-                <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
+                <span className="text-sm text-slate-400 hover:text-white cursor-pointer transition-colors">
                   Admin
                 </span>
               </Link>
@@ -148,32 +148,32 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Follow Us</h3>
+            <h3 className="font-semibold mb-4 text-white">Follow Us</h3>
             <div className="flex gap-4">
               <a
                 href="https://www.instagram.com/lekkerspots/"
-                className="text-muted-foreground hover:text-foreground"
+                className="text-pink-500 hover:text-pink-400 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-testid="link-instagram"
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-6 w-6" />
               </a>
               <a
                 href="https://forms.gle/GY4WUo9EPkBvv2Ja6"
-                className="text-muted-foreground hover:text-foreground"
+                className="text-cyan-400 hover:text-cyan-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-testid="link-email"
               >
-                <Mail className="h-5 w-5" />
+                <Mail className="h-6 w-6" />
               </a>
             </div>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Newsletter</h3>
-            <p className="text-sm text-muted-foreground mb-3">
+            <h3 className="font-semibold mb-4 text-white">Newsletter</h3>
+            <p className="text-sm text-slate-400 mb-3">
               Get updates on new locations
             </p>
             <Form {...form}>
@@ -191,7 +191,7 @@ export default function Footer() {
                           {...field}
                           type="text"
                           placeholder="Your name"
-                          className="text-sm"
+                          className="text-sm bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
                           data-testid="input-newsletter-name"
                         />
                       </FormControl>
@@ -209,7 +209,7 @@ export default function Footer() {
                           {...field}
                           type="email"
                           placeholder="Your email"
-                          className="text-sm"
+                          className="text-sm bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
                           data-testid="input-newsletter-email"
                         />
                       </FormControl>
@@ -230,7 +230,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-slate-700 mt-8 pt-8 text-center text-sm text-slate-400">
           <p>
             &copy; {new Date().getFullYear()} LekkerSpots. All rights reserved.
           </p>
