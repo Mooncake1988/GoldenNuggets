@@ -482,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = Math.min(parseInt(req.query.limit as string) || 3, 10);
 
       const response = await fetch(
-        `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/posts?status=confirmed&limit=${limit}&expand=free_web_content`,
+        `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/posts?status=confirmed&limit=${limit}&expand=free_web_content&order_by=publish_date&direction=desc`,
         {
           method: "GET",
           headers: {

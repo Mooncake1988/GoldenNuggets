@@ -54,3 +54,30 @@ The project uses a PostgreSQL database (Neon serverless) with `Locations` (name,
 **Animations**: Lottie React
 **Newsletter Integration**: Beehiiv API (subscription and posts/stories endpoints)
 **SEO**: IndexNow Protocol
+
+## Beehiiv API Integration Notes
+
+### Stories/Posts Endpoint
+
+The Stories section on the homepage fetches the 3 most recent newsletter posts from Beehiiv using:
+```
+GET /v2/publications/{publicationId}/posts?status=confirmed&limit=3&expand=free_web_content&order_by=publish_date&direction=desc
+```
+
+**Critical Parameters:**
+- `status=confirmed` - Only fetch published posts (not drafts)
+- `order_by=publish_date&direction=desc` - **Required!** Ensures newest posts are returned first
+
+### Known Issue & Fix (January 2026)
+
+**Problem:** New posts weren't appearing in the Stories section despite being published on Beehiiv.
+
+**Root Cause:** The Beehiiv API defaults to sorting by `created` date in `ascending` order (oldest first). When requesting only 3 posts without explicit sorting, the API returned the 3 oldest posts instead of the 3 newest.
+
+**Solution:** Added `order_by=publish_date&direction=desc` query parameters to the API call in `server/routes.ts` to ensure posts are sorted by publish date (newest first).
+
+**If stories aren't updating after publishing:**
+1. Wait 5-10 minutes - Beehiiv may have a slight delay before the API reflects new posts
+2. Ensure the post status is "confirmed" (published, not draft or scheduled)
+3. Hard refresh the browser (Ctrl+Shift+R / Cmd+Shift+R) to clear any cached data
+4. Check server logs for any Beehiiv API errors
