@@ -65,22 +65,57 @@ The "Trending Lekker Spots" feature uses the Apify `instagram-hashtag-stats` act
 
 **API Endpoint Used:**
 ```
-POST https://api.apify.com/v2/acts/apify~instagram-hashtag-stats/run-sync-get-dataset-items
+POST https://api.apify.com/v2/acts/apify~instagram-hashtag-stats/run-sync-get-dataset-items?token={APIFY_API_KEY}
 ```
 
-**Data Flow:**
-1. Admin assigns an Instagram hashtag to a location (e.g., `dekleineschur`)
-2. Admin clicks "Update Social Trends" in the admin dashboard
-3. System queries Apify for current post counts for all tracked hashtags
-4. Trending score = percentage growth since last update
-5. Locations with positive growth appear in the "Trending Lekker Spots" section
+**Request Format:**
+```json
+{
+  "hashtags": ["dekleineschur"]
+}
+```
+
+**Response Format:**
+```json
+[
+  {
+    "id": "17841563825106882",
+    "name": "dekleineschur",
+    "postsCount": 1278000,
+    "topPosts": [...],
+    "relatedHashtags": [...]
+  }
+]
+```
+
+**Key Field:** `postsCount` - Total number of Instagram posts using this hashtag.
+
+### Data Flow
+
+1. Admin assigns an Instagram hashtag to a location (e.g., `dekleineschur`) via the Edit Location form
+2. Admin clicks "Update Social Trends" button in the admin dashboard
+3. System makes **one API call per hashtag** to Apify (e.g., 5 locations with hashtags = 5 API calls)
+4. For each hashtag, the system:
+   - Fetches current `postsCount` from Apify
+   - Compares to previous `postsCount` stored in database
+   - Calculates trending score as percentage growth: `((new - old) / old) * 100`
+   - Updates the location record with new counts and trending score
+5. Locations with positive growth appear in the "Trending Lekker Spots" homepage section
+
+### API Cost Considerations
+
+- **1 API call per hashtag** when "Update Social Trends" is clicked
+- Apify uses a "pay per event" model for this actor
+- To minimize costs: only assign hashtags to locations you actively want to track
+- The system processes hashtags sequentially (not in parallel) to avoid rate limits
 
 ### Data Synchronization
 
 **Current Method: Manual Updates Only**
 - Admin must click "Update Social Trends" button in the admin dashboard
-- Located at: `/admin` → "Update Social Trends" button
+- Located at: `/admin` → "Social Trends" card → "Update Social Trends" button
 - API endpoint: `POST /api/admin/social-trends/update`
+- The button shows a loading spinner during the update process
 
 **Future Enhancement:** Could add scheduled/cron updates for automatic daily syncing.
 
