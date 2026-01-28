@@ -2,12 +2,8 @@ import { storage } from "./storage";
 import type { Location } from "@shared/schema";
 
 const APIFY_API_TOKEN = process.env.APIFY_API_KEY;
-const APIFY_ACTOR_ID = "apify~instagram-hashtag-scraper";
-
-interface ApifyHashtagResult {
-  tagName: string;
-  postsCount: number;
-}
+// Use the Instagram Hashtag Stats scraper which returns total post counts
+const APIFY_ACTOR_ID = "apify~instagram-hashtag-stats";
 
 export function calculateTrendingScore(currentCount: number, previousCount: number): number {
   if (previousCount === 0) {
@@ -34,7 +30,6 @@ export async function fetchHashtagPostCount(hashtag: string): Promise<number | n
         },
         body: JSON.stringify({
           hashtags: [cleanHashtag],
-          resultsLimit: 1,
         }),
       }
     );
@@ -49,11 +44,14 @@ export async function fetchHashtagPostCount(hashtag: string): Promise<number | n
     
     if (Array.isArray(data) && data.length > 0) {
       const result = data[0];
+      // instagram-hashtag-stats returns postsCount
       if (result.postsCount !== undefined) {
+        console.log(`[SocialTrends] Found ${result.postsCount} posts for #${cleanHashtag}`);
         return result.postsCount;
       }
-      if (result.edge_hashtag_to_media?.count !== undefined) {
-        return result.edge_hashtag_to_media.count;
+      // Fallback for alternative field names
+      if (result.totalPostCount !== undefined) {
+        return result.totalPostCount;
       }
     }
 
