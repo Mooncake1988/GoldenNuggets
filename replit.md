@@ -38,6 +38,7 @@ The backend is built with Node.js and Express.js in TypeScript, providing RESTfu
 - **News Ticker**: An animated horizontal scrolling ticker on the homepage for announcements, managed via `/admin/ticker` with category, priority, and expiration settings.
 - **Insider Brief**: Location pages include "Insider Tips" (FAQ-style information like WiFi, parking, pet policies) managed within the location edit page. These tips are fully crawlable via SSR, hidden DOM content for crawlers (`sr-only` div), and JSON-LD structured data (FAQPage schema) for rich results.
 - **Continue Your Adventure**: A manual curation system for linking 2-3 related nearby spots on each location detail page. Admins select related locations via multi-select in the edit form, and visitors see these recommendations displayed below Insider Tips. This reduces bounce rate and improves SEO through internal linking. The section is fully server-side rendered for crawlers (like Insider Tips), ensuring Google indexes the internal links without needing JavaScript. API endpoint: `GET /api/locations/:id/related`.
+- **Trending Lekker Spots**: Instagram-based social trending feature that tracks hashtag post counts using the Apify API. Locations with an assigned Instagram hashtag are monitored for post count growth, and a trending score (percentage growth) is calculated. The homepage displays the top 5 trending locations with fire badges and growth percentages (CoinMarketCap-style). LocationCards also show a "Trending" badge when the trending score exceeds 5%. API endpoints: `GET /api/locations/trending` (public) and `POST /api/admin/social-trends/update` (admin, triggers manual data refresh).
 
 ### Database
 
@@ -54,6 +55,7 @@ The project uses a PostgreSQL database (Neon serverless) with `Locations` (name,
 **Animations**: Lottie React
 **Newsletter Integration**: Beehiiv API (subscription and posts/stories endpoints)
 **SEO**: IndexNow Protocol
+**Social Trends**: Apify Instagram Hashtag Scraper API (tracks hashtag post counts for trending feature)
 
 ## Beehiiv API Integration Notes
 

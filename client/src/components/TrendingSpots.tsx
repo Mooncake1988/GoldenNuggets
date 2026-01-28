@@ -42,7 +42,9 @@ function TrendingLocationCard({ location, rank }: { location: Location; rank: nu
           </Badge>
           <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md">
             <TrendingUp className="w-3 h-3 text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-400">+{trendingScore.toFixed(1)}%</span>
+            <span className="text-xs font-bold text-emerald-400">
+              {trendingScore >= 0 ? '+' : ''}{trendingScore.toFixed(1)}%
+            </span>
           </div>
         </div>
         <CardContent className="p-4">

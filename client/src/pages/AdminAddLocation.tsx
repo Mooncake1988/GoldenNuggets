@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { ObjectUploader } from "@/components/ObjectUploader";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Instagram } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Category } from "@shared/schema";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,6 +34,7 @@ export default function AdminAddLocation() {
     longitude: "18.4241",
     tags: "",
     featured: false,
+    instagramHashtag: "",
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -78,6 +79,7 @@ export default function AdminAddLocation() {
         ...formData,
         tags: tagsArray,
         images: uploadedImages,
+        instagramHashtag: formData.instagramHashtag || null,
       });
     },
     onSuccess: () => {
@@ -319,6 +321,23 @@ export default function AdminAddLocation() {
                   </Label>
                   <p className="text-xs text-muted-foreground ml-2">
                     (Featured locations appear on the homepage)
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="instagramHashtag" className="flex items-center gap-2">
+                    <Instagram className="h-4 w-4 text-pink-500" />
+                    Instagram Hashtag
+                  </Label>
+                  <Input
+                    id="instagramHashtag"
+                    value={formData.instagramHashtag}
+                    onChange={(e) => setFormData({ ...formData, instagramHashtag: e.target.value.replace(/^#/, '') })}
+                    placeholder="e.g. papkuilsfontein"
+                    data-testid="input-instagram-hashtag"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter the Instagram hashtag (without #) to track social trends for this location. This enables the "Trending" feature.
                   </p>
                 </div>
 

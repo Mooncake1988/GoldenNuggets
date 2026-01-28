@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import InsiderTipsManager from "@/components/InsiderTipsManager";
-import { Upload, X, Loader2, MapPin, Plus, Compass } from "lucide-react";
+import { Upload, X, Loader2, MapPin, Plus, Compass, Instagram } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Location, Category } from "@shared/schema";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,6 +38,7 @@ export default function AdminEditLocation() {
     longitude: "18.4241",
     tags: "",
     featured: false,
+    instagramHashtag: "",
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -95,6 +96,7 @@ export default function AdminEditLocation() {
         longitude: currentLocation.longitude,
         tags: currentLocation.tags.join(", "),
         featured: currentLocation.featured,
+        instagramHashtag: currentLocation.instagramHashtag || "",
       });
       setUploadedImages(currentLocation.images);
       setSelectedRelatedIds(currentLocation.relatedLocationIds || []);
@@ -109,6 +111,7 @@ export default function AdminEditLocation() {
         tags: tagsArray,
         images: uploadedImages,
         relatedLocationIds: selectedRelatedIds,
+        instagramHashtag: formData.instagramHashtag || null,
       });
     },
     onSuccess: () => {
@@ -358,6 +361,23 @@ export default function AdminEditLocation() {
                   </Label>
                   <p className="text-xs text-muted-foreground ml-2">
                     (Featured locations appear on the homepage)
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="instagramHashtag" className="flex items-center gap-2">
+                    <Instagram className="h-4 w-4 text-pink-500" />
+                    Instagram Hashtag
+                  </Label>
+                  <Input
+                    id="instagramHashtag"
+                    value={formData.instagramHashtag}
+                    onChange={(e) => setFormData({ ...formData, instagramHashtag: e.target.value.replace(/^#/, '') })}
+                    placeholder="e.g. papkuilsfontein"
+                    data-testid="input-instagram-hashtag"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter the Instagram hashtag (without #) to track social trends for this location. This enables the "Trending" feature.
                   </p>
                 </div>
 
