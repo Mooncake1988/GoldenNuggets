@@ -1,0 +1,61 @@
+I've analyzed the Replit screenshot. It's a great start—Replit has correctly identified the need for the `feat/instagram-trending-spots` branch and recognized that we need to modify the database schema and create a background "cron" job.
+
+However, to make the "Trending" logic actually work like **CoinMarketCap**, we need to be very specific about the data fields. If we only store the "current" count, we can't calculate the "gain" (the % increase).
+
+Here is the exact code for your `shared/schema.ts` file. You can copy this and give it to Replit:
+
+### **1. Updated Schema for `shared/schema.ts**`
+
+I have added the five essential fields to the `locations` table: `instagramHashtag`, `currentPostCount`, `previousPostCount`, `trendingScore`, and `socialLastUpdated`.
+
+```typescript
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const locations = pgTable("locations", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  imageUrl: text("image_url").notNull(),
+  latitude: text("latitude").notNull(),
+  longitude: text("longitude").notNull(),
+  address: text("address"),
+  website: text("website"),
+  isGoldenNugget: boolean("is_golden_nugget").default(false),
+  // --- NEW SOCIAL TRENDING FIELDS ---
+  instagramHashtag: text("instagram_hashtag"), // e.g., "papkuilsfontein"
+  currentPostCount: integer("current_post_count").default(0),
+  previousPostCount: integer("previous_post_count").default(0),
+  trendingScore: integer("trending_score").default(0), // The % growth
+  socialLastUpdated: timestamp("social_last_updated"),
+});
+
+// Update the insert schema to include the new fields
+export const insertLocationSchema = createInsertSchema(locations).extend({
+  instagramHashtag: z.string().optional(),
+});
+
+export type Location = typeof locations.$inferSelect;
+export type InsertLocation = z.infer<typeof insertLocationSchema>;
+
+// ... rest of your existing schema (ticker, stories, etc.) remains the same
+
+```
+
+---
+
+### **2. Why this is the "Golden" setup:**
+
+* **The Gain Logic:** By having both `currentPostCount` and `previousPostCount`, Replit can calculate the 24-hour growth. Without the previous count, you just have a static number, not a "trend."
+* **The Trending Score:** This is a simple integer. On your homepage, you can now tell Replit: *"Show me the top 3 locations where trending_score is highest."*
+* **Lo-Fi Compatibility:** This doesn't change your existing data; it just adds a "Social Heat" layer on top of your current nuggets.
+
+### **Next Step for Replit**
+
+Once Replit has updated the schema, you should give it this instruction:
+
+> "Now that the schema is updated, let's create a new service in `server/routes.ts` called `updateSocialTrends`. This service should take the `currentPostCount`, move it to `previousPostCount`, fetch the new total from our API, and calculate the `trendingScore` as the percentage difference."
+
+**Would you like me to look at your `client/src/pages/Home.tsx` next to see where the best place would be to visually display these "Trending" spots?**
