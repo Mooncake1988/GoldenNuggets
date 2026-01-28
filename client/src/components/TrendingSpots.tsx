@@ -134,12 +134,14 @@ export default function TrendingSpots() {
             Discover what's hot on Instagram right now
           </p>
         </div>
-        <Link href="/trending" data-testid="link-view-all-trending">
-          <span className="text-sm text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1">
-            View all trending
-            <ArrowUpRight className="w-4 h-4" />
-          </span>
-        </Link>
+        {trendingLocations.length > 5 && (
+          <Link href="/map?trending=true" data-testid="link-view-all-trending">
+            <span className="text-sm text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1">
+              View all trending
+              <ArrowUpRight className="w-4 h-4" />
+            </span>
+          </Link>
+        )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {trendingLocations.slice(0, 5).map((location, index) => (
