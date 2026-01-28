@@ -57,6 +57,15 @@ export interface IStorage {
   createInsiderTip(tip: InsertInsiderTip): Promise<InsiderTip>;
   updateInsiderTip(id: string, tip: Partial<InsertInsiderTip>): Promise<InsiderTip>;
   deleteInsiderTip(id: string): Promise<void>;
+  // Social Trending
+  getLocationsWithHashtags(): Promise<Location[]>;
+  getTrendingLocations(limit?: number): Promise<Location[]>;
+  updateLocationSocialData(id: string, data: {
+    currentPostCount: number;
+    previousPostCount: number;
+    trendingScore: number;
+    socialLastUpdated: Date;
+  }): Promise<Location>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -290,6 +299,50 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInsiderTip(id: string): Promise<void> {
     await db.delete(insiderTips).where(eq(insiderTips.id, id));
+  }
+
+  async getLocationsWithHashtags(): Promise<Location[]> {
+    return await db
+      .select()
+      .from(locations)
+      .where(sql`${locations.instagramHashtag} IS NOT NULL AND ${locations.instagramHashtag} != ''`);
+  }
+
+  async getTrendingLocations(limit: number = 5): Promise<Location[]> {
+    return await db
+      .select()
+      .from(locations)
+      .where(
+        and(
+          sql`${locations.instagramHashtag} IS NOT NULL AND ${locations.instagramHashtag} != ''`,
+          sql`${locations.trendingScore} > 0`
+        )
+      )
+      .orderBy(desc(locations.trendingScore))
+      .limit(limit);
+  }
+
+  async updateLocationSocialData(
+    id: string, 
+    data: {
+      currentPostCount: number;
+      previousPostCount: number;
+      trendingScore: number;
+      socialLastUpdated: Date;
+    }
+  ): Promise<Location> {
+    const [updated] = await db
+      .update(locations)
+      .set({
+        currentPostCount: data.currentPostCount,
+        previousPostCount: data.previousPostCount,
+        trendingScore: data.trendingScore,
+        socialLastUpdated: data.socialLastUpdated,
+        updatedAt: new Date(),
+      })
+      .where(eq(locations.id, id))
+      .returning();
+    return updated;
   }
 }
 
