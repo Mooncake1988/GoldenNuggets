@@ -261,6 +261,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trending Spots Routes - MUST be before /api/locations/:id to avoid route matching issues
+  app.get("/api/locations/trending", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 5;
+      const trendingLocations = await getTrendingSpots(limit);
+      res.json(trendingLocations);
+    } catch (error) {
+      console.error("Error fetching trending locations:", error);
+      res.status(500).json({ error: "Failed to fetch trending locations" });
+    }
+  });
+
   app.get("/api/locations/:id", async (req, res) => {
     try {
       const location = await storage.getLocation(req.params.id);
@@ -588,18 +600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Trending Spots Routes
-  app.get("/api/locations/trending", async (req, res) => {
-    try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 5;
-      const trendingLocations = await getTrendingSpots(limit);
-      res.json(trendingLocations);
-    } catch (error) {
-      console.error("Error fetching trending locations:", error);
-      res.status(500).json({ error: "Failed to fetch trending locations" });
-    }
-  });
-
+  // Admin endpoint to manually trigger social trends update
   app.post("/api/admin/social-trends/update", isAuthenticated, async (req, res) => {
     try {
       console.log("[SocialTrends] Manual update triggered by admin");
