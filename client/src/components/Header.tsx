@@ -41,7 +41,7 @@ export default function Header() {
               </span>
             </Link>
             <a 
-              href="https://lekkerspots.beehiiv.com/" 
+              href="https://newsletter.lekkerspots.co.za/" 
               target="_blank" 
               rel="noopener noreferrer"
               data-testid="link-nav-stories"
@@ -98,7 +98,7 @@ export default function Header() {
               </span>
             </Link>
             <a 
-              href="https://lekkerspots.beehiiv.com/" 
+              href="https://newsletter.lekkerspots.co.za/" 
               target="_blank" 
               rel="noopener noreferrer"
               data-testid="link-mobile-stories"

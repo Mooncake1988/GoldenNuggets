@@ -13,7 +13,7 @@ A vibrant travel discovery web application showcasing hidden gems and local favo
 - **Responsive Design**: Beautiful mobile-first design that works on all devices
 - **Admin Dashboard**: Secure admin panel for content management
 - **Multi-Image Upload**: Upload multiple images per location with Google Cloud Storage integration
-- **Newsletter Integration**: Beehiiv newsletter signup with celebratory confetti animation
+- **Newsletter Integration**: Custom newsletter subdomain (newsletter.lekkerspots.co.za) powered by Beehiiv with celebratory confetti animation
 - **Continue Your Adventure**: Related spots recommendations on location pages for improved engagement and SEO
 - **Insider Tips**: FAQ-style tips (WiFi, parking, pet policies) with JSON-LD structured data for rich search results
 - **News Ticker**: Animated announcements banner on homepage with admin management
@@ -157,6 +157,14 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Responsive map controls
 
 ## 🎨 Recent Updates
+
+### Custom Newsletter Subdomain (January 2026)
+- **Change**: Migrated newsletter links from Beehiiv default subdomain to custom subdomain
+- **Old URL**: `https://lekkerspots.beehiiv.com/`
+- **New URL**: `https://newsletter.lekkerspots.co.za/`
+- **Updated Components**: Header navigation, Footer links, Stories section
+- **SEO**: Added newsletter URL to JSON-LD structured data (`sameAs` array) for better brand recognition by search engines and AI crawlers
+- **Impact**: Improved branding consistency with official LekkerSpots domain
 
 ### Continue Your Adventure Feature (January 2026)
 - **New Feature**: Added "Continue Your Adventure" section to location detail pages

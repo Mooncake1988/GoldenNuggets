@@ -110,7 +110,7 @@ export default function StoriesSection() {
             </p>
           </div>
           <a 
-            href="https://lekkerspots.beehiiv.com/" 
+            href="https://newsletter.lekkerspots.co.za/" 
             target="_blank" 
             rel="noopener noreferrer"
             data-testid="link-view-all-stories"
@@ -139,7 +139,7 @@ export default function StoriesSection() {
                 No stories available yet. Check back soon!
               </p>
               <a 
-                href="https://lekkerspots.beehiiv.com/" 
+                href="https://newsletter.lekkerspots.co.za/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-block mt-4"
