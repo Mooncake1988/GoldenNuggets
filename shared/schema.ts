@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, jsonb, index, integer, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -45,6 +45,12 @@ export const locations = pgTable("locations", {
   tags: text("tags").array().notNull().default(sql`ARRAY[]::text[]`),
   featured: boolean("featured").notNull().default(false),
   relatedLocationIds: text("related_location_ids").array().notNull().default(sql`ARRAY[]::text[]`),
+  // Social Trending Fields for Instagram integration
+  instagramHashtag: text("instagram_hashtag"),
+  currentPostCount: integer("current_post_count").default(0),
+  previousPostCount: integer("previous_post_count").default(0),
+  trendingScore: real("trending_score").default(0),
+  socialLastUpdated: timestamp("social_last_updated"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -3,6 +3,7 @@ import NewsTicker from "@/components/NewsTicker";
 import HeroSection from "@/components/HeroSection";
 import TagFilter from "@/components/TagFilter";
 import LocationCard from "@/components/LocationCard";
+import TrendingSpots from "@/components/TrendingSpots";
 import StoriesSection from "@/components/StoriesSection";
 import Footer from "@/components/Footer";
 import LottieAnimation from "@/components/LottieAnimation";
@@ -180,6 +181,7 @@ export default function Home() {
                     description={location.description}
                     image={location.images[0] || ""}
                     tags={location.tags}
+                    trendingScore={location.trendingScore}
                   />
                 ))}
               </div>
@@ -216,6 +218,8 @@ export default function Home() {
 
       {!searchQuery && !selectedTag && (
         <>
+          <TrendingSpots />
+          
           <StoriesSection />
           
           <section className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 border-t">

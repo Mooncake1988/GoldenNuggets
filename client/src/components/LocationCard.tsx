@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { MapPin, Flame } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -12,6 +12,7 @@ interface LocationCardProps {
   description: string;
   image: string;
   tags: string[];
+  trendingScore?: number | null;
 }
 
 const getCategoryColor = (category: string) => {
@@ -40,6 +41,8 @@ const getCategoryBorderClass = (category: string) => {
   return borderClasses[category] || "border-2 border-primary/40 hover:border-primary hover:shadow-[0_0_20px_rgba(0,150,136,0.3)]";
 };
 
+const TRENDING_THRESHOLD = 5;
+
 export default function LocationCard({
   id,
   slug,
@@ -49,7 +52,10 @@ export default function LocationCard({
   description,
   image,
   tags,
+  trendingScore,
 }: LocationCardProps) {
+  const isTrending = trendingScore != null && trendingScore > TRENDING_THRESHOLD;
+
   return (
     <Link href={`/location/${slug}`} data-testid={`link-location-${id}`}>
       <Card
@@ -71,6 +77,15 @@ export default function LocationCard({
         <Badge className={`absolute top-3 left-3 backdrop-blur-sm font-semibold shadow-lg ${getCategoryColor(category)}`}>
           {category}
         </Badge>
+        {isTrending && (
+          <Badge 
+            className="absolute top-3 right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 backdrop-blur-sm font-bold shadow-lg"
+            data-testid={`badge-trending-${id}`}
+          >
+            <Flame className="w-3 h-3 mr-1" />
+            Trending
+          </Badge>
+        )}
       </div>
       <CardContent className="p-4 md:p-6">
         <h3 className="font-bold text-xl mb-1" data-testid={`text-location-name-${id}`}>{name}</h3>

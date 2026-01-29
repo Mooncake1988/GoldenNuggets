@@ -6,6 +6,7 @@ import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { insertLocationSchema, insertCategorySchema, newsletterSubscriptionSchema, insertTickerItemSchema, insertInsiderTipSchema } from "@shared/schema";
 import passport from "passport";
 import { notifyLocationCreated, notifyLocationUpdated, notifyLocationDeleted } from "./indexnow";
+import { updateAllSocialTrends, getTrendingSpots } from "./socialTrends";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
@@ -257,6 +258,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching related locations:", error);
       res.status(500).json({ error: "Failed to fetch related locations" });
+    }
+  });
+
+  // Trending Spots Routes - MUST be before /api/locations/:id to avoid route matching issues
+  app.get("/api/locations/trending", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 5;
+      const trendingLocations = await getTrendingSpots(limit);
+      res.json(trendingLocations);
+    } catch (error) {
+      console.error("Error fetching trending locations:", error);
+      res.status(500).json({ error: "Failed to fetch trending locations" });
     }
   });
 
@@ -584,6 +597,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error subscribing to newsletter:", error);
       res.status(500).json({ error: "Failed to subscribe. Please try again later." });
+    }
+  });
+
+  // Admin endpoint to manually trigger social trends update
+  app.post("/api/admin/social-trends/update", isAuthenticated, async (req, res) => {
+    try {
+      console.log("[SocialTrends] Manual update triggered by admin");
+      const result = await updateAllSocialTrends();
+      res.json({
+        message: "Social trends update completed",
+        ...result,
+      });
+    } catch (error) {
+      console.error("Error updating social trends:", error);
+      res.status(500).json({ error: "Failed to update social trends" });
     }
   });
 

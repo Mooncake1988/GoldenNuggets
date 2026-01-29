@@ -1,0 +1,39 @@
+I see! Thank you for that clarification. That changes the strategy slightly because **you** are now the "heartbeat" of the data.
+
+Since the system relies on you clicking that button to calculate the growth (Current vs. Previous), the "Trending" list will only be as accurate as your clicking routine.
+
+Here is my revised recommendation for your manual workflow:
+
+### 1. The "Once-a-Day" Routine (Recommended)
+
+Even though it's manual, I still suggest clicking it **once every 24 hours** (e.g., every morning when you start work).
+
+* **Why?** This keeps the "Trending" period consistent. If you click it once a day, your "Trending Score" effectively shows the **Top Gainers of the last 24 hours**.
+* **The "CoinMarketCap" Effect:** If you click it at random times (e.g., once after 2 hours, then once after 3 days), the percentages will be all over the place and won't accurately reflect "Social Heat."
+
+### 2. The "Weekend Peak" Strategy
+
+If you want to save your Apify credits and don't want to click every day:
+
+* Click it **once on Friday morning** (to set the baseline).
+* Click it **once on Monday morning** (to capture the weekend travel buzz).
+* This will show which spots were the most popular over the entire weekend.
+
+### 3. Why it’s actually "Safe" to click often
+
+With only **44 locations**, you don't need to worry about "breaking" anything or spending too much.
+
+* Each click likely takes about 2–5 minutes to finish the scrape.
+* Even if you clicked it every single day, you would only be doing ~1,300 lookups a month. This easily fits within the $30/month budget you mentioned (and likely even fits into a free trial/tier).
+
+---
+
+### A Strategic Suggestion: "The Retirement Plan"
+
+Since you are using Replit, you can actually tell your AI developer to **automate this** so you never have to remember to click it again.
+
+If you want to stop being the "manual sync-er," you can give Replit this prompt:
+
+> "The Instagram trending feature currently requires a manual button click. I want to automate this. Please add a **Cron Job** (using `node-cron` or a simple `setInterval`) in `server/index.ts` that automatically triggers the `updateSocialTrends` function once every 24 hours at 2:00 AM."
+
+**How does that sound?** If you prefer the manual control for now, just stick to the **"One Click Every Morning"** routine to keep your Trending data looking professional and consistent!

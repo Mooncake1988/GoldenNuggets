@@ -1,0 +1,57 @@
+That screenshot from Replit looks like you've got a solid "Green Light" on the initial environment setup! It’s great to see your AI developer is ready to roll.
+
+Since we've settled on the **`feat/instagram-trending-spots`** branch and the goal of creating a "Top Gainers" list for your locations, I’ve prepared the **technical blueprint** you can hand over to Replit.
+
+This ensures the AI doesn't just "guess" how to build it, but follows the specific data structure required for a trending algorithm.
+
+---
+
+### **1. Database Schema Update (`shared/schema.ts`)**
+
+We need to track three specific things: the **Instagram Hashtag** for that spot, the **current post count**, and the **previous post count** (to calculate the growth percentage).
+
+**Tell Replit:** *"Update the `locations` table in `shared/schema.ts` to include these fields:"*
+
+```typescript
+// Add these to the locations table definition
+instagramHashtag: text("instagram_hashtag"),
+currentPostCount: integer("current_post_count").default(0),
+previousPostCount: integer("previous_post_count").default(0),
+socialLastUpdated: timestamp("social_last_updated"),
+trendingScore: integer("trending_score").default(0), // Calculated % growth
+
+```
+
+---
+
+### **2. The Trending Logic (The "Secret Sauce")**
+
+To make it look like CoinMarketCap, Replit needs to create a function that calculates the "Heat Index."
+
+**Tell Replit:** *"Create a utility function to calculate the Trending Score whenever we fetch new data:"*
+
+> **Note:** If a spot goes from 1,000 to 1,100 posts, it gets a score of **10**. We then sort your homepage by the highest score!
+
+---
+
+### **3. The Data Fetching Strategy (Apify Integration)**
+
+Since we are leaning towards **Apify**, you'll need to provide Replit with an API key once you sign up.
+
+**Tell Replit:** *"Prepare a service in `server/routes.ts` that uses the Apify Instagram Scraper. It should loop through all locations that have an `instagramHashtag` and update their counts once every 24 hours."*
+
+---
+
+### **4. Frontend: The "Trending" Badge (`LocationCard.tsx`)**
+
+Finally, we want to show the users that a spot is "Hot."
+
+**Tell Replit:** *"In `client/src/components/LocationCard.tsx`, add a logic to display a '🔥 Trending' badge if the `trendingScore` is above 5%."*
+
+---
+
+### **What I think about the Replit progress:**
+
+Replit is excellent at "boilerplate," but it can sometimes over-complicate API calls. By giving it this **specific schema** and the **Trending Score formula**, you are keeping the "brain" of LekkerSpots focused on your Lo-Fi, authentic vision while using high-tech data under the hood.
+
+**Would you like me to generate the full `schema.ts` file with these updates included so you can just copy-paste it into Replit?**

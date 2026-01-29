@@ -1,0 +1,56 @@
+This is the exact strategic moment where "Public Travel Diary" meets "Data Science." You’ve built the engine; now you need to make sure the fuel (your hashtags) is high-quality so your "Trending" list actually reflects reality.
+
+Here is how you solve the hashtag dilemma to avoid "human error" and ensure your data is actually useful.
+
+### **1. The "Golden Rule" of Trending Data**
+
+For a "Trending" list to be accurate, **consistency is more important than variety.**
+
+If you use `#padstal` for one place and `#cederberg` for another, you aren't comparing apples to apples. One hashtag represents a *category*, and the other represents a *region*.
+
+* **The Problem:** `#cederberg` will almost always have a higher post count and "heat" because it’s a whole region. It will "drown out" the specific padstals.
+* **The Solution:** You should pick **ONE specific "Primary Hashtag"** per location for your database to track. This hashtag should be the one most uniquely tied to that specific spot.
+
+### **2. Should you use more than one?**
+
+In your Instagram *posts*, yes—use 3 to 5. But for your **LekkerSpots Database Tracking**, you should only track **one primary tag** per spot to keep the "Trending Score" pure.
+
+**My Recommendation for "De Kleine Schur":**
+
+* **Don't use:** `#padstal` (Too generic. You'll see every padstal in South Africa, not just yours).
+* **Don't use:** `#cederberg` (Too broad. You'll see hikers, flowers, and other farms).
+* **Use the specific Brand Tag:** `#dekleineschur` or `#dekleineschurpadstal`.
+* *Why?* If 10 people visit that specific spot this weekend and tag it, your "Trending Score" will spike accurately for *that location*.
+
+
+
+---
+
+### **3. The "LekkerSpots" Hashtag Hierarchy**
+
+When assigning hashtags in your Admin dashboard, follow this priority list to avoid "wrong" trends:
+
+| Priority | Type | Example | Use for "Trending" column? |
+| --- | --- | --- | --- |
+| **1 (Best)** | **Specific Brand** | `#papkuilsfontein` | **YES** — This is the most accurate. |
+| **2** | **Unique Nickname** | `#wolfbergarch` | **YES** — If the place doesn't have a brand tag. |
+| **3 (Risky)** | **Niche Category** | `#cederbergfarmstay` | **NO** — Too much "noise" from other places. |
+| **4 (Avoid)** | **General** | `#travel` / `#padstal` | **NEVER** — Your data will be useless. |
+
+---
+
+### **4. How to avoid "Human Error" (Strategic Tip)**
+
+To ensure your "Trending" section isn't just showing the most famous places (like Table Mountain), you can tell Replit to **calculate the % growth, not the total number.**
+
+> **Example:** > * **Table Mountain:** 1,000,000 posts  1,000,100 today (**0.01% growth**)
+> * **De Kleine Schur:** 500 posts  550 today (**10% growth**)
+> 
+> 
+> In this scenario, **De Kleine Schur** wins the #1 spot on your "Trending" list. This is how you surface the "Hidden Gems" you love!
+
+### **Next Step for you & Replit**
+
+Go through your `locations` table and assign the most **specific brand hashtag** you can find for each "nugget."
+
+**Would you like me to help you brainstorm the "Primary Hashtags" for your top 5 most important locations right now?** Just give me their names!

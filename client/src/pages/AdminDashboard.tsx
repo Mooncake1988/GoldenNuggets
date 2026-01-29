@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Edit, Trash2, LogOut, Star, Megaphone } from "lucide-react";
+import { Plus, MapPin, Edit, Trash2, LogOut, Star, Megaphone, TrendingUp, RefreshCw } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -84,6 +84,39 @@ export default function AdminDashboard() {
     },
   });
 
+  const updateTrendsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/social-trends/update");
+      return response.json();
+    },
+    onSuccess: (data: { updated: number; message: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/locations/trending"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+      toast({
+        title: "Social Trends Updated",
+        description: data.message || `Updated trending data for ${data.updated} locations`,
+      });
+    },
+    onError: (error: Error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "Session expired. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/admin/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update social trends. Check your Apify API key.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading || !isAuthenticated) {
     return null;
   }
@@ -134,6 +167,35 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold" data-testid="text-total-locations">
                   {locations?.length || 0}
                 </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Social Trends</CardTitle>
+                <TrendingUp className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Fetch latest Instagram hashtag data from Apify
+                </p>
+                <Button 
+                  onClick={() => updateTrendsMutation.mutate()}
+                  disabled={updateTrendsMutation.isPending}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 border-orange-600"
+                  data-testid="button-update-social-trends"
+                >
+                  {updateTrendsMutation.isPending ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Update Social Trends
+                    </>
+                  )}
+                </Button>
               </CardContent>
             </Card>
           </div>

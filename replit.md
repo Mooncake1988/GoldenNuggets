@@ -38,6 +38,7 @@ The backend is built with Node.js and Express.js in TypeScript, providing RESTfu
 - **News Ticker**: An animated horizontal scrolling ticker on the homepage for announcements, managed via `/admin/ticker` with category, priority, and expiration settings.
 - **Insider Brief**: Location pages include "Insider Tips" (FAQ-style information like WiFi, parking, pet policies) managed within the location edit page. These tips are fully crawlable via SSR, hidden DOM content for crawlers (`sr-only` div), and JSON-LD structured data (FAQPage schema) for rich results.
 - **Continue Your Adventure**: A manual curation system for linking 2-3 related nearby spots on each location detail page. Admins select related locations via multi-select in the edit form, and visitors see these recommendations displayed below Insider Tips. This reduces bounce rate and improves SEO through internal linking. The section is fully server-side rendered for crawlers (like Insider Tips), ensuring Google indexes the internal links without needing JavaScript. API endpoint: `GET /api/locations/:id/related`.
+- **Trending Lekker Spots**: Instagram-based social trending feature that tracks hashtag post counts using the Apify API. Locations with an assigned Instagram hashtag are monitored for post count growth, and a trending score (percentage growth) is calculated. The homepage displays the top 5 trending locations with fire badges and growth percentages (CoinMarketCap-style). LocationCards also show a "Trending" badge when the trending score exceeds 5%. API endpoints: `GET /api/locations/trending` (public) and `POST /api/admin/social-trends/update` (admin, triggers manual data refresh).
 
 ### Database
 
@@ -54,6 +55,100 @@ The project uses a PostgreSQL database (Neon serverless) with `Locations` (name,
 **Animations**: Lottie React
 **Newsletter Integration**: Beehiiv API (subscription and posts/stories endpoints)
 **SEO**: IndexNow Protocol
+**Social Trends**: Apify Instagram Hashtag Stats API (tracks hashtag post counts for trending feature)
+
+## Apify Instagram Trending Integration
+
+### How It Works
+
+The "Trending Lekker Spots" feature uses the Apify `instagram-hashtag-stats` actor to track Instagram hashtag popularity and calculate trending scores based on percentage growth.
+
+**API Endpoint Used:**
+```
+POST https://api.apify.com/v2/acts/apify~instagram-hashtag-stats/run-sync-get-dataset-items?token={APIFY_API_KEY}
+```
+
+**Request Format:**
+```json
+{
+  "hashtags": ["dekleineschur"]
+}
+```
+
+**Response Format:**
+```json
+[
+  {
+    "id": "17841563825106882",
+    "name": "dekleineschur",
+    "postsCount": 1278000,
+    "topPosts": [...],
+    "relatedHashtags": [...]
+  }
+]
+```
+
+**Key Field:** `postsCount` - Total number of Instagram posts using this hashtag.
+
+### Data Flow
+
+1. Admin assigns an Instagram hashtag to a location (e.g., `dekleineschur`) via the Edit Location form
+2. Admin clicks "Update Social Trends" button in the admin dashboard
+3. System makes **one API call per hashtag** to Apify (e.g., 5 locations with hashtags = 5 API calls)
+4. For each hashtag, the system:
+   - Fetches current `postsCount` from Apify
+   - Compares to previous `postsCount` stored in database
+   - Calculates trending score as percentage growth: `((new - old) / old) * 100`
+   - Updates the location record with new counts and trending score
+5. Locations with positive growth appear in the "Trending Lekker Spots" homepage section
+
+### API Cost Considerations
+
+- **1 API call per hashtag** when "Update Social Trends" is clicked
+- Apify uses a "pay per event" model for this actor
+- To minimize costs: only assign hashtags to locations you actively want to track
+- The system processes hashtags sequentially (not in parallel) to avoid rate limits
+
+### Data Synchronization
+
+**Current Method: Manual Updates Only**
+- Admin must click "Update Social Trends" button in the admin dashboard
+- Located at: `/admin` → "Social Trends" card → "Update Social Trends" button
+- API endpoint: `POST /api/admin/social-trends/update`
+- The button shows a loading spinner during the update process
+
+**Future Enhancement:** Could add scheduled/cron updates for automatic daily syncing.
+
+### Homepage Display Behavior
+
+- **No trending data:** The entire "Trending Lekker Spots" section is hidden
+- **1-5 trending locations:** Shows all trending locations, no "View all" link
+- **6+ trending locations:** Shows top 5 with "View all trending" link to map
+
+### Hashtag Best Practices
+
+When assigning hashtags in the admin dashboard, follow this priority:
+
+| Priority | Type | Example | Recommended? |
+|----------|------|---------|--------------|
+| **1 (Best)** | Specific Brand | `#dekleineschur` | ✅ YES - Most accurate |
+| **2** | Unique Nickname | `#wolfbergarch` | ✅ YES - If no brand tag exists |
+| **3 (Risky)** | Niche Category | `#cederbergfarmstay` | ⚠️ NO - Too much noise |
+| **4 (Avoid)** | Generic | `#travel`, `#padstal` | ❌ NEVER - Data becomes useless |
+
+**Key Principle:** The trending score shows **percentage growth**, not raw post counts. A small location with 10% growth will rank higher than a famous spot with 0.01% growth. This surfaces "hidden gems" rather than always showing popular locations.
+
+### Troubleshooting
+
+**Trending section not appearing?**
+1. Ensure at least one location has an Instagram hashtag assigned
+2. Click "Update Social Trends" in admin dashboard
+3. The hashtag must have posts on Instagram (0-post hashtags won't trend)
+
+**Apify API not working?**
+1. Verify `APIFY_API_KEY` secret is set correctly
+2. Check Apify dashboard for actor run status
+3. Ensure you're using `apify~instagram-hashtag-stats` actor (not the scraper)
 
 ## Beehiiv API Integration Notes
 
