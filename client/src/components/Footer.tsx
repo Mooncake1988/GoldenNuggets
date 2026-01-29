@@ -130,7 +130,7 @@ export default function Footer() {
                 </span>
               </Link>
               <a 
-                href="https://lekkerspots.beehiiv.com/" 
+                href="https://newsletter.lekkerspots.co.za/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 data-testid="link-footer-stories"
