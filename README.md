@@ -13,7 +13,7 @@ A vibrant travel discovery web application showcasing hidden gems and local favo
 - **Responsive Design**: Beautiful mobile-first design that works on all devices
 - **Admin Dashboard**: Secure admin panel for content management
 - **Multi-Image Upload**: Upload multiple images per location with Google Cloud Storage integration
-- **Newsletter Integration**: Custom newsletter subdomain (newsletter.lekkerspots.co.za) powered by Beehiiv with celebratory confetti animation
+- **Newsletter Integration**: Custom newsletter subdomain (newsletter.lekkerspots.co.za) powered by Beehiiv with celebratory confetti animation and content tag display
 - **Continue Your Adventure**: Related spots recommendations on location pages for improved engagement and SEO
 - **Insider Tips**: FAQ-style tips (WiFi, parking, pet policies) with JSON-LD structured data for rich search results
 - **News Ticker**: Animated announcements banner on homepage with admin management
@@ -157,6 +157,13 @@ node -e "console.log(require('bcrypt').hashSync('your_password', 10))"
 - Responsive map controls
 
 ## 🎨 Recent Updates
+
+### Beehiiv Content Tags Display (February 2026)
+- **New Feature**: Story cards on the homepage now display content tags from Beehiiv posts
+- **How It Works**: Tags assigned in Beehiiv (e.g., "soul searching", "trail running", "farm stay") are automatically pulled via the Beehiiv API and displayed as badges on story cards
+- **Display**: Tags appear as subtle secondary badges above the publish date on each story card
+- **API**: The `/api/stories` endpoint now returns a `tags` array with content tag strings from Beehiiv's `content_tags` field
+- **Inspiration**: Similar to Milkroad's newsletter tag display system
 
 ### Custom Newsletter Subdomain (January 2026)
 - **Change**: Migrated newsletter links from Beehiiv default subdomain to custom subdomain
