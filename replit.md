@@ -23,7 +23,7 @@ The frontend is a React 18 application with TypeScript, Vite, and Wouter for rou
 - **Categories Page**: Shows all locations by category with optional "Featured Only" filter.
 - **Map Page**: Interactive Leaflet map of all locations with optional "Featured Only" filter.
 - **About Us Page**: Static content with SEO meta tags.
-- **Stories Section**: Embedded on the homepage below Featured Locations, fetches and displays the 3 most recent newsletter stories from Beehiiv API with thumbnails, titles, excerpts, and publish dates. Links to full stories on the custom newsletter subdomain (https://newsletter.lekkerspots.co.za).
+- **Stories Section**: Embedded on the homepage below Featured Locations, fetches and displays the 3 most recent newsletter stories from Beehiiv API with thumbnails, titles, excerpts, publish dates, and **content tags** (displayed as badges). Links to full stories on the custom newsletter subdomain (https://newsletter.lekkerspots.co.za). Tags assigned in Beehiiv (e.g., "soul searching", "trail running", "farm stay") are automatically pulled via the API and displayed on story cards.
 
 The admin dashboard provides comprehensive image management with drag-and-drop reordering, individual delete controls, and visual indicators for preview thumbnails. Admins can mark locations as "featured" and manage "Insider Tips" and "News Ticker" items.
 
