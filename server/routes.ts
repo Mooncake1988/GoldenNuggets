@@ -524,6 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         readTime: post.stats?.email?.read_time_seconds 
           ? Math.ceil(post.stats.email.read_time_seconds / 60) 
           : null,
+        tags: post.content_tags || [],
       })) || [];
 
       // Sort by publish date descending (newest first)

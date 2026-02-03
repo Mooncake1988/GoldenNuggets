@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, BookOpen, Calendar } from "lucide-react";
 import { format } from "date-fns";
@@ -14,6 +15,7 @@ interface Story {
   url: string;
   publishedAt: number;
   readTime: number | null;
+  tags: string[];
 }
 
 function StoryCardSkeleton() {
@@ -60,6 +62,20 @@ function StoryCard({ story }: { story: Story }) {
           )}
         </div>
         <CardContent className="p-4 space-y-2">
+          {story.tags && story.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-1" data-testid={`tags-story-${story.id}`}>
+              {story.tags.map((tag, index) => (
+                <Badge 
+                  key={index} 
+                  variant="secondary" 
+                  className="text-xs px-2 py-0.5"
+                  data-testid={`badge-tag-${story.id}-${index}`}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {publishDate && (
               <span className="flex items-center gap-1" data-testid={`text-story-date-${story.id}`}>
