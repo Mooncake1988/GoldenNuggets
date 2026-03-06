@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import InsiderTipsManager from "@/components/InsiderTipsManager";
-import { Upload, X, Loader2, MapPin, Plus, Compass, Instagram } from "lucide-react";
+import { Upload, X, Loader2, MapPin, Plus, Compass, Instagram, ExternalLink } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Location, Category } from "@shared/schema";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,6 +39,7 @@ export default function AdminEditLocation() {
     tags: "",
     featured: false,
     instagramHashtag: "",
+    bookingUrl: "",
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -97,6 +98,7 @@ export default function AdminEditLocation() {
         tags: currentLocation.tags.join(", "),
         featured: currentLocation.featured,
         instagramHashtag: currentLocation.instagramHashtag || "",
+        bookingUrl: currentLocation.bookingUrl || "",
       });
       setUploadedImages(currentLocation.images);
       setSelectedRelatedIds(currentLocation.relatedLocationIds || []);
@@ -112,6 +114,7 @@ export default function AdminEditLocation() {
         images: uploadedImages,
         relatedLocationIds: selectedRelatedIds,
         instagramHashtag: formData.instagramHashtag || null,
+        bookingUrl: formData.bookingUrl || null,
       });
     },
     onSuccess: () => {
@@ -378,6 +381,24 @@ export default function AdminEditLocation() {
                   />
                   <p className="text-xs text-muted-foreground">
                     Enter the Instagram hashtag (without #) to track social trends for this location. This enables the "Trending" feature.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bookingUrl" className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4 text-primary" />
+                    Booking URL
+                  </Label>
+                  <Input
+                    id="bookingUrl"
+                    type="url"
+                    value={formData.bookingUrl}
+                    onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
+                    placeholder="e.g. https://www.airbnb.com/rooms/12345"
+                    data-testid="input-booking-url"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Paste a link to Airbnb, Booking.com, or any booking platform. This adds a "Book This Place" section on the location page.
                   </p>
                 </div>
 
