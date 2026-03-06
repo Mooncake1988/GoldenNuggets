@@ -45,6 +45,7 @@ export const locations = pgTable("locations", {
   tags: text("tags").array().notNull().default(sql`ARRAY[]::text[]`),
   featured: boolean("featured").notNull().default(false),
   relatedLocationIds: text("related_location_ids").array().notNull().default(sql`ARRAY[]::text[]`),
+  bookingUrl: text("booking_url"),
   // Social Trending Fields for Instagram integration
   instagramHashtag: text("instagram_hashtag"),
   currentPostCount: integer("current_post_count").default(0),

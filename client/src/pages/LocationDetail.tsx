@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
 import InsiderBrief from "@/components/InsiderBrief";
 import ContinueYourAdventure from "@/components/ContinueYourAdventure";
-import { MapPin, Navigation, ArrowLeft } from "lucide-react";
+import { MapPin, Navigation, ArrowLeft, ExternalLink, BedDouble } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CANONICAL_BASE_URL } from "@/lib/config";
 
@@ -319,6 +319,41 @@ export default function LocationDetail() {
                   </div>
                 </CardContent>
               </Card>
+
+              {location.bookingUrl && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <BedDouble className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-medium mb-1">Book This Place</p>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {(() => {
+                            const url = location.bookingUrl!.toLowerCase();
+                            if (url.includes("airbnb")) return "This spot is available on Airbnb. Book your stay directly through their platform.";
+                            if (url.includes("booking.com")) return "This spot is available on Booking.com. Reserve your stay directly through their platform.";
+                            if (url.includes("vrbo")) return "This spot is available on Vrbo. Book your stay directly through their platform.";
+                            return "This spot offers accommodation. Book your stay through the link below.";
+                          })()}
+                        </p>
+                        <Button
+                          onClick={() => window.open(location.bookingUrl!, "_blank", "noopener,noreferrer")}
+                          data-testid="button-book-place"
+                        >
+                          {(() => {
+                            const url = location.bookingUrl!.toLowerCase();
+                            if (url.includes("airbnb")) return "View on Airbnb";
+                            if (url.includes("booking.com")) return "View on Booking.com";
+                            if (url.includes("vrbo")) return "View on Vrbo";
+                            return "Book Now";
+                          })()}
+                          <ExternalLink className="h-4 w-4 ml-2" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               <InsiderBrief locationId={location.id} initialData={ssrInsiderTips} />
 

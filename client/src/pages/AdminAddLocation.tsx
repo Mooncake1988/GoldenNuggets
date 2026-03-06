@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { ObjectUploader } from "@/components/ObjectUploader";
-import { Upload, X, Instagram } from "lucide-react";
+import { Upload, X, Instagram, ExternalLink } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
 import type { Category } from "@shared/schema";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,6 +35,7 @@ export default function AdminAddLocation() {
     tags: "",
     featured: false,
     instagramHashtag: "",
+    bookingUrl: "",
   });
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -80,6 +81,7 @@ export default function AdminAddLocation() {
         tags: tagsArray,
         images: uploadedImages,
         instagramHashtag: formData.instagramHashtag || null,
+        bookingUrl: formData.bookingUrl || null,
       });
     },
     onSuccess: () => {
@@ -338,6 +340,24 @@ export default function AdminAddLocation() {
                   />
                   <p className="text-xs text-muted-foreground">
                     Enter the Instagram hashtag (without #) to track social trends for this location. This enables the "Trending" feature.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bookingUrl" className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4 text-primary" />
+                    Booking URL
+                  </Label>
+                  <Input
+                    id="bookingUrl"
+                    type="url"
+                    value={formData.bookingUrl}
+                    onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
+                    placeholder="e.g. https://www.airbnb.com/rooms/12345"
+                    data-testid="input-booking-url"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Paste a link to Airbnb, Booking.com, or any booking platform. This adds a "Book This Place" section on the location page.
                   </p>
                 </div>
 
